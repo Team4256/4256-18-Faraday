@@ -1,6 +1,5 @@
-# 4256-17-Rockefeller  
-the Cyborg Cats' Java robot code for FRC Steamworks 2017  
--> winner of the Innovation in Control Award Sponsored by Rockwell Automation at the Rocket City Regional!  
+# 4256-18-Faraday
+the Cyborg Cats' Java robot code for FRC Power Up 2018  
   
 The classes under com.cyborgcats.reusable were designed to work year after year with little to no modification, so they would likely work for other FRC teams using similar hardware. Please just cite our work in a comment somewhere if you decide to use it. Thanks!  
   
@@ -23,9 +22,7 @@ In addition, please note that the "abstract" label on our classes just means tha
 
 student team:  
 Hayden Shively  
-Ian Woodard  
-Jack Bauer  
-Teagan LeVar  
+Ian Woodard   
   
 QUESTIONS AND COMMENTS ARE WELCOME!  
   
