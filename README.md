@@ -22,7 +22,8 @@ In addition, please note that the "abstract" label on our classes just means tha
 
 student team:  
 Hayden Shively  
-Ian Woodard   
+Ian Woodard
+Michael Pritchett 
   
 QUESTIONS AND COMMENTS ARE WELCOME!  
   
