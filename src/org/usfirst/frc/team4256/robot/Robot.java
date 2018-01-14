@@ -23,7 +23,7 @@ package org.usfirst.frc.team4256.robot;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.cyborgcats.reusable.R_CANTalon;
+import com.cyborgcats.reusable.R_Talon;
 import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
@@ -35,7 +35,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Robot extends IterativeRobot {
 	//{Human Input}
@@ -47,9 +48,10 @@ public class Robot extends IterativeRobot {
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
-	private static NetworkTable rockefeller;
-	private static NetworkTable edison;
-	private static NetworkTable tesla;
+	private static NetworkTableInstance nt;
+	private static NetworkTable faraday;
+	private static NetworkTable targeting;
+	private static NetworkTable zed;
 	private static double metersX = 0;
 	private static double metersY = 0;
 	
@@ -67,19 +69,20 @@ public class Robot extends IterativeRobot {
 	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD, true, Parameters.Swerve_driveDA, Parameters.Swerve_driveDB, Parameters.Swerve_calibratorD);
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
-	private static final R_CANTalon climberA = new R_CANTalon(Parameters.ClimberA, 51, R_CANTalon.voltage);
-	private static final R_CANTalon climberB = new R_CANTalon(Parameters.ClimberB, 51, R_CANTalon.follower);
+	private static final R_Talon climberA = new R_Talon(Parameters.ClimberA, 51, R_Talon.voltage);
+	private static final R_Talon climberB = new R_Talon(Parameters.ClimberB, 51, R_Talon.follower);
 	
-	private static final R_CANTalon lift = new R_CANTalon(Parameters.Lift, 1, R_CANTalon.voltage);
+	private static final R_Talon lift = new R_Talon(Parameters.Lift, 1, R_Talon.voltage);
 	private static final DoubleSolenoid clamp = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
 	private static final DoubleSolenoid gearer = new DoubleSolenoid(Parameters.Gearer_module, Parameters.Gearer_forward, Parameters.Gearer_reverse);
 	
 	@Override
 	public void robotInit() {
+		nt = NetworkTableInstance.getDefault();
 		//{Robot Input}
-		rockefeller = NetworkTable.getTable("rockefeller");
-		edison = NetworkTable.getTable("edison");
-		tesla = NetworkTable.getTable("tesla");
+		faraday = nt.getTable("Faraday");
+		targeting = nt.getTable("Targeting");
+		zed = nt.getTable("ZED");
 		//{Robot Output}
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
@@ -97,7 +100,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		gyro.reset();
-		autoMode = (int)rockefeller.getNumber("auto mode", 1);
+		autoMode = (int)faraday.getNumber("auto mode", 1);
 		autoStep = 0;
 		V_PID.clear("forward");
 		V_PID.clear("strafe");
@@ -120,11 +123,11 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testInit() {//TODO these numbers should come from the ZED/TK1
-		tesla.putNumber("x", 0);
-		tesla.putNumber("y", 0);
-		tesla.putNumber("expected x", 0);
-		tesla.putNumber("expected y", 0);
-		tesla.putNumber("expected angle", 0);
+		zed.putNumber("x", 0);
+		zed.putNumber("y", 0);
+		zed.putNumber("expected x", 0);
+		zed.putNumber("expected y", 0);
+		zed.putNumber("expected angle", 0);
 	}
 	
 	@Override
@@ -133,12 +136,12 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotPeriodic() {
-		rockefeller.putBoolean("old gear out", gearer.get().equals(DoubleSolenoid.Value.kForward));
-		rockefeller.putBoolean("clamp open", clamp.get().equals(DoubleSolenoid.Value.kForward));
-		rockefeller.putBoolean("lift down", liftState.equals(LiftState.down));
-		rockefeller.putBoolean("aligning", swerve.isAligning());
-		rockefeller.putBoolean("aligned", swerve.isAligned());
-		rockefeller.putNumber("match timer", V_Instructions.getSeconds());
+		faraday.putBoolean("old gear out", gearer.get().equals(DoubleSolenoid.Value.kForward));
+		faraday.putBoolean("clamp open", clamp.get().equals(DoubleSolenoid.Value.kForward));
+		faraday.putBoolean("lift down", liftState.equals(LiftState.down));
+		faraday.putBoolean("aligning", swerve.isAligning());
+		faraday.putBoolean("aligned", swerve.isAligned());
+		faraday.putNumber("match timer", V_Instructions.getSeconds());
 	}
 	
 	@Override
@@ -169,8 +172,8 @@ public class Robot extends IterativeRobot {
 				if (V_Instructions.readyToMoveOn() && V_Instructions.canMoveOn()) {
 					autoStep++;
 				}else if (V_Instructions.readyToMoveOn() && !V_Instructions.canMoveOn()) {
-					double pegX = edison.getNumber("peg x", 0);
-					if (edison.getNumber("targets", 0) > 1 && edison.getNumber("peg y", 0) < 198) {
+					double pegX = targeting.getNumber("peg x", 0);
+					if (targeting.getNumber("targets", 0) > 1 && targeting.getNumber("peg y", 0) < 198) {
 						double xError = pegX - 170;
 						double angleError = xError*40/100;
 						swerve.holonomic(Parameters.leftGear + angleError, 0.12, 0);
@@ -190,8 +193,8 @@ public class Robot extends IterativeRobot {
 				if (V_Instructions.readyToMoveOn() && V_Instructions.canMoveOn()) {
 					autoStep++;
 				}else if (V_Instructions.readyToMoveOn() && !V_Instructions.canMoveOn()) {
-					double pegX = edison.getNumber("peg x", 0);
-					if (edison.getNumber("targets", 0) > 0 && edison.getNumber("peg y", 0) < 205) {
+					double pegX = targeting.getNumber("peg x", 0);
+					if (targeting.getNumber("targets", 0) > 0 && targeting.getNumber("peg y", 0) < 205) {
 						double xError = pegX - 170;
 						double angleError = xError*45/100;
 						swerve.holonomic(Parameters.centerGear + angleError, 0.15, 0);
@@ -215,8 +218,8 @@ public class Robot extends IterativeRobot {
 				if (V_Instructions.readyToMoveOn() && V_Instructions.canMoveOn()) {
 					autoStep++;
 				}else if (V_Instructions.readyToMoveOn() && !V_Instructions.canMoveOn()) {
-					double pegX = edison.getNumber("peg x", 0);
-					if (edison.getNumber("targets", 0) > 1 && edison.getNumber("peg y", 0) < 198) {
+					double pegX = targeting.getNumber("peg x", 0);
+					if (targeting.getNumber("targets", 0) > 1 && targeting.getNumber("peg y", 0) < 198) {
 						double xError = pegX - 170;
 						double angleError = xError*45/100;
 						swerve.holonomic(Parameters.rightGear + angleError, 0.12, 0);
@@ -344,11 +347,11 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
-		metersX = tesla.getNumber("x", metersX);
-		metersY = tesla.getNumber("y", metersY);
-		double expectedX = tesla.getNumber("expected x", metersX);
-		double expectedY = tesla.getNumber("expected y", metersY);
-		double expectedAngle = tesla.getNumber("expected angle", gyro.getCurrentAngle());
+		metersX = zed.getNumber("x", metersX);
+		metersY = zed.getNumber("y", metersY);
+		double expectedX = zed.getNumber("expected x", metersX);
+		double expectedY = zed.getNumber("expected y", metersY);
+		double expectedAngle = zed.getNumber("expected angle", gyro.getCurrentAngle());
 		double xError = expectedX - metersX;
 		double yError = expectedY - metersY;
 		double spinError = gyro.wornPath(expectedAngle);

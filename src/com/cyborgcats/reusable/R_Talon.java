@@ -1,23 +1,25 @@
 package com.cyborgcats.reusable;//COMPLETE 2017
 
-import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
-public class R_CANTalon extends CANTalon {
-	public static final FeedbackDevice absolute = FeedbackDevice.CtreMagEncoder_Absolute;
-	public static final FeedbackDevice relative = FeedbackDevice.CtreMagEncoder_Relative;
-	public static final TalonControlMode current = TalonControlMode.Current;
-	public static final TalonControlMode follower = TalonControlMode.Follower;
-	public static final TalonControlMode percent = TalonControlMode.PercentVbus;
-	public static final TalonControlMode position = TalonControlMode.Position;
-	public static final TalonControlMode speed = TalonControlMode.Speed;
-	public static final TalonControlMode voltage = TalonControlMode.Voltage;
+public class R_Talon extends TalonSRX {
+	public static final FeedbackDevice absolute = FeedbackDevice.CTRE_MagEncoder_Absolute;
+	public static final FeedbackDevice relative = FeedbackDevice.CTRE_MagEncoder_Relative;
+	public static final ControlMode current = ControlMode.Current;
+	public static final ControlMode follower = ControlMode.Follower;
+	public static final ControlMode percent = ControlMode.PercentOutput;
+	public static final ControlMode position = ControlMode.Position;
+	public static final ControlMode velocity = ControlMode.Velocity;
+	public static final ControlMode disabled = ControlMode.Disabled;
 	private boolean updated = false;
 	private double lastSetPoint = 0;
 	private double lastLegalDirection = 1;
 	public V_Compass compass;
 	private double gearRatio;
 	//This constructor is intended for use with an encoder on a motor with limited motion.
-	public R_CANTalon(final int deviceID, final double gearRatio, final TalonControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType, final double protectedZoneStart, final double protectedZoneSize) {
+	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (isSensorPresent(deviceType) == FeedbackDeviceStatus.FeedbackStatusPresent) {
@@ -30,7 +32,7 @@ public class R_CANTalon extends CANTalon {
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
-	public R_CANTalon(final int deviceID, final double gearRatio, final TalonControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType) {
+	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (isSensorPresent(deviceType) == FeedbackDeviceStatus.FeedbackStatusPresent) {
@@ -43,7 +45,7 @@ public class R_CANTalon extends CANTalon {
 		compass = new V_Compass(0, 0);
 	}
 	//This constructor is intended for a motor without an encoder.
-	public R_CANTalon(final int deviceID, final double gearRatio, final TalonControlMode controlMode) {
+	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		changeControlMode(controlMode);
@@ -105,7 +107,7 @@ public class R_CANTalon extends CANTalon {
 	 * Voltage: -1 to 1 (gets scaled to -12 to 12)
 	**/
 	@Override
-	public void set(final double value) {
+	public void set(final ControlMode controlMode, final double value) {
 		set(value, true, true);
 	}
 	
@@ -118,7 +120,7 @@ public class R_CANTalon extends CANTalon {
 				super.set(value);
 			}updated = true;
 			break;
-		case PercentVbus:super.set(value);break;
+		case PercentOutput:super.set(value);break;
 		case Position:
 			if (treatAsAngle) {
 				super.set((getCurrentAngle(false) + wornPath(value))*gearRatio/360);
@@ -127,8 +129,8 @@ public class R_CANTalon extends CANTalon {
 				super.set(value);
 			}
 			break;
-		case Speed:super.set(value);break;
-		case Voltage:
+		case Velocity:super.set(value);break;
+		case Disabled:
 			if (Math.abs(value) > 1) {value = Math.signum(value);}
 			super.set(value*12);
 			break;
@@ -158,7 +160,7 @@ public class R_CANTalon extends CANTalon {
 		switch (getControlMode()) {
 		case Current:return getError();
 		case Position:return getError()*360/(4096*gearRatio);
-		case Speed:return getError()*600/(4096*gearRatio);
+		case Velocity:return getError()*600/(4096*gearRatio);
 		default:return -1;
 		}
 	}

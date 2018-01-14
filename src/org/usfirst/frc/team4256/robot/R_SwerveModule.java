@@ -1,6 +1,6 @@
 package org.usfirst.frc.team4256.robot;//COMPLETE 2017
 
-import com.cyborgcats.reusable.R_CANTalon;
+import com.cyborgcats.reusable.R_Talon;
 import com.cyborgcats.reusable.V_Compass;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -12,15 +12,15 @@ public class R_SwerveModule {
 	private boolean aligning = false;
 	private double alignmentRevs = 0;
 	private double decapitated = 1;
-	private R_CANTalon rotator;
-	private R_CANTalon tractionA;
-	private R_CANTalon tractionB;
+	private R_Talon rotator;
+	private R_Talon tractionA;
+	private R_Talon tractionB;
 	public DigitalInput sensor;
 	
 	public R_SwerveModule(final int rotatorID, final boolean flipped, final int tractionAID, final int tractionBID, final int sensorID) {
-		this.rotator = new R_CANTalon(rotatorID, rotatorGearRatio, R_CANTalon.position, flipped, R_CANTalon.absolute);
-		this.tractionA = new R_CANTalon(tractionAID, tractionGearRatio, R_CANTalon.percent);
-		this.tractionB = new R_CANTalon(tractionBID, tractionGearRatio, R_CANTalon.follower);
+		this.rotator = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, flipped, R_Talon.absolute);
+		this.tractionA = new R_Talon(tractionAID, tractionGearRatio, R_Talon.percent);
+		this.tractionB = new R_Talon(tractionBID, tractionGearRatio, R_Talon.follower);
 		this.sensor = new DigitalInput(sensorID);
 	}
 	/**
