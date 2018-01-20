@@ -3,18 +3,21 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public class R_Talon extends TalonSRX {
 	public static final FeedbackDevice absolute = FeedbackDevice.CTRE_MagEncoder_Absolute;
 	public static final FeedbackDevice relative = FeedbackDevice.CTRE_MagEncoder_Relative;
+	public static final NeutralMode brake = NeutralMode.Brake;
+	public static final NeutralMode coast = NeutralMode.Coast;
 	public static final ControlMode current = ControlMode.Current;
 	public static final ControlMode follower = ControlMode.Follower;
 	public static final ControlMode percent = ControlMode.PercentOutput;
 	public static final ControlMode position = ControlMode.Position;
 	public static final ControlMode velocity = ControlMode.Velocity;
 	public static final ControlMode disabled = ControlMode.Disabled;
-	private static final int kTimeoutMS = 10;
-	private static final double countsPerRev = 4096.0;
+	public static final int kTimeoutMS = 10;
+	public static final double countsPerRev = 4096.0;
 	private ControlMode controlMode;
 	private boolean updated = false;
 	private double lastSetPoint = 0;
@@ -75,8 +78,8 @@ public class R_Talon extends TalonSRX {
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
 	**/
-	public void init() {
-		init(0, 12f);
+	public void init() {//TODO 12f no longer applicable
+		init(0, 1);
 	}
 	/**
 	 * This function returns the current angle. If wraparound is true, the output will be between 0 and 359.999...

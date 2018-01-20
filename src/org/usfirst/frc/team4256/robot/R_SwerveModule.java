@@ -20,7 +20,6 @@ public class R_SwerveModule {
 	public R_SwerveModule(final int rotatorID, final boolean flipped, final int tractionAID, final int tractionBID, final int sensorID) {
 		this.rotator = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, flipped, R_Talon.absolute);
 		this.tractionA = new R_Talon(tractionAID, tractionGearRatio, R_Talon.percent);
-		this.tractionB = new R_Talon(tractionBID, tractionGearRatio, R_Talon.follower);
 		this.sensor = new DigitalInput(sensorID);
 	}
 	/**
@@ -28,12 +27,12 @@ public class R_SwerveModule {
 	**/
 	public void init() {
 		rotator.init();
-		rotator.enableBrakeMode(false);
-		rotator.setPID(Parameters.swerveP, Parameters.swerveI, Parameters.swerveD);
-		tractionA.init(0, 12f);
-		tractionA.enableBrakeMode(false);
-		tractionB.init(tractionA.getDeviceID(), 12f);
-		tractionB.enableBrakeMode(false);
+		rotator.setNeutralMode(R_Talon.coast);
+		rotator.config_kP(0, 6, R_Talon.kTimeoutMS);
+		rotator.config_kI(0, 0, R_Talon.kTimeoutMS);
+		rotator.config_kD(0, .6, R_Talon.kTimeoutMS);
+		tractionA.init();
+		tractionA.setNeutralMode(R_Talon.coast);
 	}
 	/**
 	 * This function indicates whether the module has been aligned.
@@ -50,22 +49,22 @@ public class R_SwerveModule {
 	/**
 	 * Call this to align the module with its magnet.
 	**/
-	public void align(final double increment) {
-		set(0);
-		if (sensor.get()) {
-			if (!aligning) {
-				aligned = false;
-				aligning = true;
-				alignmentRevs = rotator.getPosition();
-			}alignmentRevs += increment;
-			rotator.set(alignmentRevs, false, true);
-		}else {
-			aligning = false;
-			rotator.set(alignmentRevs, false, true);
-			rotator.compass.setTareAngle(alignmentRevs%rotatorGearRatio*360/rotatorGearRatio);
-			aligned = true;
-		}
-	}
+//	public void align(final double increment) {
+//		set(0);
+//		if (sensor.get()) {
+//			if (!aligning) {
+//				aligned = false;
+//				aligning = true;
+//				alignmentRevs = rotator.getPosition();
+//			}alignmentRevs += increment;
+//			rotator.set(alignmentRevs, false, true);
+//		}else {
+//			aligning = false;
+//			rotator.set(alignmentRevs, false, true);
+//			rotator.compass.setTareAngle(alignmentRevs%rotatorGearRatio*360/rotatorGearRatio);
+//			aligned = true;
+//		}
+//	}
 	/**
 	 * This offsets the tare angle by the specified amount. Positive means clockwise and negative means counter-clockwise.
 	 * Useful when correcting for loose mechanical tolerances.
@@ -84,7 +83,7 @@ public class R_SwerveModule {
 	 * If ignore is true, nothing will happen, which is useful for coasting based on variables outside this class' scope.
 	**/
 	public void swivelTo(final double wheel_chassisAngle, final boolean ignore) {
-		if (!ignore) {rotator.set(decapitateAngle(wheel_chassisAngle));}//if this doesn't run, complete loop update will eventually set it to be the last angle
+		if (!ignore) {rotator.quickSet(decapitateAngle(wheel_chassisAngle));}//if this doesn't run, complete loop update will eventually set it to be the last angle
 	}
 	/**
 	 * Use wheel_fieldAngle to specify the wheel's orientation relative to the field in degrees.
@@ -97,7 +96,7 @@ public class R_SwerveModule {
 	 * It also makes sure that they turn in the correct direction, regardless of decapitated state.
 	**/
 	public void set(final double speed) {
-		tractionA.set(speed*decapitated);
+		tractionA.quickSet(speed*decapitated);
 	}
 	/**
 	 * A shortcut to call completeLoopUpdate on all the Talons in the module except for the traction slave.
