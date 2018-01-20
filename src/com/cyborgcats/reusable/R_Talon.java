@@ -13,6 +13,8 @@ public class R_Talon extends TalonSRX {
 	public static final ControlMode position = ControlMode.Position;
 	public static final ControlMode velocity = ControlMode.Velocity;
 	public static final ControlMode disabled = ControlMode.Disabled;
+	private static final int kTimeoutMS = 10;
+	private ControlMode controlMode;
 	private boolean updated = false;
 	private double lastSetPoint = 0;
 	private double lastLegalDirection = 1;
@@ -22,33 +24,33 @@ public class R_Talon extends TalonSRX {
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
-		if (isSensorPresent(deviceType) == FeedbackDeviceStatus.FeedbackStatusPresent) {
-			setFeedbackDevice(deviceType);
-		}else {
+		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			throw new IllegalStateException("A CANTalon could not find its integrated versaplanetary encoder.");
+		}else {
+			configSelectedFeedbackSensor(deviceType, 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
-		reverseOutput(flipped);
-		changeControlMode(controlMode);
+		setSensorPhase(flipped);
+		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
-		if (isSensorPresent(deviceType) == FeedbackDeviceStatus.FeedbackStatusPresent) {
-			setFeedbackDevice(deviceType);
-		}else {
+		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			throw new IllegalStateException("A CANTalon could not find its integrated versaplanetary encoder.");
+		}else {
+			configSelectedFeedbackSensor(deviceType, 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
-		reverseOutput(flipped);
-		changeControlMode(controlMode);
+		setSensorPhase(flipped);
+		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
 	}
 	//This constructor is intended for a motor without an encoder.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
-		changeControlMode(controlMode);
+		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
 	}
 	/**
@@ -56,15 +58,17 @@ public class R_Talon extends TalonSRX {
 	 * It then gets enslaved to the motor at the specified ID.
 	**/
 	public void init(final int masterID, final float maxVolts) {
-		clearStickyFaults();
-		setProfile(0);//choose between PID loop parameter stores
-		setAllowableClosedLoopErr(0);
-		configNominalOutputVoltage(+0f, -0f);//minimum voltage draw
-		configPeakOutputVoltage(Math.abs(maxVolts), -Math.abs(maxVolts));//maximum voltage draw
+		//clearStickyFaults();TODO
+		selectProfileSlot(0, 0);//first is motion profile slot (things like allowable error), second is PID slot ID
+		configAllowableClosedloopError(0, 0, kTimeoutMS);//motion profile slot, allowable error, timeout ms
+		configNominalOutputForward(0, kTimeoutMS);//minimum voltage draw
+		configNominalOutputReverse(0, kTimeoutMS);
+		configPeakOutputForward(Math.abs(maxVolts), kTimeoutMS);//maximum voltage draw
+		configPeakOutputReverse(-Math.abs(maxVolts), kTimeoutMS);
 		if (getControlMode() == follower) {
-			set(masterID);
+			quickSet(masterID);//TODO may need to be super set not quickSet
 		}else {
-			set(0);
+			quickSet(0);//TODO may need to be super set not quickSet
 		}
 	}
 	/**
@@ -78,7 +82,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		if (getControlMode() != position) {return -1;}
-		return wraparound ? V_Compass.validateAngle(getPosition()*360/gearRatio) : getPosition()*360/gearRatio;
+		return wraparound ? V_Compass.validateAngle(getSelectedSensorPosition(0)*360/gearRatio) : getSelectedSensorPosition(0)*360/gearRatio;//arg in getSelectedSensorPosition is PID slot ID
 	}
 	/**
 	 * This function finds the shortest legal path from the current angle to the end angle and returns the size of that path in degrees.
@@ -106,46 +110,48 @@ public class R_Talon extends TalonSRX {
 	 * Speed: RPM
 	 * Voltage: -1 to 1 (gets scaled to -12 to 12)
 	**/
-	@Override
-	public void set(final ControlMode controlMode, final double value) {
+	public void quickSet(final double value) {
 		set(value, true, true);
 	}
 	
 	public void set(double value, final boolean treatAsAngle, final boolean setupdated) {//CURRENT, ANGLE, SPEED
 		if (setupdated) {lastSetPoint = value;}
+		
 		switch (getControlMode()) {
-		case Current:super.set(value);break;
+		case Current:super.set(controlMode, value);break;//just use the basic set function
+		case PercentOutput:super.set(controlMode, value);break;//just use the basic set function
+		case Velocity:super.set(controlMode, value);break;//just use the basic set function
+		
 		case Follower:
 			if (!updated) {//updated is treated differently for follower than for others because it should only be messed with once
-				super.set(value);
+				super.set(controlMode, value);
 			}updated = true;
 			break;
-		case PercentOutput:super.set(value);break;
+		
 		case Position:
 			if (treatAsAngle) {
-				super.set((getCurrentAngle(false) + wornPath(value))*gearRatio/360);
+				super.set(controlMode, (getCurrentAngle(false) + wornPath(value))*gearRatio/360);
 			}else {
 				lastSetPoint = value*360/gearRatio;
-				super.set(value);
+				super.set(controlMode, value);
 			}
 			break;
-		case Velocity:super.set(value);break;
+		
 		case Disabled:
 			if (Math.abs(value) > 1) {value = Math.signum(value);}
-			super.set(value*12);
+			super.set(controlMode, value*12);
 			break;
+			
 		default:break;
 		}
-		if (getControlMode() != follower) {
-			updated = setupdated;
-		}
+		if (getControlMode() != follower) {updated = setupdated;}
 	}
 	/**
 	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
 	**/
 	public void completeLoopUpdate() {
 		if (!updated && getControlMode() != follower) {
-			set(lastSetPoint, true, false);
+			this.set(lastSetPoint, true, false);
 		}else if (getControlMode() != follower) {
 			updated = false;
 		}
@@ -158,9 +164,9 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentError() {//CURRENT, ANGLE, SPEED
 		switch (getControlMode()) {
-		case Current:return getError();
-		case Position:return getError()*360/(4096*gearRatio);
-		case Velocity:return getError()*600/(4096*gearRatio);
+		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
+		case Position:return getClosedLoopError(0)*360/(4096*gearRatio);
+		case Velocity:return getClosedLoopError(0)*600/(4096*gearRatio);
 		default:return -1;
 		}
 	}

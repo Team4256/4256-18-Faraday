@@ -69,10 +69,10 @@ public class Robot extends IterativeRobot {
 	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD, true, Parameters.Swerve_driveDA, Parameters.Swerve_driveDB, Parameters.Swerve_calibratorD);
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
-	private static final R_Talon climberA = new R_Talon(Parameters.ClimberA, 51, R_Talon.voltage);
+	private static final R_Talon climberA = new R_Talon(Parameters.ClimberA, 51, R_Talon.percent);//TODO may not function the same as the voltage mode
 	private static final R_Talon climberB = new R_Talon(Parameters.ClimberB, 51, R_Talon.follower);
 	
-	private static final R_Talon lift = new R_Talon(Parameters.Lift, 1, R_Talon.voltage);
+	private static final R_Talon lift = new R_Talon(Parameters.Lift, 1, R_Talon.percent);//TODO may not function the same as the voltage mode
 	private static final DoubleSolenoid clamp = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
 	private static final DoubleSolenoid gearer = new DoubleSolenoid(Parameters.Gearer_module, Parameters.Gearer_forward, Parameters.Gearer_reverse);
 	
@@ -157,10 +157,10 @@ public class Robot extends IterativeRobot {
 				//practice robot: 9, -3, 6, 8
 			}
 			if (!liftState.equals(LiftState.up)) {//RAISE LIFTER
-				lift.set(-.23);
+				lift.quickSet(-.23);
 				liftState = LiftState.middle;
 			}else {
-				lift.set(-.1);
+				lift.quickSet(-.1);
 			}
 			if (lift.getOutputCurrent() < 3) {
 				highAmpTimer = System.currentTimeMillis();
@@ -183,7 +183,7 @@ public class Robot extends IterativeRobot {
 						}else {
 							swerve.holonomic(Parameters.leftGear, 0, 0);
 							clamp.set(DoubleSolenoid.Value.kForward);
-							lift.set(0);
+							lift.quickSet(0);
 						}
 					}
 				}
@@ -204,7 +204,7 @@ public class Robot extends IterativeRobot {
 						}else if (V_Instructions.getSeconds() < 9) {
 							swerve.holonomic(Parameters.centerGear, 0, 0);
 							clamp.set(DoubleSolenoid.Value.kForward);
-							lift.set(0);
+							lift.quickSet(0);
 						}else if (V_Instructions.getSeconds() < 10) {
 							swerve.holonomic(Parameters.centerGear, -.15, 0);
 						}else {
@@ -229,7 +229,7 @@ public class Robot extends IterativeRobot {
 						}else {
 							swerve.holonomic(Parameters.rightGear, 0, 0);
 							clamp.set(DoubleSolenoid.Value.kForward);
-							lift.set(0);
+							lift.quickSet(0);
 						}
 					}
 				}
@@ -291,9 +291,9 @@ public class Robot extends IterativeRobot {
 		if (driver.getRawButton(R_Xbox.BUTTON_LB)) {//CLIMBER
 			double climbSpeed = driver.getRawButton(R_Xbox.BUTTON_RB) ? 1 : .6;//make both values negative for use with a single CIM
 			if (gunner.getAxisPress(R_Xbox.AXIS_LT, .5)) {climbSpeed *= -1;}
-			climberA.set(climbSpeed);
+			climberA.quickSet(climbSpeed);
 		}else {
-			climberA.set(0);
+			climberA.quickSet(0);
 		}
 		
 		if (V_Fridge.freeze("POVSOUTH", driver.getPOV(0) == R_Xbox.POV_SOUTH)) {//GEARER
@@ -310,20 +310,20 @@ public class Robot extends IterativeRobot {
 		
 		if (V_Fridge.freeze("AXISLT", driver.getAxisPress(R_Xbox.AXIS_LT, .5))) {//LIFTER
 			if (!liftState.equals(LiftState.up)) {
-				lift.set(-.23);
+				lift.quickSet(-.23);
 				liftState = LiftState.middle;
 			}else {
-				lift.set(-.1);
+				lift.quickSet(-.1);
 			}
 			if (lift.getOutputCurrent() < 3) {
 				highAmpTimer = System.currentTimeMillis();
 			}else if (System.currentTimeMillis() - highAmpTimer > 500) {liftState = LiftState.up;}
 		}else {
 			if (!liftState.equals(LiftState.down)) {
-				lift.set(.15);
+				lift.quickSet(.15);
 				liftState = LiftState.middle;
 			}else {
-				lift.set(0);
+				lift.quickSet(0);
 			}
 			if (lift.getOutputCurrent() < 1.7) {
 				highAmpTimer = System.currentTimeMillis();
