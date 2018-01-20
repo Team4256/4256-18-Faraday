@@ -82,7 +82,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		if (getControlMode() != position) {return -1;}
-		return wraparound ? V_Compass.validateAngle(getSelectedSensorPosition(0)*360/gearRatio) : getSelectedSensorPosition(0)*360/gearRatio;//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validateAngle(getSelectedSensorPosition(0)*360/(4096.0*gearRatio)) : getSelectedSensorPosition(0)*360/(4096.0*gearRatio);//arg in getSelectedSensorPosition is PID slot ID
 	}
 	/**
 	 * This function finds the shortest legal path from the current angle to the end angle and returns the size of that path in degrees.
@@ -130,9 +130,9 @@ public class R_Talon extends TalonSRX {
 		
 		case Position:
 			if (treatAsAngle) {
-				super.set(controlMode, (getCurrentAngle(false) + wornPath(value))*gearRatio/360);
+				super.set(controlMode, (getCurrentAngle(false) + wornPath(value))*4096.0*gearRatio/360.0);
 			}else {
-				lastSetPoint = value*360/gearRatio;
+				lastSetPoint = value*360.0/gearRatio;
 				super.set(controlMode, value);
 			}
 			break;
