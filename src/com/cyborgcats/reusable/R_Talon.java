@@ -14,6 +14,7 @@ public class R_Talon extends TalonSRX {
 	public static final ControlMode velocity = ControlMode.Velocity;
 	public static final ControlMode disabled = ControlMode.Disabled;
 	private static final int kTimeoutMS = 10;
+	private static final double countsPerRev = 4096.0;
 	private ControlMode controlMode;
 	private boolean updated = false;
 	private double lastSetPoint = 0;
@@ -82,7 +83,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		if (getControlMode() != position) {return -1;}
-		return wraparound ? V_Compass.validateAngle(getSelectedSensorPosition(0)*360/(4096.0*gearRatio)) : getSelectedSensorPosition(0)*360/(4096.0*gearRatio);//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validateAngle(getSelectedSensorPosition(0)*360/(countsPerRev*gearRatio)) : getSelectedSensorPosition(0)*360/(countsPerRev*gearRatio);//arg in getSelectedSensorPosition is PID slot ID
 	}
 	/**
 	 * This function finds the shortest legal path from the current angle to the end angle and returns the size of that path in degrees.
@@ -130,7 +131,7 @@ public class R_Talon extends TalonSRX {
 		
 		case Position:
 			if (treatAsAngle) {
-				super.set(controlMode, (getCurrentAngle(false) + wornPath(value))*4096.0*gearRatio/360.0);
+				super.set(controlMode, (getCurrentAngle(false) + wornPath(value))*countsPerRev*gearRatio/360.0);
 			}else {
 				lastSetPoint = value*360.0/gearRatio;
 				super.set(controlMode, value);
@@ -165,8 +166,8 @@ public class R_Talon extends TalonSRX {
 	public double getCurrentError() {//CURRENT, ANGLE, SPEED
 		switch (getControlMode()) {
 		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
-		case Position:return getClosedLoopError(0)*360/(4096*gearRatio);
-		case Velocity:return getClosedLoopError(0)*600/(4096*gearRatio);
+		case Position:return getClosedLoopError(0)*360/(countsPerRev*gearRatio);
+		case Velocity:return getClosedLoopError(0)*600/(countsPerRev*gearRatio);
 		default:return -1;
 		}
 	}
