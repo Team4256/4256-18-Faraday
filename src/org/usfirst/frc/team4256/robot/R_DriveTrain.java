@@ -42,20 +42,20 @@ public class R_DriveTrain {
 	public boolean isAligning() {
 		return aligning;
 	}
-	/**
-	 * 
-	**/
-	public void align(final double increment) {
-		aligning = true;
-		do {
-			moduleA.align(increment);
-			moduleB.align(increment);
-			moduleC.align(increment);
-			moduleD.align(increment);
-		}while ((moduleA.isAligning() || moduleB.isAligning() || moduleC.isAligning() || moduleD.isAligning()));
-		aligning = false;
-		aligned = true;
-	}
+//	/**
+//	 * 
+//	**/
+//	public void align(final double increment) {
+//		aligning = true;
+//		do {
+//			moduleA.align(increment);
+//			moduleB.align(increment);
+//			moduleC.align(increment);
+//			moduleD.align(increment);
+//		}while ((moduleA.isAligning() || moduleB.isAligning() || moduleC.isAligning() || moduleD.isAligning()));
+//		aligning = false;
+//		aligned = true;
+//	}
 	
 	public void holonomic2(final double forward, final double strafe, final double spin) {
 		double a = strafe - spin*(Side/Radius),b = strafe + spin*(Side/Radius),c = forward - spin*(Front/Radius),d = forward + spin*(Front/Radius);

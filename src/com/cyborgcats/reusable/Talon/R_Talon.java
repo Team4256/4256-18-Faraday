@@ -1,5 +1,6 @@
-package com.cyborgcats.reusable;//COMPLETE 2017
+package com.cyborgcats.reusable.Talon;
 
+import com.cyborgcats.reusable.V_Compass;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -8,14 +9,15 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 public class R_Talon extends TalonSRX {
 	public static final FeedbackDevice absolute = FeedbackDevice.CTRE_MagEncoder_Absolute;
 	public static final FeedbackDevice relative = FeedbackDevice.CTRE_MagEncoder_Relative;
-	public static final NeutralMode brake = NeutralMode.Brake;
-	public static final NeutralMode coast = NeutralMode.Coast;
 	public static final ControlMode current = ControlMode.Current;
 	public static final ControlMode follower = ControlMode.Follower;
 	public static final ControlMode percent = ControlMode.PercentOutput;
 	public static final ControlMode position = ControlMode.Position;
 	public static final ControlMode velocity = ControlMode.Velocity;
 	public static final ControlMode disabled = ControlMode.Disabled;
+	public static final NeutralMode brake = NeutralMode.Brake;
+	public static final NeutralMode coast = NeutralMode.Coast;
+	
 	public static final int kTimeoutMS = 10;
 	public static final double countsPerRev = 4096.0;
 	private ControlMode controlMode;
@@ -57,6 +59,8 @@ public class R_Talon extends TalonSRX {
 		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
 	}
+	
+	
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
 	 * It then gets enslaved to the motor at the specified ID.
@@ -75,19 +79,25 @@ public class R_Talon extends TalonSRX {
 			quickSet(0);//TODO may need to be super set not quickSet
 		}
 	}
+	
+	
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
 	**/
-	public void init() {//TODO 12f no longer applicable
+	public void init() {//TODO
 		init(0, 1);
 	}
+	
+	
 	/**
 	 * This function returns the current angle. If wraparound is true, the output will be between 0 and 359.999...
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		if (getControlMode() != position) {return -1;}
-		return wraparound ? V_Compass.validateAngle(getSelectedSensorPosition(0)*360/(countsPerRev*gearRatio)) : getSelectedSensorPosition(0)*360/(countsPerRev*gearRatio);//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validateAngle(ConvertTo.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0))) : ConvertTo.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
+	
+	
 	/**
 	 * This function finds the shortest legal path from the current angle to the end angle and returns the size of that path in degrees.
 	 * Positive means clockwise and negative means counter-clockwise.
@@ -105,6 +115,8 @@ public class R_Talon extends TalonSRX {
 			currentPathVector = 360*Math.signum(-currentPathVector) + currentPathVector;
 		}return currentPathVector;
 	}
+	
+	
 	/**
 	 * This function sets the motor's output or target setpoint based on the current control mode.
 	 * Current: Milliamperes
@@ -134,9 +146,10 @@ public class R_Talon extends TalonSRX {
 		
 		case Position:
 			if (treatAsAngle) {
-				super.set(controlMode, (getCurrentAngle(false) + wornPath(value))*countsPerRev*gearRatio/360.0);
+				super.set(controlMode, ConvertFrom.DEGREES.afterGears(gearRatio, getCurrentAngle(false) + wornPath(value)));
 			}else {
-				lastSetPoint = value*360.0/gearRatio;
+				//lastSetPoint = ConvertFrom.REVS.afterGears(gearRatio, value);
+				lastSetPoint = value*360.0/gearRatio;//TODO not sure exactly why this is being modified here
 				super.set(controlMode, value);
 			}
 			break;
@@ -150,6 +163,8 @@ public class R_Talon extends TalonSRX {
 		}
 		if (getControlMode() != follower) {updated = setupdated;}
 	}
+	
+	
 	/**
 	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
 	**/
@@ -160,6 +175,8 @@ public class R_Talon extends TalonSRX {
 			updated = false;
 		}
 	}
+	
+	
 	/**
 	 * This function returns the PID error for the current control mode.
 	 * Current: Milliamperes
@@ -169,8 +186,8 @@ public class R_Talon extends TalonSRX {
 	public double getCurrentError() {//CURRENT, ANGLE, SPEED
 		switch (getControlMode()) {
 		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
-		case Position:return getClosedLoopError(0)*360/(countsPerRev*gearRatio);
-		case Velocity:return getClosedLoopError(0)*600/(countsPerRev*gearRatio);
+		case Position:return ConvertTo.DEGREES.afterGears(gearRatio, getClosedLoopError(0));
+		case Velocity:return getClosedLoopError(0)*600/(countsPerRev*gearRatio);//TODO not sure if its supposed to be 600
 		default:return -1;
 		}
 	}

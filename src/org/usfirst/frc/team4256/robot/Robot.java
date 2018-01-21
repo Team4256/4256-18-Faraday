@@ -1,4 +1,4 @@
-//DRIVER
+//DRIVER//TODO document new driver commands
 //start + back: align
 //left stick, both axis: raw speed and direction
 //right stick, x axis: raw spin
@@ -23,7 +23,7 @@ package org.usfirst.frc.team4256.robot;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.cyborgcats.reusable.R_Talon;
+import com.cyborgcats.reusable.Talon.R_Talon;
 import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
@@ -55,22 +55,14 @@ public class Robot extends IterativeRobot {
 	private static double metersX = 0;
 	private static double metersY = 0;
 	
-	private static Long highAmpTimer = System.currentTimeMillis();
-	public static enum LiftState {up, middle, down}
-	public static LiftState liftState = LiftState.down;
-	private static int autoMode = 1;
-	private static int autoStep = 0;
 	//{Robot Output}
 	private static final Compressor compressor = new Compressor(0);
 	
-	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA, true, Parameters.Swerve_driveAA, Parameters.Swerve_driveAB, Parameters.Swerve_calibratorA);
-	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB, true, Parameters.Swerve_driveBA, Parameters.Swerve_driveBB, Parameters.Swerve_calibratorB);
-	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC, true, Parameters.Swerve_driveCA, Parameters.Swerve_driveCB, Parameters.Swerve_calibratorC);
-	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD, true, Parameters.Swerve_driveDA, Parameters.Swerve_driveDB, Parameters.Swerve_calibratorD);
+	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA, true, Parameters.Swerve_driveAA, Parameters.Swerve_driveAB);
+	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB, true, Parameters.Swerve_driveBA, Parameters.Swerve_driveBB);
+	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC, true, Parameters.Swerve_driveCA, Parameters.Swerve_driveCB);
+	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD, true, Parameters.Swerve_driveDA, Parameters.Swerve_driveDB);
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
-	
-	private static final R_Talon climberA = new R_Talon(Parameters.ClimberA, 51, R_Talon.percent);//TODO may not function the same as the voltage mode
-	private static final R_Talon climberB = new R_Talon(Parameters.ClimberB, 51, R_Talon.follower);
 	
 	private static final R_Talon lift = new R_Talon(Parameters.Lift, 1, R_Talon.percent);//TODO may not function the same as the voltage mode
 	private static final DoubleSolenoid clamp = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
@@ -138,7 +130,6 @@ public class Robot extends IterativeRobot {
 	public void robotPeriodic() {
 		faraday.putBoolean("old gear out", gearer.get().equals(DoubleSolenoid.Value.kForward));
 		faraday.putBoolean("clamp open", clamp.get().equals(DoubleSolenoid.Value.kForward));
-		faraday.putBoolean("lift down", liftState.equals(LiftState.down));
 		faraday.putBoolean("aligning", swerve.isAligning());
 		faraday.putBoolean("aligned", swerve.isAligned());
 		faraday.putNumber("match timer", V_Instructions.getSeconds());
@@ -146,104 +137,6 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		if (!V_Instructions.startedTimer()) {
-			V_Instructions.startTimer();
-		}
-		if (Timer.getMatchTime() <= 15) {
-			if (!swerve.isAligned()) {//ALIGN
-				swerve.align(.004);
-				moduleA.setTareAngle(5);	moduleB.setTareAngle(3);	moduleC.setTareAngle(4);	moduleD.setTareAngle(5);
-				//comp robot: 5, 3, 4, 5
-				//practice robot: 9, -3, 6, 8
-			}
-			if (!liftState.equals(LiftState.up)) {//RAISE LIFTER
-				lift.quickSet(-.23);
-				liftState = LiftState.middle;
-			}else {
-				lift.quickSet(-.1);
-			}
-			if (lift.getOutputCurrent() < 3) {
-				highAmpTimer = System.currentTimeMillis();
-			}else if (System.currentTimeMillis() - highAmpTimer > 500) {liftState = LiftState.up;}
-			
-			switch (autoMode) {
-			case 0://LEFT GEAR
-				V_Instructions.follow(Parameters.leftInstructions, autoStep, swerve, gyro);
-				if (V_Instructions.readyToMoveOn() && V_Instructions.canMoveOn()) {
-					autoStep++;
-				}else if (V_Instructions.readyToMoveOn() && !V_Instructions.canMoveOn()) {
-					double pegX = targeting.getNumber("peg x", 0);
-					if (targeting.getNumber("targets", 0) > 1 && targeting.getNumber("peg y", 0) < 198) {
-						double xError = pegX - 170;
-						double angleError = xError*40/100;
-						swerve.holonomic(Parameters.leftGear + angleError, 0.12, 0);
-					}else {
-						if (V_Instructions.getSeconds() < 10.25) {
-							swerve.holonomic(Parameters.leftGear, .18, -.06);
-						}else {
-							swerve.holonomic(Parameters.leftGear, 0, 0);
-							clamp.set(DoubleSolenoid.Value.kForward);
-							lift.quickSet(0);
-						}
-					}
-				}
-				break;
-			case 1://MIDDLE GEAR
-				V_Instructions.follow(Parameters.middleInstructions, autoStep, swerve, gyro);
-				if (V_Instructions.readyToMoveOn() && V_Instructions.canMoveOn()) {
-					autoStep++;
-				}else if (V_Instructions.readyToMoveOn() && !V_Instructions.canMoveOn()) {
-					double pegX = targeting.getNumber("peg x", 0);
-					if (targeting.getNumber("targets", 0) > 0 && targeting.getNumber("peg y", 0) < 205) {
-						double xError = pegX - 170;
-						double angleError = xError*45/100;
-						swerve.holonomic(Parameters.centerGear + angleError, 0.15, 0);
-					}else {
-						if (V_Instructions.getSeconds() < 8) {
-							swerve.holonomic(Parameters.centerGear, .15, 0);
-						}else if (V_Instructions.getSeconds() < 9) {
-							swerve.holonomic(Parameters.centerGear, 0, 0);
-							clamp.set(DoubleSolenoid.Value.kForward);
-							lift.quickSet(0);
-						}else if (V_Instructions.getSeconds() < 10) {
-							swerve.holonomic(Parameters.centerGear, -.15, 0);
-						}else {
-							swerve.holonomic(Parameters.centerGear, 0, 0);
-						}
-					}
-				}
-				break;
-			case 2://RIGHT GEAR
-				V_Instructions.follow(Parameters.rightInstructions, autoStep, swerve, gyro);
-				if (V_Instructions.readyToMoveOn() && V_Instructions.canMoveOn()) {
-					autoStep++;
-				}else if (V_Instructions.readyToMoveOn() && !V_Instructions.canMoveOn()) {
-					double pegX = targeting.getNumber("peg x", 0);
-					if (targeting.getNumber("targets", 0) > 1 && targeting.getNumber("peg y", 0) < 198) {
-						double xError = pegX - 170;
-						double angleError = xError*45/100;
-						swerve.holonomic(Parameters.rightGear + angleError, 0.12, 0);
-					}else {
-						if (V_Instructions.getSeconds() < 9) {
-							swerve.holonomic(Parameters.rightGear, .12, 0);
-						}else {
-							swerve.holonomic(Parameters.rightGear, 0, 0);
-							clamp.set(DoubleSolenoid.Value.kForward);
-							lift.quickSet(0);
-						}
-					}
-				}
-				break;
-			default:break;
-			}
-			//{completing Talon updates}
-			moduleA.completeLoopUpdate();
-			moduleB.completeLoopUpdate();
-			moduleC.completeLoopUpdate();
-			moduleD.completeLoopUpdate();
-			climberA.completeLoopUpdate();
-			lift.completeLoopUpdate();
-		}
 	}
 	
 	@Override
@@ -289,7 +182,7 @@ public class Robot extends IterativeRobot {
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_LB)) {//CLIMBER
-			double climbSpeed = driver.getRawButton(R_Xbox.BUTTON_RB) ? 1 : .6;//make both values negative for use with a single CIM
+			double climbSpeed = driver.getRawButton(R_Xbox.BUTTON_RB) ? 1 : .6;
 			if (gunner.getAxisPress(R_Xbox.AXIS_LT, .5)) {climbSpeed *= -1;}
 			climberA.quickSet(climbSpeed);
 		}else {
@@ -308,27 +201,6 @@ public class Robot extends IterativeRobot {
 			clamp.set(DoubleSolenoid.Value.kReverse);
 		}
 		
-		if (V_Fridge.freeze("AXISLT", driver.getAxisPress(R_Xbox.AXIS_LT, .5))) {//LIFTER
-			if (!liftState.equals(LiftState.up)) {
-				lift.quickSet(-.23);
-				liftState = LiftState.middle;
-			}else {
-				lift.quickSet(-.1);
-			}
-			if (lift.getOutputCurrent() < 3) {
-				highAmpTimer = System.currentTimeMillis();
-			}else if (System.currentTimeMillis() - highAmpTimer > 500) {liftState = LiftState.up;}
-		}else {
-			if (!liftState.equals(LiftState.down)) {
-				lift.quickSet(.15);
-				liftState = LiftState.middle;
-			}else {
-				lift.quickSet(0);
-			}
-			if (lift.getOutputCurrent() < 1.7) {
-				highAmpTimer = System.currentTimeMillis();
-			}if (System.currentTimeMillis() - highAmpTimer > 500) {liftState = LiftState.down;}
-		}
 		
 		if (gyro.netAcceleration() >= 1) {
 			driver.setRumble(RumbleType.kLeftRumble, 1);//DANGER RUMBLE
