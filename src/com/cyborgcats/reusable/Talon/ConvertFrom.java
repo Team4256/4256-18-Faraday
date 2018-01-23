@@ -6,7 +6,7 @@ public enum ConvertFrom {
 	
 	public static final double countsPerRev = 4096.0;
 	
-	double beforeGears(final double value) {
+	public double beforeGears(final double value) {
 		switch(this) {
 		case REVS: return value*countsPerRev;
 		case DEGREES: return value*countsPerRev/360.0;
@@ -14,7 +14,7 @@ public enum ConvertFrom {
 		}
 	}
 	
-	double afterGears(final double gearRatio, final double value) {
+	public double afterGears(final double gearRatio, final double value) {
 		return beforeGears(value)*gearRatio;
 	}
 }

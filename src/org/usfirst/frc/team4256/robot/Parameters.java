@@ -19,18 +19,10 @@ public abstract class Parameters {
 	public static final int Swerve_rotatorB = 12;//CAN, front right
 	public static final int Swerve_rotatorC = 13;//CAN, aft left
 	public static final int Swerve_rotatorD = 14;//CAN, aft right
-	public static final int Swerve_driveAA = 21;//CAN, front left
-	public static final int Swerve_driveAB = 22;//CAN, front left
-	public static final int Swerve_driveBA = 23;//CAN, front right
-	public static final int Swerve_driveBB = 24;//CAN, front right
-	public static final int Swerve_driveCA = 25;//CAN, aft left
-	public static final int Swerve_driveCB = 26;//CAN, aft left
-	public static final int Swerve_driveDA = 27;//CAN, aft right
-	public static final int Swerve_driveDB = 28;//CAN, aft right
-	public static final int Swerve_calibratorA = 0;//AIO, front left
-	public static final int Swerve_calibratorB = 1;//AIO, front right
-	public static final int Swerve_calibratorC = 2;//AIO, aft left
-	public static final int Swerve_calibratorD = 3;//AIO, aft right
+	public static final int Swerve_driveA = 21;//CAN, front left
+	public static final int Swerve_driveB = 22;//CAN, front right
+	public static final int Swerve_driveC = 23;//CAN, aft left
+	public static final int Swerve_driveD = 24;//CAN, aft right
 	
 	//PNEUMATICS
 	public static final int Shooter_flapModule = 0;//PCM

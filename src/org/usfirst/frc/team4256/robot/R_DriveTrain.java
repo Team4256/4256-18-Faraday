@@ -25,10 +25,10 @@ public class R_DriveTrain {
 	 * This function prepares each swerve module individually.
 	**/
 	public void init() {
-		moduleA.init();
-		moduleB.init();
-		moduleC.init();
-		moduleD.init();
+		moduleA.init(false);//TODO remove these params once electronics is correct
+		moduleB.init(false);
+		moduleC.init(false);
+		moduleD.init(false);
 	}
 	/**
 	 * This function indicates whether the entire drive train has been aligned.

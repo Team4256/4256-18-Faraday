@@ -58,13 +58,13 @@ public class Robot extends IterativeRobot {
 	//{Robot Output}
 	private static final Compressor compressor = new Compressor(0);
 	
-	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA, true, Parameters.Swerve_driveAA, Parameters.Swerve_driveAB);
-	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB, true, Parameters.Swerve_driveBA, Parameters.Swerve_driveBB);
-	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC, true, Parameters.Swerve_driveCA, Parameters.Swerve_driveCB);
-	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD, true, Parameters.Swerve_driveDA, Parameters.Swerve_driveDB);
+	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ true, Parameters.Swerve_driveA);
+	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ true, Parameters.Swerve_driveB);
+	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ true, Parameters.Swerve_driveC);
+	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ true, Parameters.Swerve_driveD);
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
-	private static final R_Talon lift = new R_Talon(Parameters.Lift, 1, R_Talon.percent);//TODO may not function the same as the voltage mode
+	private static final R_Talon lift = new R_Talon(Parameters.Lift,/*gear ratio*/ 1, R_Talon.percent);//TODO may not function the same as the voltage mode
 	private static final DoubleSolenoid clamp = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
 	private static final DoubleSolenoid gearer = new DoubleSolenoid(Parameters.Gearer_module, Parameters.Gearer_forward, Parameters.Gearer_reverse);
 	
@@ -142,7 +142,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
-			swerve.align(.004);//TODO limit how long this can take
+//			swerve.align(.004);//TODO limit how long this can take
 			moduleA.setTareAngle(5);	moduleB.setTareAngle(3);	moduleC.setTareAngle(4);	moduleD.setTareAngle(5);
 			//comp robot: 5, 3, 4, 5
 			//practice robot: 9, -3, 6, 8

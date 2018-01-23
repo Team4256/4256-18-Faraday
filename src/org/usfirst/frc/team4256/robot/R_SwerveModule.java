@@ -1,9 +1,7 @@
-package org.usfirst.frc.team4256.robot;//COMPLETE 2017
+package org.usfirst.frc.team4256.robot;
 
 import com.cyborgcats.reusable.Talon.R_Talon;
 import com.cyborgcats.reusable.V_Compass;
-
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
@@ -11,20 +9,25 @@ public class R_SwerveModule {
 	private double decapitated = 1;
 	private R_Talon rotation;
 	private R_Talon traction;
-	public DigitalInput sensor;
 	
-	public R_SwerveModule(final int rotatorID, final boolean flipped, final int tractionID, final int sensorID) {
-		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, flipped, R_Talon.absolute);
+	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID) {
+		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Talon.absolute, flippedSensor);
 		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent);
-		this.sensor = new DigitalInput(sensorID);
 	}
 	
 	
 	/**
-	 * This function prepares each motor individually, including setting PID values for the rotator and enslaving the second traction motor.
+	 * This function prepares each motor individually, including setting PID values for the rotator.
 	**/
-	public void init() {
+	public void init(final boolean reversedMotor) {
 		rotation.init();
+		rotation.setInverted(reversedMotor);//TODO Temporary line, only here until electronics are correct
+		/*
+		 * Though reversedMotor is a hardware characteristic that will not change after construction, I remembered why we didn't
+		 * put it in the constructor last year: we want to force electronics to be right in the first place, especially since
+		 * flipping motor leads is such an easy thing to fix. It would be nice to use the same argument for flippedSensor (which is
+		 * in the constructor) but changing that requires taking apart the whole encoder so we are more lenient.
+		 */
 		rotation.setNeutralMode(R_Talon.coast);
 		rotation.config_kP(0, 6, R_Talon.kTimeoutMS);
 		rotation.config_kI(0, 0, R_Talon.kTimeoutMS);

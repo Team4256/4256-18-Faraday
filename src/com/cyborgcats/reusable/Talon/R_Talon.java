@@ -27,7 +27,7 @@ public class R_Talon extends TalonSRX {
 	public V_Compass compass;
 	private double gearRatio;
 	//This constructor is intended for use with an encoder on a motor with limited motion.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType, final double protectedZoneStart, final double protectedZoneSize) {
+	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final FeedbackDevice deviceType, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
@@ -35,12 +35,12 @@ public class R_Talon extends TalonSRX {
 		}else {
 			configSelectedFeedbackSensor(deviceType, 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
-		setSensorPhase(flipped);
+		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final boolean flipped, final FeedbackDevice deviceType) {
+	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final FeedbackDevice deviceType, final boolean flippedSensor) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
@@ -48,7 +48,7 @@ public class R_Talon extends TalonSRX {
 		}else {
 			configSelectedFeedbackSensor(deviceType, 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
-		setSensorPhase(flipped);
+		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
 	}
