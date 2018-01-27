@@ -5,8 +5,8 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 public enum R_Encoder {
 	CTRE_MAG_ABSOLUTE(FeedbackDevice.CTRE_MagEncoder_Absolute, 4096),
 	CTRE_MAG_RELATIVE(FeedbackDevice.CTRE_MagEncoder_Relative, 4096),
-	THE_FIRST_QUAD(FeedbackDevice.QuadEncoder, 12),
-	THE_SECOND_QUAD(FeedbackDevice.QuadEncoder, 1111);
+	RS7_QUAD(FeedbackDevice.QuadEncoder, 12),
+	OEM_QUAD(FeedbackDevice.QuadEncoder, 1440);
 	
 	private final FeedbackDevice feedbackDevice;
 	private final int countsPerRev;
