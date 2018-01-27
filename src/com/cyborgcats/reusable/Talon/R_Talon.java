@@ -22,8 +22,9 @@ public class R_Talon extends TalonSRX {
 	private double lastLegalDirection = 1;
 	public V_Compass compass;
 	private double gearRatio;
-	private ConvertTo convertTo;
-	private ConvertFrom convertFrom;
+	private Convert convert;
+//	private ConvertTo convertTo;
+//	private ConvertFrom convertFrom;
 	//This constructor is intended for use with an encoder on a motor with limited motion.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
@@ -36,7 +37,7 @@ public class R_Talon extends TalonSRX {
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
-		convertTo.countsPerRev = (double)encoder.countsPerRev();		convertFrom.countsPerRev = (double)encoder.countsPerRev();
+		convert = new Convert(encoder.countsPerRev());
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
@@ -50,7 +51,7 @@ public class R_Talon extends TalonSRX {
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
-		convertTo.countsPerRev = (double)encoder.countsPerRev();		convertFrom.countsPerRev = (double)encoder.countsPerRev();
+		convert = new Convert(encoder.countsPerRev());
 	}
 	//This constructor is intended for a motor without an encoder.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
@@ -94,7 +95,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		if (getControlMode() != position) {return -1;}
-		return wraparound ? V_Compass.validateAngle(ConvertTo.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0))) : ConvertTo.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0))) : ConvertTo.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
 	
