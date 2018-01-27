@@ -30,7 +30,11 @@ public class R_Talon extends TalonSRX {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
-			throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			switch(encoder) {
+			case CTRE_MAG_ABSOLUTE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			case CTRE_MAG_RELATIVE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			default: break;
+			}
 		}else {
 			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
@@ -44,7 +48,11 @@ public class R_Talon extends TalonSRX {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
-			throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			switch(encoder) {
+			case CTRE_MAG_ABSOLUTE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			case CTRE_MAG_RELATIVE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			default: break;
+			}
 		}else {
 			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
@@ -95,7 +103,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		if (getControlMode() != position) {return -1;}
-		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0))) : ConvertTo.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
 	
@@ -147,7 +155,7 @@ public class R_Talon extends TalonSRX {
 		
 		case Position:
 			if (treatAsAngle) {
-				super.set(controlMode, ConvertFrom.DEGREES.afterGears(gearRatio, getCurrentAngle(false) + wornPath(value)));
+				super.set(controlMode, convert.from.DEGREES.afterGears(gearRatio, getCurrentAngle(false) + wornPath(value)));
 			}else {
 				//lastSetPoint = ConvertFrom.REVS.afterGears(gearRatio, value);
 				lastSetPoint = value*360.0/gearRatio;//TODO not sure exactly why this is being modified here
@@ -187,7 +195,7 @@ public class R_Talon extends TalonSRX {
 	public double getCurrentError() {//CURRENT, ANGLE, SPEED
 		switch (getControlMode()) {
 		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
-		case Position:return ConvertTo.DEGREES.afterGears(gearRatio, getClosedLoopError(0));
+		case Position:return convert.to.DEGREES.afterGears(gearRatio, getClosedLoopError(0));
 		case Velocity:return getClosedLoopError(0)*600/(4096.0*gearRatio);//TODO add this into enums
 		default:return -1;
 		}

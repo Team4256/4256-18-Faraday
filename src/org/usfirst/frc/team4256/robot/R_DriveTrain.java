@@ -3,9 +3,13 @@ package org.usfirst.frc.team4256.robot;
 import com.cyborgcats.reusable.R_Gyro;
 
 public class R_DriveTrain {
-	private static final double Side = 21.85;//inches, wheel tip to wheel tip
+	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
+	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
+	private static final double pivotToAftX = 8.90;//inches, pivot point to aft wheel tip, x
+	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
+	
 	private static final double Front = 25.85;//inches, wheel tip to wheel tip
-	private static final double Radius = Math.sqrt(Side*Side + Front*Front);
+	//private static final double Radius = Math.sqrt(Side*Side + Front*Front);
 	private boolean aligned = false;
 	private boolean aligning = false;
 	private R_Gyro gyro;
@@ -80,19 +84,37 @@ public class R_DriveTrain {
 	}
 	
 	public void holonomic(final double direction, final double speed, final double spin) {//TODO could combine holonomics
+		//TODO accept 2 speeds, one from ZED and one from driver. Use max()
 		double chassis_fieldAngle = gyro.getCurrentAngle();
-		double forward = Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
-		double strafe = Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
-		forward *= speed;strafe *= speed;
-		double a = strafe - spin*(Side/Radius),b = strafe + spin*(Side/Radius),c = forward - spin*(Front/Radius),d = forward + spin*(Front/Radius);
+		double speedY = Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		double speedX = Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		speedY *= speed;speedX *= speed;
+		
+		double moduleAX = speedX + speed*pivotToFrontY;
+		double moduleAY = speedY + speed*pivotToFrontX;
+		double moduleBX = speedX + speed*pivotToFrontY;
+		double moduleBY = speedY - speed*pivotToFrontX;
+		double moduleCX = speedX - speed*pivotToAftY;
+		double moduleCY = speedY + speed*pivotToAftX;
+		double moduleDX = speedX - speed*pivotToAftY;
+		double moduleDY = speedY - speed*pivotToAftX;
+		
+		
+//		double a = speedX - spin*(Side/Radius),
+//				b = speedX + spin*(Side/Radius),
+//				c = speedY - spin*(Front/Radius),
+//				d = speedY + spin*(Front/Radius);
 		boolean bad = speed == 0 && spin == 0;
-		moduleA.swivelTo(Math.toDegrees(Math.atan2(b,d)), bad);
-		moduleB.swivelTo(Math.toDegrees(Math.atan2(b,c)), bad);
-		moduleC.swivelTo(Math.toDegrees(Math.atan2(a,d)), bad);
-		moduleD.swivelTo(Math.toDegrees(Math.atan2(a,c)), bad);
+		moduleA.swivelTo(Math.toDegrees(Math.atan2(moduleAX, moduleAY)), bad);
+		moduleB.swivelTo(Math.toDegrees(Math.atan2(moduleBX, moduleBY)), bad);
+		moduleC.swivelTo(Math.toDegrees(Math.atan2(moduleCX, moduleCY)), bad);
+		moduleD.swivelTo(Math.toDegrees(Math.atan2(moduleDX, moduleDY)), bad);
 		
 		if (isThere(5)) {
-			double speedA = Math.sqrt(b*b + d*d),speedB = Math.sqrt(b*b + c*c),speedC = Math.sqrt(a*a + d*d),speedD = Math.sqrt(a*a + c*c);
+			double speedA = Math.sqrt(moduleAX*moduleAX + moduleAY*moduleAY),
+					speedB = Math.sqrt(moduleBX*moduleBX + moduleBY*moduleBY),
+					speedC = Math.sqrt(moduleCX*moduleCX + moduleCY*moduleCY),
+					speedD = Math.sqrt(moduleDX*moduleDX + moduleDY*moduleDY);
 			if (bad) {
 				moduleA.set(0);	moduleB.set(0);	moduleC.set(0);	moduleD.set(0);
 			}else {
