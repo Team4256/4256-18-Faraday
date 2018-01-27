@@ -38,6 +38,5 @@
 			<attribute name="javadoc_location" value="http://www.kauailabs.com/public_files/navx-mxp/apidocs/java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="USERLIBS_DIR/navx_frc-3.0.346.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
