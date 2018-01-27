@@ -2,13 +2,10 @@ package com.cyborgcats.reusable.Talon;
 
 import com.cyborgcats.reusable.V_Compass;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public class R_Talon extends TalonSRX {
-	public static final FeedbackDevice absolute = FeedbackDevice.CTRE_MagEncoder_Absolute;
-	public static final FeedbackDevice relative = FeedbackDevice.CTRE_MagEncoder_Relative;
 	public static final ControlMode current = ControlMode.Current;
 	public static final ControlMode follower = ControlMode.Follower;
 	public static final ControlMode percent = ControlMode.PercentOutput;
@@ -19,38 +16,41 @@ public class R_Talon extends TalonSRX {
 	public static final NeutralMode coast = NeutralMode.Coast;
 	
 	public static final int kTimeoutMS = 10;
-	public static final double countsPerRev = 4096.0;
 	private ControlMode controlMode;
 	private boolean updated = false;
 	private double lastSetPoint = 0;
 	private double lastLegalDirection = 1;
 	public V_Compass compass;
 	private double gearRatio;
+	private ConvertTo convertTo;
+	private ConvertFrom convertFrom;
 	//This constructor is intended for use with an encoder on a motor with limited motion.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final FeedbackDevice deviceType, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
+	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
-			throw new IllegalStateException("A CANTalon could not find its integrated versaplanetary encoder.");
+			throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
 		}else {
-			configSelectedFeedbackSensor(deviceType, 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
+			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
+		convertTo.countsPerRev = (double)encoder.countsPerRev();		convertFrom.countsPerRev = (double)encoder.countsPerRev();
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final FeedbackDevice deviceType, final boolean flippedSensor) {
+	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
 		super(deviceID);
 		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
-			throw new IllegalStateException("A CANTalon could not find its integrated versaplanetary encoder.");
+			throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
 		}else {
-			configSelectedFeedbackSensor(deviceType, 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
+			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
+		convertTo.countsPerRev = (double)encoder.countsPerRev();		convertFrom.countsPerRev = (double)encoder.countsPerRev();
 	}
 	//This constructor is intended for a motor without an encoder.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
@@ -187,7 +187,7 @@ public class R_Talon extends TalonSRX {
 		switch (getControlMode()) {
 		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
 		case Position:return ConvertTo.DEGREES.afterGears(gearRatio, getClosedLoopError(0));
-		case Velocity:return getClosedLoopError(0)*600/(countsPerRev*gearRatio);//TODO not sure if its supposed to be 600
+		case Velocity:return getClosedLoopError(0)*600/(4096.0*gearRatio);//TODO add this into enums
 		default:return -1;
 		}
 	}

@@ -4,7 +4,7 @@ public enum ConvertFrom {
 	REVS,
 	DEGREES;
 	
-	public static final double countsPerRev = 4096.0;
+	public double countsPerRev;
 	
 	public double beforeGears(final double value) {
 		switch(this) {

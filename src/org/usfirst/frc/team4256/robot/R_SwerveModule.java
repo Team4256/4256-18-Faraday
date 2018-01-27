@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4256.robot;
 
+import com.cyborgcats.reusable.Talon.R_Encoder;
 import com.cyborgcats.reusable.Talon.R_Talon;
 import com.cyborgcats.reusable.V_Compass;
 
@@ -11,7 +12,7 @@ public class R_SwerveModule {
 	private R_Talon traction;
 	
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID) {
-		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Talon.absolute, flippedSensor);
+		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
 		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent);
 	}
 	

@@ -4,7 +4,7 @@ public enum ConvertTo {
 	REVS,
 	DEGREES;
 	
-	public static final double countsPerRev = 4096.0;
+	public double countsPerRev;
 	
 	public double beforeGears(final int encoderCounts) {
 		switch(this) {
