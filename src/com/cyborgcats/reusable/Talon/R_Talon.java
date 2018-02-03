@@ -22,7 +22,7 @@ public class R_Talon extends TalonSRX {
 	private double lastLegalDirection = 1;
 	public V_Compass compass;
 	private double gearRatio;
-	private Convert convert;
+	public Convert convert;
 //	private ConvertTo convertTo;
 //	private ConvertFrom convertFrom;
 	//This constructor is intended for use with an encoder on a motor with limited motion.
