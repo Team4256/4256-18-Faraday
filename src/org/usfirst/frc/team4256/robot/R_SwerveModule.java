@@ -11,6 +11,12 @@ public class R_SwerveModule {
 	private R_Talon rotation;
 	private R_Talon traction;
 	
+	//This constructor is intended for use with the module which has an encoder on the traction motor.
+	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction) {
+		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
+		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent, R_Encoder.RS7_QUAD, flippedSensorTraction);
+	}
+	//This constructor is intended for all other modules.
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID) {
 		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
 		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent);

@@ -58,7 +58,7 @@ public class Robot extends IterativeRobot {
 	//{Robot Output}
 	private static final Compressor compressor = new Compressor(0);
 	
-	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ true, Parameters.Swerve_driveA);
+	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ true, Parameters.Swerve_driveA, false);
 	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ true, Parameters.Swerve_driveB);
 	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ true, Parameters.Swerve_driveC);
 	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ true, Parameters.Swerve_driveD);
