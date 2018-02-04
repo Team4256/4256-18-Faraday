@@ -78,9 +78,9 @@ public class R_Talon extends TalonSRX {
 		configPeakOutputForward(Math.abs(maxVolts), kTimeoutMS);//maximum voltage draw
 		configPeakOutputReverse(-Math.abs(maxVolts), kTimeoutMS);
 		if (getControlMode() == follower) {
-			quickSet(masterID);//TODO may need to be super set not quickSet
+			quickSet(masterID, false);
 		}else {
-			quickSet(0);//TODO may need to be super set not quickSet
+			quickSet(0, false);
 		}
 	}
 	
@@ -93,13 +93,16 @@ public class R_Talon extends TalonSRX {
 	}
 	
 	
+	/**
+	 * This function returns the current position in revolutions.
+	**/
 	public double getCurrentRevs() {
 		return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
 	
 	/**
-	 * This function returns the current angle. If wraparound is true, the output will be between 0 and 359.999...
+	 * This function returns the current position in degrees. If wraparound is true, the output will be between 0 and 359.999...
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
@@ -126,50 +129,108 @@ public class R_Talon extends TalonSRX {
 	
 	
 	/**
-	 * This function sets the motor's output or target setpoint based on the current control mode.
+	 * This function sets the motor's output or target setpoint based on the control mode.
 	 * Current: Milliamperes
 	 * Follower: ID
-	 * PercentVbus: -1 to 1
-	 * Position: Degrees
+	 * Percent: -1 to 1
+	 * Position: if treatAsDegrees, then will not spin more than 360 degrees
 	 * Speed: RPM
-	 * Voltage: -1 to 1 (gets scaled to -12 to 12)
 	**/
-	public void quickSet(final double value) {
-		set(value, true, true);
+	public void quickSet(final double value, final boolean treatAsDegrees) {
+		try {
+			this.set(value, treatAsDegrees, true);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
 	}
-	
-	public void set(double value, final boolean treatAsAngle, final boolean setupdated) {//CURRENT, ANGLE, SPEED
-		if (setupdated) {lastSetPoint = value;}
-		
-		switch (getControlMode()) {
-		case Current:super.set(controlMode, value);break;//just use the basic set function
-		case PercentOutput:super.set(controlMode, value);break;//just use the basic set function
-		case Velocity:super.set(controlMode, value);break;//just use the basic set function
-		
+
+
+	public void set(double value, final boolean treatAsDegrees, final boolean setUpdated) throws IllegalAccessException {
+		double currentSetPoint = lastSetPoint;
+		switch (controlMode) {
+		case Current:
+			currentSetPoint = setMilliAmps(value);
+			updated = setUpdated;break;
 		case Follower:
 			if (!updated) {//updated is treated differently for follower than for others because it should only be messed with once
-				super.set(controlMode, value);
-			}updated = true;
-			break;
-		
+				currentSetPoint = (double)setFollower((int)value);//casting back and forth from double to int is not the best, but necessary
+				updated = true;
+			}break;
+		case PercentOutput:
+			currentSetPoint = setPercent(value);
+			updated = setUpdated;break;
 		case Position:
-			if (treatAsAngle) {
-				super.set(controlMode, convert.from.DEGREES.afterGears(getCurrentAngle(false) + wornPath(value)));
-			}else {
-				//lastSetPoint = ConvertFrom.REVS.afterGears(gearRatio, value);
-				//lastSetPoint = value*360.0/gearRatio;//TODO not sure exactly why this is being modified here
-				super.set(controlMode, value);
-			}
-			break;
-		
-		case Disabled:
-			if (Math.abs(value) > 1) {value = Math.signum(value);}
-			super.set(controlMode, value*12);
-			break;
-			
-		default:break;
+			currentSetPoint = treatAsDegrees ? setDegrees(value) : setRevs(value);
+			updated = setUpdated;break;
+		case Velocity:
+			currentSetPoint = setRPM(value);
+			updated = setUpdated;break;
+		default:updated = false;break;
 		}
-		if (getControlMode() != follower) {updated = setupdated;}
+		
+		if (updated) {
+			lastSetPoint = currentSetPoint;
+		}
+	}
+
+	
+	private double setMilliAmps(final double milliAmps) throws IllegalAccessException {
+		if (controlMode == current) {
+			super.set(controlMode, milliAmps);
+		}else {
+			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given amps in " + controlMode.name() + " mode.");
+		}return milliAmps;
+	}
+	
+	
+	private int setFollower(final int masterID) throws IllegalAccessException {
+		if (controlMode == follower) {
+			super.set(controlMode, masterID);
+		}else {
+			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given master ID in " + controlMode.name() + " mode.");
+		}return masterID;
+	}
+	
+	
+	private double setPercent(final double percentage) throws IllegalAccessException {
+		if (controlMode == percent) {
+			super.set(controlMode, percentage);
+		}else {
+			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given percentage in " + controlMode.name() + " mode.");
+		}return percentage;
+	}
+	
+	
+	private double setDegrees(final double degrees) throws IllegalAccessException {
+		if (controlMode == position) {
+			final double encoderCounts = convert.from.DEGREES.afterGears(getCurrentAngle(false) + wornPath(degrees));
+			super.set(controlMode, encoderCounts);
+			return encoderCounts;
+		}else {
+			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given degrees in " + controlMode.name() + " mode.");
+		}
+	}
+	
+	
+	private double setRevs(final double revs) throws IllegalAccessException {
+		if (controlMode == position) {
+			final double encoderCounts = convert.from.REVS.afterGears(revs);
+			super.set(controlMode, encoderCounts);
+			return encoderCounts;
+		}else {
+			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given revs in " + controlMode.name() + " mode.");
+		}
+	}
+	
+	
+	private double setRPM(final double rpm) throws IllegalAccessException {
+		if (controlMode == velocity) {
+			final double encoderUnits = convert.from.RPM.afterGears(rpm);
+			super.set(controlMode, encoderUnits);
+			return encoderUnits;
+		}else {
+			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given rpm in " + controlMode.name() + " mode.");
+		}
 	}
 	
 	
@@ -178,7 +239,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public void completeLoopUpdate() {
 		if (!updated && getControlMode() != follower) {
-			this.set(lastSetPoint, true, false);
+			super.set(controlMode, lastSetPoint);
 		}else if (getControlMode() != follower) {
 			updated = false;
 		}
@@ -188,15 +249,15 @@ public class R_Talon extends TalonSRX {
 	/**
 	 * This function returns the PID error for the current control mode.
 	 * Current: Milliamperes
-	 * Position: Degrees
+	 * Position: neither degrees nor revs are wrapped around 360 or 1
 	 * Speed: RPM
 	**/
-	public double getCurrentError() {//CURRENT, ANGLE, SPEED
+	public double getCurrentError(final boolean asDegrees) {
 		switch (getControlMode()) {
 		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
-		case Position:return convert.to.DEGREES.afterGears(getClosedLoopError(0));
+		case Position:return asDegrees ? convert.to.DEGREES.afterGears(getClosedLoopError(0)) : convert.to.REVS.afterGears(getClosedLoopError(0));
 		case Velocity:return convert.to.RPM.afterGears(getClosedLoopError(0));
-		default:return -1;
+		default:return 0.0;
 		}
 	}
 }

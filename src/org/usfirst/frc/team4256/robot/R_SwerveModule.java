@@ -63,10 +63,10 @@ public class R_SwerveModule {
 	
 	/**
 	 * Use wheel_chassisAngle to specify the wheel's orientation relative to the robot in degrees.
-	 * If ignore is true, nothing will happen, which is useful for coasting based on variables outside this class' scope.
+	 * If ignore is true, nothing will happen, which is useful for coasting based on variables outside this class's scope.
 	**/
 	public void swivelTo(final double wheel_chassisAngle, final boolean ignore) {
-		if (!ignore) {rotation.quickSet(decapitateAngle(wheel_chassisAngle));}//if this doesn't run, complete loop update will eventually set it to be the last angle
+		if (!ignore) {rotation.quickSet(decapitateAngle(wheel_chassisAngle), true);}//if this doesn't run, complete loop update will eventually set it to be the last angle
 	}
 	
 	
@@ -83,7 +83,7 @@ public class R_SwerveModule {
 	 * It also makes sure that they turn in the correct direction, regardless of decapitated state.
 	**/
 	public void set(final double speed) {
-		traction.quickSet(speed*decapitated);
+		traction.quickSet(speed*decapitated, false);
 	}
 	
 	
@@ -100,7 +100,7 @@ public class R_SwerveModule {
 	 * Threshold should be specified in degrees. If the rotator is within that many degrees of its target, this function returns true.
 	**/
 	public boolean isThere(final double threshold) {
-		return Math.abs(rotation.getCurrentError()) <= threshold;
+		return Math.abs(rotation.getCurrentError(true)) <= threshold;
 	}
 	
 	

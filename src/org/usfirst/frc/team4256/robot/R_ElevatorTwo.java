@@ -30,9 +30,9 @@ public class R_ElevatorTwo {
 	public void zero() {
 		if(!limitSwitch.get()) {
 			knowsZero = false;
-			master.quickSet(-0.3);
+			master.quickSet(-0.3, false);
 		}else {
-			master.quickSet(0);
+			master.quickSet(0, false);
 			master.getSensorCollection().setQuadraturePosition(0, R_Talon.kTimeoutMS);
 			knowsZero = true;
 		}

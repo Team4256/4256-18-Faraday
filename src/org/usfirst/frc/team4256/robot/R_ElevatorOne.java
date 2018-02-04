@@ -44,7 +44,7 @@ public class R_ElevatorOne {
 	 * This function sets the elevator to a certain revolution value using PID.
 	**/
 	public void setRevs(final double revs) {
-		master.set(master.convert.from.REVS.afterGears(revs), false, true);
+		master.quickSet(revs, false);
 	}
 	
 	public double getRevs() {
@@ -66,7 +66,7 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void increment(final double revs) {
-		master.set(master.getCurrentRevs() + revs, false, true);
+		master.quickSet(master.getCurrentRevs() + revs, false);
 	}
 	
 	/**
@@ -78,7 +78,7 @@ public class R_ElevatorOne {
 			knowsZero = false;
 			increment(-0.3);
 		}else {
-			master.quickSet(0);
+			master.quickSet(0, false);
 			master.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
 			master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
 			master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
