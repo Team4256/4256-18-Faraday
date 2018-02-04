@@ -21,14 +21,11 @@ public class R_Talon extends TalonSRX {
 	private double lastSetPoint = 0;
 	private double lastLegalDirection = 1;
 	public V_Compass compass;
-	private double gearRatio;
 	public Convert convert;
-//	private ConvertTo convertTo;
-//	private ConvertFrom convertFrom;
+	
 	//This constructor is intended for use with an encoder on a motor with limited motion.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
-		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
 			case CTRE_MAG_ABSOLUTE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
@@ -41,12 +38,11 @@ public class R_Talon extends TalonSRX {
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
-		convert = new Convert(encoder.countsPerRev());
+		convert = new Convert(encoder.countsPerRev(), gearRatio);
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
 		super(deviceID);
-		this.gearRatio = gearRatio;
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
 			case CTRE_MAG_ABSOLUTE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
@@ -59,12 +55,11 @@ public class R_Talon extends TalonSRX {
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
-		convert = new Convert(encoder.countsPerRev());
+		convert = new Convert(encoder.countsPerRev(), gearRatio);
 	}
 	//This constructor is intended for a motor without an encoder.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
 		super(deviceID);
-		this.gearRatio = gearRatio;
 		this.controlMode = controlMode;
 		compass = new V_Compass(0, 0);
 	}
@@ -99,7 +94,7 @@ public class R_Talon extends TalonSRX {
 	
 	
 	public double getCurrentRevs() {
-		return convert.to.REVS.afterGears(gearRatio, getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
 	
@@ -107,7 +102,7 @@ public class R_Talon extends TalonSRX {
 	 * This function returns the current angle. If wraparound is true, the output will be between 0 and 359.999...
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
-		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(gearRatio, getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
 	
@@ -159,10 +154,10 @@ public class R_Talon extends TalonSRX {
 		
 		case Position:
 			if (treatAsAngle) {
-				super.set(controlMode, convert.from.DEGREES.afterGears(gearRatio, getCurrentAngle(false) + wornPath(value)));
+				super.set(controlMode, convert.from.DEGREES.afterGears(getCurrentAngle(false) + wornPath(value)));
 			}else {
 				//lastSetPoint = ConvertFrom.REVS.afterGears(gearRatio, value);
-				lastSetPoint = value*360.0/gearRatio;//TODO not sure exactly why this is being modified here
+				//lastSetPoint = value*360.0/gearRatio;//TODO not sure exactly why this is being modified here
 				super.set(controlMode, value);
 			}
 			break;
@@ -199,8 +194,8 @@ public class R_Talon extends TalonSRX {
 	public double getCurrentError() {//CURRENT, ANGLE, SPEED
 		switch (getControlMode()) {
 		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
-		case Position:return convert.to.DEGREES.afterGears(gearRatio, getClosedLoopError(0));
-		case Velocity:return getClosedLoopError(0)*600/(4096.0*gearRatio);//TODO add this into enums
+		case Position:return convert.to.DEGREES.afterGears(getClosedLoopError(0));
+		case Velocity:return convert.to.RPM.afterGears(getClosedLoopError(0));
 		default:return -1;
 		}
 	}

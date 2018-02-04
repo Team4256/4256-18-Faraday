@@ -8,10 +8,8 @@ public class R_DriveTrain {
 	private static final double pivotToAftX = 8.90;//inches, pivot point to aft wheel tip, x
 	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
 	
-	private static final double Front = 25.85;//inches, wheel tip to wheel tip
+	//private static final double Front = 25.85;//inches, wheel tip to wheel tip
 	//private static final double Radius = Math.sqrt(Side*Side + Front*Front);
-	private boolean aligned = false;
-	private boolean aligning = false;
 	private R_Gyro gyro;
 	private R_SwerveModule moduleA;
 	private R_SwerveModule moduleB;
@@ -33,18 +31,6 @@ public class R_DriveTrain {
 		moduleB.init(false);
 		moduleC.init(false);
 		moduleD.init(false);
-	}
-	/**
-	 * This function indicates whether the entire drive train has been aligned.
-	**/
-	public boolean isAligned() {
-		return aligned;
-	}
-	/**
-	 * This function indicates whether the entire drive train is aligning.
-	**/
-	public boolean isAligning() {
-		return aligning;
 	}
 //	/**
 //	 * 
@@ -86,9 +72,8 @@ public class R_DriveTrain {
 	public void holonomic(final double direction, final double speed, final double spin) {//TODO could combine holonomics
 		//TODO accept 2 speeds, one from ZED and one from driver. Use max()
 		double chassis_fieldAngle = gyro.getCurrentAngle();
-		double speedY = Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
-		double speedX = Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
-		speedY *= speed;speedX *= speed;
+		double speedY = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		double speedX = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
 		
 		double moduleAX = speedX + speed*pivotToFrontY;
 		double moduleAY = speedY + speed*pivotToFrontX;
@@ -99,11 +84,6 @@ public class R_DriveTrain {
 		double moduleDX = speedX - speed*pivotToAftY;
 		double moduleDY = speedY - speed*pivotToAftX;
 		
-		
-//		double a = speedX - spin*(Side/Radius),
-//				b = speedX + spin*(Side/Radius),
-//				c = speedY - spin*(Front/Radius),
-//				d = speedY + spin*(Front/Radius);
 		boolean bad = speed == 0 && spin == 0;
 		moduleA.swivelTo(Math.toDegrees(Math.atan2(moduleAX, moduleAY)), bad);
 		moduleB.swivelTo(Math.toDegrees(Math.atan2(moduleBX, moduleBY)), bad);
