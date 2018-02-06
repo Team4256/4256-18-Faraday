@@ -22,6 +22,7 @@ public class R_ElevatorTwo {
 	**/
 	public void init() {
 		master.setNeutralMode(R_Talon.coast);//TODO which works better?
+		master.init();
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4256.robot;
 
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.cyborgcats.reusable.Talon.R_Encoder;
 import com.cyborgcats.reusable.Talon.R_Talon;
 
@@ -11,8 +12,8 @@ public class R_ElevatorOne {
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
 	private static final double maximumHeight = 48.0;//inches
 	private R_Talon master;
-	private R_Talon followerA;
-	private R_Talon followerB;
+	private VictorSPX followerA;
+	private VictorSPX followerB;
 	private DoubleSolenoid shifter;
 	private DigitalInput limitSwitch;
 	private boolean isLowGear = true;
@@ -21,8 +22,8 @@ public class R_ElevatorOne {
 
 	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter, final int limitSwitchPort) {
 		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, false);
-		followerA = new R_Talon(followerAID, gearRatio, R_Talon.follower);
-		followerB = new R_Talon(followerBID, gearRatio, R_Talon.follower);
+		followerA = new VictorSPX(followerAID);
+		followerB = new VictorSPX(followerBID);
 		
 		this.shifter = shifter;	
 		
@@ -33,9 +34,10 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void init() {
-		master.setNeutralMode(R_Talon.coast);//TODO which works better?
+		master.setNeutralMode(R_Talon.coast);//TODO which works better (brake or coast)?
 		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
 		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
+		master.init();
 		followerA.follow(master);
 		followerB.follow(master);
 	}
@@ -80,7 +82,7 @@ public class R_ElevatorOne {
 		}else {
 			master.quickSet(0, false);
 			master.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
-			master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
+			master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion (might need to be reversed)
 			master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
 			master.overrideSoftLimitsEnable(false);
 			
@@ -107,7 +109,7 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void shiftLowGear() {
-		shifter.set(DoubleSolenoid.Value.kReverse);
+		shifter.set(DoubleSolenoid.Value.kForward);
 		isLowGear = true;
 	}
 	
@@ -115,7 +117,7 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void shiftHighGear() {
-		shifter.set(DoubleSolenoid.Value.kForward);
+		shifter.set(DoubleSolenoid.Value.kReverse);
 		isLowGear = false;
 	}
 	
