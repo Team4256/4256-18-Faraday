@@ -213,7 +213,6 @@ public class Robot extends IterativeRobot {
 		moduleB.completeLoopUpdate();
 		moduleC.completeLoopUpdate();
 		moduleD.completeLoopUpdate();
-		climberA.completeLoopUpdate();
 		lift.completeLoopUpdate();
 	}
 	
