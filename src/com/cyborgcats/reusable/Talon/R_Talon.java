@@ -70,9 +70,10 @@ public class R_Talon extends TalonSRX {
 	 * It then gets enslaved to the motor at the specified ID.
 	**/
 	public void init(final int masterID, final float maxVolts) {
-		//clearStickyFaults();TODO
+		clearStickyFaults(kTimeoutMS);//TODO everywhere where we have kTimeoutMS, do error handling
 		selectProfileSlot(0, 0);//first is motion profile slot (things like allowable error), second is PID slot ID
 		configAllowableClosedloopError(0, 0, kTimeoutMS);//motion profile slot, allowable error, timeout ms
+		//super.config
 		configNominalOutputForward(0, kTimeoutMS);//minimum voltage draw
 		configNominalOutputReverse(0, kTimeoutMS);
 		configPeakOutputForward(Math.abs(maxVolts), kTimeoutMS);//maximum voltage draw
@@ -160,7 +161,8 @@ public class R_Talon extends TalonSRX {
 			currentSetPoint = treatAsDegrees ? setDegrees(value) : setRevs(value);break;
 		case Velocity:
 			currentSetPoint = setRPM(value);break;
-		default:throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " is in some strange mode.");
+		case Disabled:break;
+		default:throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + "'s mode is unimplemented.");
 		}
 		
 		updated = true;
@@ -234,7 +236,7 @@ public class R_Talon extends TalonSRX {
 	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
 	**/
 	public void completeLoopUpdate() {
-		if (!updated) {super.set(controlMode, lastSetPoint);}//send a command if there hasn't yet been one
+		if (!updated) {super.set(controlMode, lastSetPoint);}//send a command if there hasn't yet been one, using raw encoder units
 		
 		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
 	}

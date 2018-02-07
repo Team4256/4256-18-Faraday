@@ -1,7 +1,8 @@
 package com.cyborgcats.reusable;//COMPLETE 2017
 
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort;
+
+import edu.wpi.first.wpilibj.I2C;
 
 public class R_Gyro extends AHRS {
 	private double lastMeasuredAngle = 0;
@@ -9,7 +10,7 @@ public class R_Gyro extends AHRS {
 	public V_Compass compass;
 	
 	public R_Gyro(final byte updateHz, final double protectedZoneStart, final double protectedZoneSize) {
-		super(SerialPort.Port.kMXP, SerialDataType.kProcessedData, updateHz);
+		super(I2C.Port.kMXP, updateHz);
 		reset();
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 	}

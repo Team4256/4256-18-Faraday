@@ -36,11 +36,14 @@ public class R_SwerveModule {
 		 * in the constructor) but changing that requires taking apart the whole encoder so we are more lenient.
 		 */
 		rotation.setNeutralMode(R_Talon.coast);
-		rotation.config_kP(0, 6, R_Talon.kTimeoutMS);
+		rotation.config_kP(0, 1.5, R_Talon.kTimeoutMS);
 		rotation.config_kI(0, 0, R_Talon.kTimeoutMS);
-		rotation.config_kD(0, .6, R_Talon.kTimeoutMS);
+		rotation.config_kD(0, 0.7, R_Talon.kTimeoutMS);
 		traction.init();
 		traction.setNeutralMode(R_Talon.coast);
+		traction.configPeakCurrentLimit(50, R_Talon.kTimeoutMS);
+		traction.configPeakCurrentDuration(250, R_Talon.kTimeoutMS);
+		traction.configContinuousCurrentLimit(45, R_Talon.kTimeoutMS);
 	}
 	
 	

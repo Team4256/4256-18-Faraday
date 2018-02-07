@@ -48,15 +48,15 @@ public class Robot extends IterativeRobot {
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
-	private static NetworkTableInstance nt;
-	private static NetworkTable faraday;
-	private static NetworkTable targeting;
-	private static NetworkTable zed;
-	private static double metersX = 0;
-	private static double metersY = 0;
+//	private static NetworkTableInstance nt;
+//	private static NetworkTable faraday;
+//	private static NetworkTable targeting;
+//	private static NetworkTable zed;
+//	private static double metersX = 0;
+//	private static double metersY = 0;
 	
 	//{Robot Output}
-	private static final Compressor compressor = new Compressor(0);
+//	private static final Compressor compressor = new Compressor(0);
 	
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ true, Parameters.Swerve_driveA, false);
 	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ true, Parameters.Swerve_driveB);
@@ -64,62 +64,62 @@ public class Robot extends IterativeRobot {
 	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ true, Parameters.Swerve_driveD);
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
-	private static final R_Talon lift = new R_Talon(Parameters.Lift,/*gear ratio*/ 1, R_Talon.percent);//TODO may not function the same as the voltage mode
-	private static final DoubleSolenoid clamp = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
-	private static final DoubleSolenoid gearer = new DoubleSolenoid(Parameters.Gearer_module, Parameters.Gearer_forward, Parameters.Gearer_reverse);
+//	private static final R_Talon lift = new R_Talon(Parameters.Lift,/*gear ratio*/ 1, R_Talon.percent);//TODO may not function the same as the voltage mode
+//	private static final DoubleSolenoid clamp = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
+//	private static final DoubleSolenoid gearer = new DoubleSolenoid(Parameters.Gearer_module, Parameters.Gearer_forward, Parameters.Gearer_reverse);
 	
 	@Override
 	public void robotInit() {
-		nt = NetworkTableInstance.getDefault();
-		//{Robot Input}
-		faraday = nt.getTable("Faraday");
-		targeting = nt.getTable("Targeting");
-		zed = nt.getTable("ZED");
-		//{Robot Output}
-		compressor.clearAllPCMStickyFaults();
+//		nt = NetworkTableInstance.getDefault();
+//		//{Robot Input}
+//		faraday = nt.getTable("Faraday");
+//		targeting = nt.getTable("Targeting");
+//		zed = nt.getTable("ZED");
+//		//{Robot Output}
+//		compressor.clearAllPCMStickyFaults();
 		swerve.init();
-		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
-		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
-		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
-		climberA.init();
-		climberA.setVoltageCompensationRampRate(24);
-		climberB.init(climberA.getDeviceID(), 12f);
-		climberB.setVoltageCompensationRampRate(24);
-		lift.init();
-		lift.setVoltageRampRate(8);
+//		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
+//		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
+//		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
+//		climberA.init();
+//		climberA.setVoltageCompensationRampRate(24);
+//		climberB.init(climberA.getDeviceID(), 12f);
+//		climberB.setVoltageCompensationRampRate(24);
+//		lift.init();
+//		lift.setVoltageRampRate(8);
 	}
 
 	@Override
 	public void autonomousInit() {
 		gyro.reset();
-		autoMode = (int)faraday.getNumber("auto mode", 1);
-		autoStep = 0;
-		V_PID.clear("forward");
-		V_PID.clear("strafe");
-		V_PID.clear("spin");
-		V_Instructions.resetTimer();
+//		autoMode = (int)faraday.getNumber("auto mode", 1);
+//		autoStep = 0;
+//		V_PID.clear("forward");
+//		V_PID.clear("strafe");
+//		V_PID.clear("spin");
+//		V_Instructions.resetTimer();
 	}
 	
 	@Override
 	public void teleopInit() {
-		if (DriverStation.getInstance().getAlliance() != DriverStation.Alliance.Red) {//TODO override all brake modes
-			Parameters.loadingStation += 90;
-		}
-		buttons2angle.put(R_Xbox.BUTTON_X, Parameters.leftGear);
-		buttons2angle.put(R_Xbox.BUTTON_A, Parameters.centerGear);
-		buttons2angle.put(R_Xbox.BUTTON_B, Parameters.rightGear);
-		buttons2angle.put(R_Xbox.BUTTON_Y, Parameters.loadingStation);
+//		if (DriverStation.getInstance().getAlliance() != DriverStation.Alliance.Red) {//TODO override all brake modes
+//			Parameters.loadingStation += 90;
+//		}
+//		buttons2angle.put(R_Xbox.BUTTON_X, Parameters.leftGear);
+//		buttons2angle.put(R_Xbox.BUTTON_A, Parameters.centerGear);
+//		buttons2angle.put(R_Xbox.BUTTON_B, Parameters.rightGear);
+//		buttons2angle.put(R_Xbox.BUTTON_Y, Parameters.loadingStation);
 		V_PID.clear("spin");
 		lockedAngle = gyro.getCurrentAngle();
 	}
 	
 	@Override
 	public void testInit() {//TODO these numbers should come from the ZED/TK1
-		zed.putNumber("x", 0);
-		zed.putNumber("y", 0);
-		zed.putNumber("expected x", 0);
-		zed.putNumber("expected y", 0);
-		zed.putNumber("expected angle", 0);
+//		zed.putNumber("x", 0);
+//		zed.putNumber("y", 0);
+//		zed.putNumber("expected x", 0);
+//		zed.putNumber("expected y", 0);
+//		zed.putNumber("expected angle", 0);
 	}
 	
 	@Override
@@ -128,11 +128,11 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotPeriodic() {
-		faraday.putBoolean("old gear out", gearer.get().equals(DoubleSolenoid.Value.kForward));
-		faraday.putBoolean("clamp open", clamp.get().equals(DoubleSolenoid.Value.kForward));
-		faraday.putBoolean("aligning", swerve.isAligning());
-		faraday.putBoolean("aligned", swerve.isAligned());
-		faraday.putNumber("match timer", V_Instructions.getSeconds());
+//		faraday.putBoolean("old gear out", gearer.get().equals(DoubleSolenoid.Value.kForward));
+//		faraday.putBoolean("clamp open", clamp.get().equals(DoubleSolenoid.Value.kForward));
+//		faraday.putBoolean("aligning", swerve.isAligning());
+//		faraday.putBoolean("aligned", swerve.isAligned());
+//		faraday.putNumber("match timer", V_Instructions.getSeconds());
 	}
 	
 	@Override
@@ -142,7 +142,6 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
-//			swerve.align(.004);//TODO limit how long this can take
 			moduleA.setTareAngle(5);	moduleB.setTareAngle(3);	moduleC.setTareAngle(4);	moduleD.setTareAngle(5);
 			//comp robot: 5, 3, 4, 5
 			//practice robot: 9, -3, 6, 8
@@ -181,25 +180,25 @@ public class Robot extends IterativeRobot {
 		
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_LB)) {//CLIMBER
-			double climbSpeed = driver.getRawButton(R_Xbox.BUTTON_RB) ? 1 : .6;
-			if (gunner.getAxisPress(R_Xbox.AXIS_LT, .5)) {climbSpeed *= -1;}
-			climberA.quickSet(climbSpeed);
-		}else {
-			climberA.quickSet(0);
-		}
-		
-		if (V_Fridge.freeze("POVSOUTH", driver.getPOV(0) == R_Xbox.POV_SOUTH)) {//GEARER
-			gearer.set(DoubleSolenoid.Value.kForward);
-		}else {
-			gearer.set(DoubleSolenoid.Value.kReverse);
-		}
-		
-		if (V_Fridge.freeze("AXISRT", driver.getAxisPress(R_Xbox.AXIS_RT, .5))) {//CLAMPER
-			clamp.set(DoubleSolenoid.Value.kForward);
-		}else {
-			clamp.set(DoubleSolenoid.Value.kReverse);
-		}
+//		if (driver.getRawButton(R_Xbox.BUTTON_LB)) {//CLIMBER
+//			double climbSpeed = driver.getRawButton(R_Xbox.BUTTON_RB) ? 1 : .6;
+//			if (gunner.getAxisPress(R_Xbox.AXIS_LT, .5)) {climbSpeed *= -1;}
+//			climberA.quickSet(climbSpeed);
+//		}else {
+//			climberA.quickSet(0);
+//		}
+//		
+//		if (V_Fridge.freeze("POVSOUTH", driver.getPOV(0) == R_Xbox.POV_SOUTH)) {//GEARER
+//			gearer.set(DoubleSolenoid.Value.kForward);
+//		}else {
+//			gearer.set(DoubleSolenoid.Value.kReverse);
+//		}
+//		
+//		if (V_Fridge.freeze("AXISRT", driver.getAxisPress(R_Xbox.AXIS_RT, .5))) {//CLAMPER
+//			clamp.set(DoubleSolenoid.Value.kForward);
+//		}else {
+//			clamp.set(DoubleSolenoid.Value.kReverse);
+//		}
 		
 		
 		if (gyro.netAcceleration() >= 1) {
@@ -213,20 +212,20 @@ public class Robot extends IterativeRobot {
 		moduleB.completeLoopUpdate();
 		moduleC.completeLoopUpdate();
 		moduleD.completeLoopUpdate();
-		lift.completeLoopUpdate();
+//		lift.completeLoopUpdate();
 	}
 	
 	@Override
 	public void testPeriodic() {
-		metersX = zed.getNumber("x", metersX);
-		metersY = zed.getNumber("y", metersY);
-		double expectedX = zed.getNumber("expected x", metersX);
-		double expectedY = zed.getNumber("expected y", metersY);
-		double expectedAngle = zed.getNumber("expected angle", gyro.getCurrentAngle());
-		double xError = expectedX - metersX;
-		double yError = expectedY - metersY;
-		double spinError = gyro.wornPath(expectedAngle);
-		swerve.holonomic2(V_PID.get("forward", yError), V_PID.get("strafe", xError), V_PID.get("spin", spinError));
+//		metersX = zed.getNumber("x", metersX);
+//		metersY = zed.getNumber("y", metersY);
+//		double expectedX = zed.getNumber("expected x", metersX);
+//		double expectedY = zed.getNumber("expected y", metersY);
+//		double expectedAngle = zed.getNumber("expected angle", gyro.getCurrentAngle());
+//		double xError = expectedX - metersX;
+//		double yError = expectedY - metersY;
+//		double spinError = gyro.wornPath(expectedAngle);
+//		swerve.holonomicCartesian(V_PID.get("forward", yError), V_PID.get("strafe", xError), V_PID.get("spin", spinError));
 	}
 	
 	@Override
