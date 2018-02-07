@@ -145,30 +145,26 @@ public class R_Talon extends TalonSRX {
 	}
 
 
-	public void set(double value, final boolean treatAsDegrees, final boolean setUpdated) throws IllegalAccessException {
+	public void set(double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws IllegalAccessException {
 		double currentSetPoint = lastSetPoint;
 		switch (controlMode) {
 		case Current:
-			currentSetPoint = setMilliAmps(value);
-			updated = setUpdated;break;
+			currentSetPoint = setMilliAmps(value);break;
 		case Follower:
 			if (!updated) {//updated is treated differently for follower than for others because it should only be messed with once
 				currentSetPoint = (double)setFollower((int)value);//casting back and forth from double to int is not the best, but necessary
-				updated = true;
 			}break;
 		case PercentOutput:
-			currentSetPoint = setPercent(value);
-			updated = setUpdated;break;
+			currentSetPoint = setPercent(value);break;
 		case Position:
-			currentSetPoint = treatAsDegrees ? setDegrees(value) : setRevs(value);
-			updated = setUpdated;break;
+			currentSetPoint = treatAsDegrees ? setDegrees(value) : setRevs(value);break;
 		case Velocity:
-			currentSetPoint = setRPM(value);
-			updated = setUpdated;break;
-		default:updated = false;break;
+			currentSetPoint = setRPM(value);break;
+		default:throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " is in some strange mode.");
 		}
 		
-		if (updated) {
+		updated = true;
+		if (updateSetPoint) {
 			lastSetPoint = currentSetPoint;
 		}
 	}
@@ -183,7 +179,7 @@ public class R_Talon extends TalonSRX {
 	}
 	
 	
-	private int setFollower(final int masterID) throws IllegalAccessException {
+	private int setFollower(final int masterID) throws IllegalAccessException {//Only works with other Talons. To follow Victors, use .follow() command.
 		if (controlMode == follower) {
 			super.set(controlMode, masterID);
 		}else {
@@ -238,11 +234,9 @@ public class R_Talon extends TalonSRX {
 	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
 	**/
 	public void completeLoopUpdate() {
-		if (!updated && getControlMode() != follower) {
-			super.set(controlMode, lastSetPoint);
-		}else if (getControlMode() != follower) {
-			updated = false;
-		}
+		if (!updated) {super.set(controlMode, lastSetPoint);}//send a command if there hasn't yet been one
+		
+		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
 	}
 	
 	
