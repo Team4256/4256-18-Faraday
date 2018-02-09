@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class R_ElevatorTwo {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
-	private static final double maximumHeight = 48.0;//inches
+	public static final double maximumHeight = 48.0;//inches
 	private R_Talon master;
 	private DigitalInput limitSwitch;
 	private boolean knowsZero = false;

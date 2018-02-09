@@ -142,7 +142,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
-			moduleA.setTareAngle(99);	moduleB.setTareAngle(39);	moduleC.setTareAngle(92);	moduleD.setTareAngle(0);
+			moduleA.setTareAngle(99);	moduleB.setTareAngle(39);	moduleC.setTareAngle(127);	moduleD.setTareAngle(0);
 			moduleA.swivelTo(0);	moduleB.swivelTo(0);	moduleC.swivelTo(0);	moduleD.swivelTo(0);
 		}
 		
@@ -172,7 +172,7 @@ public class Robot extends IterativeRobot {
 		}if (spin == 0) {
 			double spinError = 0;
 			if (speed >= .3) {spinError = gyro.wornPath(lockedAngle);}//stop rotation drift at high speeds
-			int gearButton = driver.mostRecentButton(gearButtons);
+//			int gearButton = driver.mostRecentButton(gearButtons);
 //			if (driver.lastPress(gearButton) > handsOffTime) {spinError = gyro.wornPath(buttons2angle.get(gearButton));}
 			if (Math.abs(spinError) > 3) {spin = V_PID.get("spin", spinError);}
 		}
