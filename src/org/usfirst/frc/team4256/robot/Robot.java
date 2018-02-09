@@ -174,7 +174,7 @@ public class Robot extends IterativeRobot {
 			double spinError = 0;
 			if (speed >= .3) {spinError = gyro.wornPath(lockedAngle);}//stop rotation drift at high speeds
 			int gearButton = driver.mostRecentButton(gearButtons);
-			if (driver.lastPress(gearButton) > handsOffTime) {spinError = gyro.wornPath(buttons2angle.get(gearButton));}
+//			if (driver.lastPress(gearButton) > handsOffTime) {spinError = gyro.wornPath(buttons2angle.get(gearButton));}
 			if (Math.abs(spinError) > 3) {spin = V_PID.get("spin", spinError);}
 		}
 		

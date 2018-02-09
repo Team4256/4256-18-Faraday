@@ -10,7 +10,7 @@ public class R_Gyro extends AHRS {
 	public V_Compass compass;
 	
 	public R_Gyro(final byte updateHz, final double protectedZoneStart, final double protectedZoneSize) {
-		super(I2C.Port.kMXP, updateHz);
+		super(I2C.Port.kOnboard, updateHz);
 		reset();
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 	}
