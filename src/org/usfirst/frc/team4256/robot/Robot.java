@@ -58,10 +58,10 @@ public class Robot extends IterativeRobot {
 	//{Robot Output}
 //	private static final Compressor compressor = new Compressor(0);
 	
-	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ true, Parameters.Swerve_driveA, false);
-	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ true, Parameters.Swerve_driveB);
-	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ true, Parameters.Swerve_driveC);
-	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ true, Parameters.Swerve_driveD);
+	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
+	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB);
+	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC);
+	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, false);
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
 //	private static final R_Talon lift = new R_Talon(Parameters.Lift,/*gear ratio*/ 1, R_Talon.percent);//TODO may not function the same as the voltage mode
@@ -142,9 +142,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
-			moduleA.setTareAngle(5);	moduleB.setTareAngle(3);	moduleC.setTareAngle(4);	moduleD.setTareAngle(5);
-			//comp robot: 5, 3, 4, 5
-			//practice robot: 9, -3, 6, 8
+			moduleA.setTareAngle(99);	moduleB.setTareAngle(39);	moduleC.setTareAngle(92);	moduleD.setTareAngle(0);
+			moduleA.swivelTo(0);	moduleB.swivelTo(0);	moduleC.swivelTo(0);	moduleD.swivelTo(0);
 		}
 		
 		if (gunner.getRawButton(R_Xbox.BUTTON_START) && gunner.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET

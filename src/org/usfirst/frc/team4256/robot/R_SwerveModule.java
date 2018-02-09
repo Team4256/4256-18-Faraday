@@ -28,7 +28,6 @@ public class R_SwerveModule {
 	**/
 	public void init(final boolean reversedMotor) {
 		rotation.init();
-		rotation.setInverted(reversedMotor);//TODO Temporary line, only here until electronics are correct
 		/*
 		 * Though reversedMotor is a hardware characteristic that will not change after construction, I remembered why we didn't
 		 * put it in the constructor last year: we want to force electronics to be right in the first place, especially since
@@ -36,10 +35,12 @@ public class R_SwerveModule {
 		 * in the constructor) but changing that requires taking apart the whole encoder so we are more lenient.
 		 */
 		rotation.setNeutralMode(R_Talon.coast);
-		rotation.config_kP(0, 1.5, R_Talon.kTimeoutMS);
+		rotation.config_kP(0, 2.9, R_Talon.kTimeoutMS);
 		rotation.config_kI(0, 0, R_Talon.kTimeoutMS);
-		rotation.config_kD(0, 0.7, R_Talon.kTimeoutMS);
+		rotation.config_kD(0, 1.2, R_Talon.kTimeoutMS);
+		
 		traction.init();
+		traction.setInverted(reversedMotor);//TODO Temporary line, only here until electronics are correct
 		traction.setNeutralMode(R_Talon.coast);
 		traction.configPeakCurrentLimit(50, R_Talon.kTimeoutMS);
 		traction.configPeakCurrentDuration(250, R_Talon.kTimeoutMS);
@@ -52,7 +53,7 @@ public class R_SwerveModule {
 	 * Useful when correcting for loose mechanical tolerances.
 	**/
 	public void setTareAngle(final double tareAngle) {
-		rotation.compass.setTareAngle(rotation.compass.getTareAngle() + tareAngle);
+		rotation.compass.setTareAngle(/*rotation.compass.getTareAngle() + */tareAngle);
 	}
 	
 	

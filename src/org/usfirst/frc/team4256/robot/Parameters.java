@@ -2,40 +2,59 @@ package org.usfirst.frc.team4256.robot;
 
 public abstract class Parameters {
 	//ELECTRONICS
-	public static final int ClimberA = 18;//CAN, master
-	public static final int ClimberB = 19;//CAN, slave
+	public static final int Swerve_rotatorA = 11;//CAN, Talon SRX, front left, PDP 4
+	public static final int Swerve_rotatorB = 12;//CAN, Talon SRX, front right, PDP 5
+	public static final int Swerve_rotatorC = 13;//CAN, Talon SRX, aft left, PDP 6
+	public static final int Swerve_rotatorD = 14;//CAN, Talon SRX, aft right, PDP 7
+	public static final int Swerve_driveA = 21;//CAN, Talon SRX, front left, PDP 0
+	public static final int Swerve_driveB = 22;//CAN, Talon SRX, front right, PDP 1
+	public static final int Swerve_driveC = 23;//CAN, Talon SRX, aft left, PDP 2
+	public static final int Swerve_driveD = 24;//CAN, Talon SRX, aft right, PDP 3
 	
-	public static final int Camera_servoX = 8;//PWM
-	public static final int Camera_servoY = 9;//PWM
+	public static final int intakeLeft = 15;//CAN, Victor SPX, PDP 8
+	public static final int intakeRight = 16;//CAN, Victor SPX, PDP 9
 	
-	public static final int Lift = 15;//CAN
+	public static final int elevatorMotorD = 17;//CAN, Talon SRX, PDP 10, Second Stage
 	
-	public static final int Shooter_flywheel = 16;//CAN
-	public static final int Shooter_rotator = 17;//CAN
-	public static final int Shooter_linearServos = 5;//PWM
-	public static final int Shooter_calibrator = 6;//DIO
+	public static final int elevatorMotorA = 26;//CAN, Talon SRX, Master, PDP 12, First Stage
+	public static final int elevatorMotorB = 27;//CAN, Victor SPX, Follower, PDP 13, First Stage
+	public static final int elevatorMotorC = 28;//CAN, Victor SPX, Follower, PDP 14, First Stage
 	
-	public static final int Swerve_rotatorA = 11;//CAN, front left
-	public static final int Swerve_rotatorB = 12;//CAN, front right
-	public static final int Swerve_rotatorC = 13;//CAN, aft left
-	public static final int Swerve_rotatorD = 14;//CAN, aft right
-	public static final int Swerve_driveA = 21;//CAN, front left
-	public static final int Swerve_driveB = 22;//CAN, front right
-	public static final int Swerve_driveC = 23;//CAN, aft left
-	public static final int Swerve_driveD = 24;//CAN, aft right
-	
-	//PNEUMATICS
-	public static final int Shooter_flapModule = 0;//PCM
-	public static final int Shooter_flapForward = 2;//PCM
-	public static final int Shooter_flapReverse = 3;//PCM
-	
-	public static final int Gearer_module = 0;//PCM
-	public static final int Gearer_forward = 0;//PCM
-	public static final int Gearer_reverse = 1;//PCM
-	
-	public static final int Clamp_module = 0;//PCM
-	public static final int Clamp_forward = 2;//PCM
-	public static final int Clamp_reverse = 3;//PCM
+	public static final int clampyRotator = 29;//CAN, Talon SRX, PDP 15
+//	public static final int ClimberA = 18;//CAN, master
+//	public static final int ClimberB = 19;//CAN, slave
+//	
+//	public static final int Camera_servoX = 8;//PWM
+//	public static final int Camera_servoY = 9;//PWM
+//	
+//	public static final int Lift = 15;//CAN
+//	
+//	public static final int Shooter_flywheel = 16;//CAN
+//	public static final int Shooter_rotator = 17;//CAN
+//	public static final int Shooter_linearServos = 5;//PWM
+//	public static final int Shooter_calibrator = 6;//DIO
+//	
+//	public static final int Swerve_rotatorA = 11;//CAN, front left
+//	public static final int Swerve_rotatorB = 12;//CAN, front right
+//	public static final int Swerve_rotatorC = 13;//CAN, aft left
+//	public static final int Swerve_rotatorD = 14;//CAN, aft right
+//	public static final int Swerve_driveA = 21;//CAN, front left
+//	public static final int Swerve_driveB = 22;//CAN, front right
+//	public static final int Swerve_driveC = 23;//CAN, aft left
+//	public static final int Swerve_driveD = 24;//CAN, aft right
+//	
+//	//PNEUMATICS
+//	public static final int Shooter_flapModule = 0;//PCM
+//	public static final int Shooter_flapForward = 2;//PCM
+//	public static final int Shooter_flapReverse = 3;//PCM
+//	
+//	public static final int Gearer_module = 0;//PCM
+//	public static final int Gearer_forward = 0;//PCM
+//	public static final int Gearer_reverse = 1;//PCM
+//	
+//	public static final int Clamp_module = 0;//PCM
+//	public static final int Clamp_forward = 2;//PCM
+//	public static final int Clamp_reverse = 3;//PCM
 	
 	//AUTONOMOUS
 	public static final double[][] leftInstructions = new double[][] {
