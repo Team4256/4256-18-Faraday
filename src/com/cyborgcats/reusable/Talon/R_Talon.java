@@ -109,6 +109,10 @@ public class R_Talon extends TalonSRX {
 		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
+	public double getCurrentRPM() {
+		return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));
+	}
+	
 	
 	/**
 	 * This function finds the shortest legal path from the current angle to the end angle and returns the size of that path in degrees.

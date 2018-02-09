@@ -6,20 +6,24 @@ import com.cyborgcats.reusable.V_Compass;
 
 public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
-	public static final double tractionGearRatio = 15.6;
+	public static final double tractionGearRatio = 40.0/3.0;
+	public static final double tractionWheelCircumference = 2.625*Math.PI;
 	private double decapitated = 1;
 	private R_Talon rotation;
 	private R_Talon traction;
+	private boolean hasTractionSensor;
 	
 	//This constructor is intended for use with the module which has an encoder on the traction motor.
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction) {
 		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
 		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent, R_Encoder.RS7_QUAD, flippedSensorTraction);
+		hasTractionSensor = true;
 	}
 	//This constructor is intended for all other modules.
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID) {
 		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
 		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent);
+		hasTractionSensor = false;
 	}
 	
 	
@@ -116,6 +120,20 @@ public class R_SwerveModule {
 		decapitated = Math.abs(rotation.wornPath(endAngle)) > 90 ? -1 : 1;
 		return decapitated == -1 ? V_Compass.validateAngle(endAngle + 180) : V_Compass.validateAngle(endAngle);
 	}
+	
+	public double netDistance() {
+		return traction.getCurrentRevs()*tractionWheelCircumference;
+	}
+	
+	public double getSpeed() {
+		if (hasTractionSensor) {
+			return traction.getCurrentRPM();
+		}else {
+			throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
+		}
+	}
+	
+	//TODO getSpeed direction, X, Y, chassis centric, field centric
 	
 	
 	/**
