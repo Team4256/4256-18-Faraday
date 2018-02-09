@@ -62,8 +62,8 @@ public class R_ElevatorTwo {
 	/**
 	 * 
 	**/
-	public void increment(final double revs) {
-		master.quickSet(master.getCurrentRevs() + revs, false);
+	public void increment(final double inches) {
+		setInches(getInches() + inches);
 	}
 	
 	/**
