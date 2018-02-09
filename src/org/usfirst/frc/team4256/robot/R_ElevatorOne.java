@@ -49,6 +49,9 @@ public class R_ElevatorOne {
 		master.quickSet(revs, false);
 	}
 	
+	/**
+	 * 
+	**/
 	public double getRevs() {
 		return master.getCurrentRevs();
 	}
@@ -60,6 +63,9 @@ public class R_ElevatorOne {
 		setRevs(inchesToRevs(inches));
 	}
 	
+	/**
+	 * 
+	**/
 	public double getInches() {
 		return revsToInches(getRevs());
 	}
@@ -128,12 +134,17 @@ public class R_ElevatorOne {
 		return isLowGear;
 	}
 	
+	/**
+	 * 
+	**/
 	private static double inchesToRevs(final double inches) {
 		return inches/sprocketCircumference;
 	}
 	
+	/**
+	 * 
+	**/
 	private static double revsToInches(final double revs) {
 		return sprocketCircumference*revs;
 	}
-
 }
