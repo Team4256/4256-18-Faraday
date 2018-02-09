@@ -28,8 +28,8 @@ public class R_DriveTrain {
 	**/
 	public void init() {
 		moduleA.init(false);//TODO remove these params once electronics is correct
-		moduleB.init(false);
-		moduleC.init(false);
+		moduleB.init(true);
+		moduleC.init(true);
 		moduleD.init(false);
 	}
 	
