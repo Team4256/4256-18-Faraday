@@ -11,80 +11,69 @@ public abstract class Parameters {
 	public static final int Swerve_driveC = 23;//CAN, Talon SRX, aft left, PDP 2
 	public static final int Swerve_driveD = 24;//CAN, Talon SRX, aft right, PDP 3
 	
-	public static final int intakeLeft = 15;//CAN, Victor SPX, PDP 8
-	public static final int intakeRight = 16;//CAN, Victor SPX, PDP 9
+	public static final int Intake_left = 15;//CAN, Victor SPX, PDP 8
+	public static final int Intake_right = 16;//CAN, Victor SPX, PDP 9
 	
-	public static final int elevatorMotorD = 17;//CAN, Talon SRX, PDP 10, Second Stage
+	public static final int ElevatorOne_master = 26;//CAN, Talon SRX, Master, PDP 12, First Stage
+	public static final int ElevatorOne_followerA = 27;//CAN, Victor SPX, Follower, PDP 13, First Stage
+	public static final int ElevatorOne_followerB = 28;//CAN, Victor SPX, Follower, PDP 14, First Stage
+	public static final int ElevatorOne_calibrator = 0;//DIO, First Stage
 	
-	public static final int elevatorMotorA = 26;//CAN, Talon SRX, Master, PDP 12, First Stage
-	public static final int elevatorMotorB = 27;//CAN, Victor SPX, Follower, PDP 13, First Stage
-	public static final int elevatorMotorC = 28;//CAN, Victor SPX, Follower, PDP 14, First Stage
+	public static final int ElevatorTwo_master = 17;//CAN, Talon SRX, PDP 10, Second Stage
+	public static final int ElevatorTwo_calibrator = 1;//DIO, Second Stage
 	
 	public static final int clampyRotator = 29;//CAN, Talon SRX, PDP 15
-//	public static final int ClimberA = 18;//CAN, master
-//	public static final int ClimberB = 19;//CAN, slave
-//	
-//	public static final int Camera_servoX = 8;//PWM
-//	public static final int Camera_servoY = 9;//PWM
-//	
-//	public static final int Lift = 15;//CAN
-//	
-//	public static final int Shooter_flywheel = 16;//CAN
-//	public static final int Shooter_rotator = 17;//CAN
-//	public static final int Shooter_linearServos = 5;//PWM
-//	public static final int Shooter_calibrator = 6;//DIO
-//	
-//	public static final int Swerve_rotatorA = 11;//CAN, front left
-//	public static final int Swerve_rotatorB = 12;//CAN, front right
-//	public static final int Swerve_rotatorC = 13;//CAN, aft left
-//	public static final int Swerve_rotatorD = 14;//CAN, aft right
-//	public static final int Swerve_driveA = 21;//CAN, front left
-//	public static final int Swerve_driveB = 22;//CAN, front right
-//	public static final int Swerve_driveC = 23;//CAN, aft left
-//	public static final int Swerve_driveD = 24;//CAN, aft right
-//	
-//	//PNEUMATICS
-//	public static final int Shooter_flapModule = 0;//PCM
-//	public static final int Shooter_flapForward = 2;//PCM
-//	public static final int Shooter_flapReverse = 3;//PCM
-//	
-//	public static final int Gearer_module = 0;//PCM
-//	public static final int Gearer_forward = 0;//PCM
-//	public static final int Gearer_reverse = 1;//PCM
-//	
-//	public static final int Clamp_module = 0;//PCM
-//	public static final int Clamp_forward = 2;//PCM
-//	public static final int Clamp_reverse = 3;//PCM
+	
+	//PNEUMATICS
+	public static final int ElevatorOne_shifterModule = 0;//PCM
+	public static final int ElevatorOne_shifterForward = 2;//PCM
+	public static final int ElevatorOne_shifterReverse = 3;//PCM
+	
+	public static final int Clamp_module = 0;//PCM
+	public static final int Clamp_forward = 2;//PCM
+	public static final int Clamp_reverse = 3;//PCM
 	
 	//AUTONOMOUS
-	public static final double[][] leftInstructions = new double[][] {
-		//duration ms, direction, speed, orientation
-		{2150, -20, .2, Parameters.leftGear},
-		{700, 0, 0, Parameters.leftGear},
-		{250, Parameters.leftGear, .15, Parameters.leftGear}
-	};
-	public static final double[][] middleInstructions = new double[][] {
-		//duration ms, direction, speed, orientation
-		{1000, 0, .15, 0}
-	};
-	public static final double[][] rightInstructions = new double[][] {
-		//duration ms, direction, speed, orientation
-		{2000, 20, .2, Parameters.rightGear},
-		{500, 0.01, 0, Parameters.rightGear},
-		{300, Parameters.rightGear, .15, Parameters.rightGear}
-	};
+//	public static final double[][] leftInstructions = new double[][] {
+//		//duration ms, direction, speed, orientation
+//		{2150, -20, .2, Parameters.leftGear},
+//		{700, 0, 0, Parameters.leftGear},
+//		{250, Parameters.leftGear, .15, Parameters.leftGear}
+//	};
+//	public static final double[][] middleInstructions = new double[][] {
+//		//duration ms, direction, speed, orientation
+//		{1000, 0, .15, 0}
+//	};
+//	public static final double[][] rightInstructions = new double[][] {
+//		//duration ms, direction, speed, orientation
+//		{2000, 20, .2, Parameters.rightGear},
+//		{500, 0.01, 0, Parameters.rightGear},
+//		{300, Parameters.rightGear, .15, Parameters.rightGear}
+//	};
 	
 	//VALUES
+	public static enum ElevatorPresets {//TODO get accurate numbers
+		FLOOR(0),
+		SWITCH(12),
+		SCALE_LOW(60),
+		SCALE_HIGH(72);
+		
+		private final int height;
+		
+		ElevatorPresets(final int height) {
+			this.height = height;
+		}
+		
+		public int height() {
+			return height;
+		}
+	}
+	
 	public static final byte Gyrometer_updateHz = 50;
 	
-	public static final double leftGear = 60;
-	public static final double centerGear = 0;
-	public static final double rightGear = 330;
-	public static double loadingStation = 320;
-	
-	public static final double swerveP = .6;
-	public static final double swerveI = 0;
-	public static final double swerveD = 6;
+	public static final double swerveP = 2.9;
+	public static final double swerveI = 0.0;
+	public static final double swerveD = 1.2;
 	
 	public static final double spinP = .0025;
 	public static final double spinI = .000015;

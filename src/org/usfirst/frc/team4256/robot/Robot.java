@@ -1,27 +1,25 @@
-//DRIVER//TODO document new driver commands
+//DRIVER
 //start + back: align
 //left stick, both axis: raw speed and direction
 //right stick, x axis: raw spin
 //left stick, press: snail mode drive
 //right stick, press: snail mode spin
-//LB: boolean climber
-//LT: toggle clamp
-//RB: turbo mode (drive and climber)
-//RT: toggle lift
-//X: left gear orientation
-//A: center gear orientation
-//B: right gear orientation
-//Y: loading station orientation
-//dpad down: toggle gearer
+//LB: 
+//LT: increment elevator down
+//RB: turbo mode drive
+//RT: increment elevator up
+//X: elevator low scale preset
+//A: elevator floor preset
+//B: elevator switch preset
+//Y: elevator high scale preset
+//dpad down: 
 
 //GUNNER
 //start + back: gyro reset
-//LT: reverse driver's climbing commands
 
 package org.usfirst.frc.team4256.robot;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
 
 import com.cyborgcats.reusable.Talon.R_Talon;
 import com.cyborgcats.reusable.R_Gyro;
@@ -42,9 +40,7 @@ public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final R_Xbox driver = new R_Xbox(0);
 	private static final R_Xbox gunner = new R_Xbox(1);
-	private static final Map<Integer, Double> buttons2angle = new HashMap<Integer, Double>();
-	private static final int[] gearButtons = new int[] {R_Xbox.BUTTON_X, R_Xbox.BUTTON_A, R_Xbox.BUTTON_B, R_Xbox.BUTTON_Y};
-	private static Long handsOffTime = System.currentTimeMillis();
+	private static double desiredElevatorHeight = ElevatorPresets.FLOOR.height();
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
@@ -56,7 +52,7 @@ public class Robot extends IterativeRobot {
 //	private static double metersY = 0;
 	
 	//{Robot Output}
-//	private static final Compressor compressor = new Compressor(0);
+	private static final Compressor compressor = new Compressor(0);
 	
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
 	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB);
@@ -64,9 +60,11 @@ public class Robot extends IterativeRobot {
 	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, false);
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
-//	private static final R_Talon lift = new R_Talon(Parameters.Lift,/*gear ratio*/ 1, R_Talon.percent);//TODO may not function the same as the voltage mode
-//	private static final DoubleSolenoid clamp = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
-//	private static final DoubleSolenoid gearer = new DoubleSolenoid(Parameters.Gearer_module, Parameters.Gearer_forward, Parameters.Gearer_reverse);
+	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
+	private static final R_ElevatorOne elevatorOne = new R_ElevatorOne(Parameters.ElevatorOne_master, Parameters.ElevatorOne_followerA, Parameters.ElevatorOne_followerB, elevatorOneShifter, Parameters.ElevatorOne_calibrator);
+	private static final R_ElevatorTwo elevatorTwo = new R_ElevatorTwo(Parameters.ElevatorTwo_master, Parameters.ElevatorTwo_calibrator);
+	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
+	
 	
 	@Override
 	public void robotInit() {
@@ -76,7 +74,7 @@ public class Robot extends IterativeRobot {
 //		targeting = nt.getTable("Targeting");
 //		zed = nt.getTable("ZED");
 //		//{Robot Output}
-//		compressor.clearAllPCMStickyFaults();
+		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 //		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
 //		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
@@ -105,12 +103,8 @@ public class Robot extends IterativeRobot {
 //		if (DriverStation.getInstance().getAlliance() != DriverStation.Alliance.Red) {//TODO override all brake modes
 //			Parameters.loadingStation += 90;
 //		}
-//		buttons2angle.put(R_Xbox.BUTTON_X, Parameters.leftGear);
-//		buttons2angle.put(R_Xbox.BUTTON_A, Parameters.centerGear);
-//		buttons2angle.put(R_Xbox.BUTTON_B, Parameters.rightGear);
-//		buttons2angle.put(R_Xbox.BUTTON_Y, Parameters.loadingStation);
-		V_PID.clear("spin");
 		lockedAngle = gyro.getCurrentAngle();
+		V_PID.clear("spin");
 	}
 	
 	@Override
@@ -143,6 +137,8 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
 			moduleA.setTareAngle(99);	moduleB.setTareAngle(39);	moduleC.setTareAngle(127);	moduleD.setTareAngle(0);
+			//practice robot:		99,			39,			127,		0
+			//competit robot:		??,			??,			???,		?
 			moduleA.swivelTo(0);	moduleB.swivelTo(0);	moduleC.swivelTo(0);	moduleD.swivelTo(0);
 		}
 		
@@ -154,38 +150,45 @@ public class Robot extends IterativeRobot {
 		
 		//{calculating speed}
 		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//--turbo mode
-		if (!driver.getRawButton(R_Xbox.BUTTON_RB)) {speed *= .6;}//--normal mode
-		if (driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT)) {speed *= .5;}//--snail mode
+		if (!driver.getRawButton(R_Xbox.BUTTON_RB)) {speed *= .6;}//--------normal mode
+		if (driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT)) {speed *= .5;}//-snail mode
 		speed *= speed;
 		//{calculating raw spin}
 		double spin = driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);
-		spin *= spin*Math.signum(spin)*.5;//--normal mode
+		spin *= spin*0.5*Math.signum(spin);//-------------------------------normal mode
 		if (driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT)) {
-			spin *= .5;//--snail mode
-			if (speed == 0) {speed = .01;}//.01 restrains coast after spinning by hacking holonomic
+			spin *= .5;//---------------------------------------------------snail mode
+			if (speed == 0) {speed = .01;}
+			//.01 restrains coast after spinning by hacking holonomic
 		}
 		//{adding driver aids}
 		if (V_Fridge.becomesTrue("hands off", spin == 0)) {
-			handsOffTime = System.currentTimeMillis();
-			lockedAngle = gyro.getCurrentAngle();//remember angle when driver stops rotating
+			lockedAngle = gyro.getCurrentAngle();
+			//remember angle when driver stops rotating
 			V_PID.clear("spin");
 		}if (spin == 0) {
 			double spinError = 0;
-			if (speed >= .3) {spinError = gyro.wornPath(lockedAngle);}//stop rotation drift at high speeds
-//			int gearButton = driver.mostRecentButton(gearButtons);
-//			if (driver.lastPress(gearButton) > handsOffTime) {spinError = gyro.wornPath(buttons2angle.get(gearButton));}
+			if (speed >= .3) {spinError = gyro.wornPath(lockedAngle);}
+			//stop rotation drift at high speeds
 			if (Math.abs(spinError) > 3) {spin = V_PID.get("spin", spinError);}
 		}
 		
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
-//		if (driver.getRawButton(R_Xbox.BUTTON_LB)) {//CLIMBER
-//			double climbSpeed = driver.getRawButton(R_Xbox.BUTTON_RB) ? 1 : .6;
-//			if (gunner.getAxisPress(R_Xbox.AXIS_LT, .5)) {climbSpeed *= -1;}
-//			climberA.quickSet(climbSpeed);
-//		}else {
-//			climberA.quickSet(0);
-//		}
+		
+		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}//ELEVATOR PRESETS
+		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
+		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
+		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
+		
+		desiredElevatorHeight -= driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
+		desiredElevatorHeight += driver.getRawAxis(R_Xbox.AXIS_RT);
+		
+		elevators.setInches(desiredElevatorHeight);
+		
+		
+		
+		
 //		
 //		if (V_Fridge.freeze("POVSOUTH", driver.getPOV(0) == R_Xbox.POV_SOUTH)) {//GEARER
 //			gearer.set(DoubleSolenoid.Value.kForward);
@@ -211,7 +214,6 @@ public class Robot extends IterativeRobot {
 		moduleB.completeLoopUpdate();
 		moduleC.completeLoopUpdate();
 		moduleD.completeLoopUpdate();
-//		lift.completeLoopUpdate();
 	}
 	
 	@Override

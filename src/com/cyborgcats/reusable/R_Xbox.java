@@ -44,18 +44,22 @@ public class R_Xbox extends XboxController {
 			deadbands[i] = 0.2;
 		}
 		for (int i = 0; i < previousAxisValues.length; i++) {
-			previousAxisValues[i] = 0;
+			previousAxisValues[i] = 0.0;
 		}
 		for (int i = 0; i < buttonTimes.length; i++) {
 			buttonTimes[i] = System.currentTimeMillis();
 		}
 	}
+	
+	
 	@Override//necessary so that lastPress() works
 	public boolean getRawButton(final int button) {
 		boolean pressed = super.getRawButton(button);
 		if (pressed) {buttonTimes[button - 1] = System.currentTimeMillis();}
 		return pressed;
 	}
+	
+	
 	/**
 	 * This function updates the deadband value for the specified axis.
 	 * It returns 0 unless |getRawAxis()| is greater than the deadband,
@@ -63,8 +67,10 @@ public class R_Xbox extends XboxController {
 	**/
 	public double getDeadbandedAxis(final int axis, final double deadband) {
 		deadbands[axis] = deadband;
-		return Math.abs(getRawAxis(axis)) <= deadbands[axis] ? 0 : getRawAxis(axis);
+		return Math.abs(getRawAxis(axis)) <= deadbands[axis] ? 0.0 : getRawAxis(axis);
 	}
+	
+	
 	/**
 	 * This function returns 0 unless |getRawAxis()| is greater than the stored deadband,
 	 * in which case it returns getRawAxis()
@@ -72,6 +78,8 @@ public class R_Xbox extends XboxController {
 	public double getDeadbandedAxis(final int axis) {
 		return getDeadbandedAxis(axis, deadbands[axis]);
 	}
+	
+	
 	/**
 	 * This function returns true if the specified axis' value is greater than the specified minimum.
 	 * Otherwise, it returns false.
@@ -79,6 +87,8 @@ public class R_Xbox extends XboxController {
 	public boolean getAxisPress(final int axis, final double minimum) {
 		return Math.abs(getRawAxis(axis)) >= minimum;
 	}
+	
+	
 	/**
 	 * This function returns true if the specified axis' value has changed since the last time it was called.
 	 * Otherwise, it returns false.
@@ -88,29 +98,38 @@ public class R_Xbox extends XboxController {
 		previousAxisValues[axis] = getRawAxis(axis);
 		return activityBool;
 	}
+	
+	
 	/**
 	 * This function returns the index of the most recently pressed button in an array of buttons.
 	**/
 	public int mostRecentButton(final int[] buttons) {
 		int recent = buttons[0];
 		for (int button : buttons) {
-			if (lastPress(recent) < lastPress(button)) {recent = button;}
+			if (lastPress(recent).compareTo(lastPress(button)) < 0) {recent = button;}
 		}return recent;
 	}
+	
+	
 	/**
 	 * This function returns the time at which the specified button was last pressed.
 	**/
 	public Long lastPress(final int button) {
 		return buttonTimes[button - 1];
 	}
+	
+	
 	/**
 	 * This function wipes the last pressed times of each of the specified buttons and replaces them with the current time.
 	**/
 	public void resetButtonTimes(final int[] buttons) {
+		final long currentTime = System.currentTimeMillis();
 		for (int button : buttons) {
-			buttonTimes[button - 1] = System.currentTimeMillis();
+			buttonTimes[button - 1] = currentTime;
 		}
 	}
+	
+	
 	/**
 	 * This function returns true if a button is pressed, if an axis value is greater than its stored deadband, or if a POV has an angle.
 	 * Otherwise, it returns false.
@@ -133,6 +152,8 @@ public class R_Xbox extends XboxController {
 		}
 		return false;
 	}
+	
+	
 	/**
 	 * This function returns the angle between the specified stick and the Y axis. If deadbanded is true, small movements in the middle are ignored.
 	**/
@@ -149,6 +170,8 @@ public class R_Xbox extends XboxController {
 			return V_Compass.convertToAngle(x, y);
 		}
 	}
+	
+	
 	/**
 	 * This function returns the length of the hypotenuse formed by the 2 axis of the specified stick. If deadbanded is true, small movements in the middle are ignored.
 	**/
@@ -158,7 +181,7 @@ public class R_Xbox extends XboxController {
 		final boolean badX = Math.abs(x) <= deadbands[stick[0]];
 		final boolean badY = Math.abs(y) <= deadbands[stick[1]];
 		if (deadbanded && badX && badY) {
-			return 0;
+			return 0.0;
 		}else {
 			return Math.sqrt(x*x + y*y);
 		}
