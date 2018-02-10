@@ -14,7 +14,7 @@ public class R_Clamp {
 	private DoubleSolenoid clampLeft;
 	private DigitalInput sensor;
 	private boolean isClampClosed = true;//TODO private?
-	private boolean isSlurped = true;//TODO private?
+	private boolean hasCube = true;//TODO private?
 	private double intakeConstant = 0.5;//TODO test
 	
 	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clampLeft, final DoubleSolenoid clampRight, final int sensorID) {
@@ -32,11 +32,11 @@ public class R_Clamp {
 		if(!sensor.get()) {
 			intakeLeft.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 			intakeRight.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
-			isSlurped = false;
+			hasCube = false;
 		}else {
 			intakeLeft.set(ControlMode.PercentOutput, 0);
 			intakeRight.set(ControlMode.PercentOutput, 0);
-			isSlurped = true;
+			hasCube = true;
 		}
 		
 	}
@@ -75,10 +75,10 @@ public class R_Clamp {
 	}
 	
 	/**
-	 * This function returns if a cube is slurped or not
+	 * This function returns it has a cube or not
 	**/
-	public boolean isSlurped() {
-		return isSlurped;
+	public boolean hasCube() {
+		return hasCube;
 	}
 
 }
