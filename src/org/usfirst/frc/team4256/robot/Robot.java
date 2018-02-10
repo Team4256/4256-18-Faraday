@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.NetworkTable;
@@ -91,11 +92,11 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		gyro.reset();
+		V_PID.clear("spin");
 //		autoMode = (int)faraday.getNumber("auto mode", 1);
 //		autoStep = 0;
 //		V_PID.clear("forward");
 //		V_PID.clear("strafe");
-//		V_PID.clear("spin");
 //		V_Instructions.resetTimer();
 	}
 	
@@ -137,8 +138,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
-			moduleA.setTareAngle(99);	moduleB.setTareAngle(39);	moduleC.setTareAngle(127);	moduleD.setTareAngle(0);
-			//practice robot:		99,			39,			127,		0
+			moduleA.setTareAngle(99);	moduleB.setTareAngle(39);	moduleC.setTareAngle(-1);	moduleD.setTareAngle(-1);
+			//practice robot:		99,			39,			-1,			-1
 			//competit robot:		??,			??,			???,		?
 			moduleA.swivelTo(0);	moduleB.swivelTo(0);	moduleC.swivelTo(0);	moduleD.swivelTo(0);
 		}
@@ -186,8 +187,13 @@ public class Robot extends IterativeRobot {
 		desiredElevatorHeight += driver.getRawAxis(R_Xbox.AXIS_RT);
 		
 		elevators.setInches(desiredElevatorHeight);
+
 		
-		
+		if (V_Fridge.freeze("shifter", driver.getRawButton(R_Xbox.BUTTON_START))) {
+			elevatorOne.shiftLowGear();
+		}else {
+			elevatorOne.shiftHighGear();
+		}
 		
 		
 //		

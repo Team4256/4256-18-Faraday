@@ -34,10 +34,12 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void init() {
+		master.init();
+		
 		master.setNeutralMode(R_Talon.coast);//TODO which works better (brake or coast)?
 		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
 		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
-		master.init();
+
 		followerA.follow(master);
 		followerB.follow(master);
 	}

@@ -26,8 +26,8 @@ public abstract class Parameters {
 	
 	//PNEUMATICS
 	public static final int ElevatorOne_shifterModule = 0;//PCM
-	public static final int ElevatorOne_shifterForward = 2;//PCM
-	public static final int ElevatorOne_shifterReverse = 3;//PCM
+	public static final int ElevatorOne_shifterForward = 1;//PCM
+	public static final int ElevatorOne_shifterReverse = 2;//PCM
 	
 	public static final int Clamp_module = 0;//PCM
 	public static final int Clamp_forward = 2;//PCM

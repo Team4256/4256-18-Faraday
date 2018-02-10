@@ -25,10 +25,11 @@ public class R_ElevatorTwo {
 	 * 
 	**/
 	public void init() {
+		master.init();
+		
 		master.setNeutralMode(R_Talon.coast);//TODO which works better?
 		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
 		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
-		master.init();
 	}
 	
 	/**
