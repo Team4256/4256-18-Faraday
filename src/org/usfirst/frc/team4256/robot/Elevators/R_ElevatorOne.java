@@ -83,11 +83,11 @@ public class R_ElevatorOne {
 	 *
 	**/
 	public void zero() {
-		if(!sensor.get()) {
+		if(!sensor.get()) {//not at zero
 			master.overrideSoftLimitsEnable(true);
 			knowsZero = false;
 			increment(-0.3);
-		}else {
+		}else {//at zero
 			master.quickSet(0, false);
 			master.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
 			master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion (might need to be reversed)

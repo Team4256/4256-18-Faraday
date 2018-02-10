@@ -78,6 +78,7 @@ public class Robot extends IterativeRobot {
 //		//{Robot Output}
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
+		elevators.init();
 //		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
 //		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
 //		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
@@ -221,6 +222,7 @@ public class Robot extends IterativeRobot {
 		moduleB.completeLoopUpdate();
 		moduleC.completeLoopUpdate();
 		moduleD.completeLoopUpdate();
+		elevators.completeLoopUpdate();
 	}
 	
 	@Override
