@@ -10,8 +10,13 @@ public class R_Elevators {
 		this.elevatorTwo = elevatorTwo;
 	}
 	
+	/**
+	 * This function utilizes both elevators to move the elevator to a certain inch value while maintaining a good center of gravity
+	**/
 	public void setInches(final double desiredInches) {
-		
+		if(!elevatorOne.isLowGear()) {
+			elevatorOne.shiftLowGear();
+		}
 		if(desiredInches > R_ElevatorTwo.maximumHeight) {//stageOne needed
 			elevatorTwo.setInches(R_ElevatorTwo.maximumHeight);
 			elevatorOne.setInches(desiredInches - R_ElevatorTwo.maximumHeight);
@@ -21,5 +26,14 @@ public class R_Elevators {
 		}
 	}
 	
+	public void init() {
+		elevatorOne.init();
+		elevatorTwo.init();
+	}
+	
+	public void completeLoopUpdate() {
+		elevatorOne.completeLoopUpdate();
+		elevatorTwo.completeLoopUpdate();
+	}
 
 }
