@@ -15,16 +15,16 @@ public class R_ElevatorOne {
 	private VictorSPX followerA;
 	private VictorSPX followerB;
 	private DoubleSolenoid shifter;
-	private DigitalInput limitSwitch;
+	private DigitalInput sensor;
 	private boolean isLowGear = true;
 	private boolean knowsZero = false;
 	private int maximumEncoderValue;
 
-	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter, final int limitSwitchPort) {
+	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter, final int sensorID) {
 		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, false);
 		followerA = new VictorSPX(followerAID);
 		followerB = new VictorSPX(followerBID);
-		
+		sensor = new DigitalInput(sensorID);
 		this.shifter = shifter;	
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
@@ -81,7 +81,7 @@ public class R_ElevatorOne {
 	 *
 	**/
 	public void zero() {
-		if(!limitSwitch.get()) {
+		if(!sensor.get()) {
 			master.overrideSoftLimitsEnable(true);
 			knowsZero = false;
 			increment(-0.3);

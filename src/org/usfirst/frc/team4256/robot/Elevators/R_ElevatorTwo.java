@@ -10,13 +10,13 @@ public class R_ElevatorTwo {
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
 	public static final double maximumHeight = 48.0;//inches
 	private R_Talon master;
-	private DigitalInput limitSwitch;
+	private DigitalInput sensor;
 	private boolean knowsZero = false;
 	private int maximumEncoderValue;
 	
-	public R_ElevatorTwo(final int masterID, final int limitSwitchPort) {
+	public R_ElevatorTwo(final int masterID, final int sensorID) {
 		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, false);
-		limitSwitch = new DigitalInput(limitSwitchPort);
+		sensor = new DigitalInput(sensorID);
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
 	}
@@ -70,7 +70,7 @@ public class R_ElevatorTwo {
 	 *
 	**/
 	public void zero() {
-		if(!limitSwitch.get()) {
+		if(!sensor.get()) {
 			master.overrideSoftLimitsEnable(true);
 			knowsZero = false;
 			increment(-0.3);
