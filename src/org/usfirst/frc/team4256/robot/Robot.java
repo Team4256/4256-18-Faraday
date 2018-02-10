@@ -20,6 +20,7 @@
 package org.usfirst.frc.team4256.robot;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
+import org.usfirst.frc.team4256.robot.Elevators.*;
 
 import com.cyborgcats.reusable.Talon.R_Talon;
 import com.cyborgcats.reusable.R_Gyro;
