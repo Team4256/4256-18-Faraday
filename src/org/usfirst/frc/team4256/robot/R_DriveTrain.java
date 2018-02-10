@@ -3,6 +3,7 @@ package org.usfirst.frc.team4256.robot;
 import com.cyborgcats.reusable.R_Gyro;
 
 public class R_DriveTrain {
+	//TODO put these distances in params
 	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
 	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
 	private static final double pivotToFront = Math.sqrt(pivotToFrontX*pivotToFrontX + pivotToFrontY*pivotToFrontY);
@@ -27,10 +28,10 @@ public class R_DriveTrain {
 	 * This function prepares each swerve module individually.
 	**/
 	public void init() {
-		moduleA.init(true);//TODO remove these params once electronics is correct
-		moduleB.init(false);
-		moduleC.init(false);
-		moduleD.init(true);
+		moduleA.init(/*reversed traction*/true);//TODO remove these params once electronics is correct
+		moduleB.init(/*reversed traction*/false);
+		moduleC.init(/*reversed traction*/false);
+		moduleD.init(/*reversed traction*/true);
 	}
 	
 	public void holonomicCartesian(final double speedX, final double speedY, final double speedSpin) {
@@ -69,6 +70,7 @@ public class R_DriveTrain {
 	}
 	
 	public void holonomic(final double direction, final double speed, final double spin) {//TODO could combine holonomics
+//		moduleD.tractionSpeed()
 		//TODO accept 2 speeds, one from ZED and one from driver. Use max()
 		double chassis_fieldAngle = gyro.getCurrentAngle();
 		double speedY = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));

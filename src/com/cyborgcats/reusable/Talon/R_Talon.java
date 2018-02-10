@@ -66,18 +66,19 @@ public class R_Talon extends TalonSRX {
 	
 	
 	/**
-	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
+	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum percentages.
 	 * It then gets enslaved to the motor at the specified ID.
 	**/
-	public void init(final int masterID, final float maxVolts) {
+	public void init(final int masterID, final double maxPercent) {
 		clearStickyFaults(kTimeoutMS);//TODO everywhere where we have kTimeoutMS, do error handling
 		selectProfileSlot(0, 0);//first is motion profile slot (things like allowable error), second is PID slot ID
 		configAllowableClosedloopError(0, 0, kTimeoutMS);//motion profile slot, allowable error, timeout ms
-		//super.config
-		configNominalOutputForward(0, kTimeoutMS);//minimum voltage draw
+		
+		configNominalOutputForward(0, kTimeoutMS);
 		configNominalOutputReverse(0, kTimeoutMS);
-		configPeakOutputForward(Math.abs(maxVolts), kTimeoutMS);//maximum voltage draw
-		configPeakOutputReverse(-Math.abs(maxVolts), kTimeoutMS);
+		configPeakOutputForward(Math.abs(maxPercent), kTimeoutMS);
+		configPeakOutputReverse(-Math.abs(maxPercent), kTimeoutMS);
+		
 		if (getControlMode() == follower) {
 			quickSet(masterID, false);
 		}else {
@@ -89,7 +90,7 @@ public class R_Talon extends TalonSRX {
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
 	**/
-	public void init() {//TODO
+	public void init() {
 		init(0, 1);
 	}
 	
@@ -108,6 +109,7 @@ public class R_Talon extends TalonSRX {
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
+	
 	
 	public double getCurrentRPM() {
 		return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));

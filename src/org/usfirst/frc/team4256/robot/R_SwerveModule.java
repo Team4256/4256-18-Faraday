@@ -7,11 +7,14 @@ import com.cyborgcats.reusable.V_Compass;
 public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
 	public static final double tractionGearRatio = 40.0/3.0;
-	public static final double tractionWheelCircumference = 2.625*Math.PI;
+	public static final double tractionWheelCircumference = 2.625*Math.PI;//inches
 	private double decapitated = 1;
 	private R_Talon rotation;
 	private R_Talon traction;
 	private boolean hasTractionSensor;
+	private double tractionPreviousPathLength = 0.0;
+	private double tractionDistanceX = 0.0;
+	private double tractionDistanceY = 0.0;
 	
 	//This constructor is intended for use with the module which has an encoder on the traction motor.
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction) {
@@ -30,21 +33,16 @@ public class R_SwerveModule {
 	/**
 	 * This function prepares each motor individually, including setting PID values for the rotator.
 	**/
-	public void init(final boolean reversedMotor) {
+	public void init(final boolean reversedTraction) {//TODO config ramp rates
 		rotation.init();
-		/*
-		 * Though reversedMotor is a hardware characteristic that will not change after construction, I remembered why we didn't
-		 * put it in the constructor last year: we want to force electronics to be right in the first place, especially since
-		 * flipping motor leads is such an easy thing to fix. It would be nice to use the same argument for flippedSensor (which is
-		 * in the constructor) but changing that requires taking apart the whole encoder so we are more lenient.
-		 */
+		
 		rotation.setNeutralMode(R_Talon.coast);
 		rotation.config_kP(0, Parameters.swerveP, R_Talon.kTimeoutMS);
 		rotation.config_kI(0, Parameters.swerveI, R_Talon.kTimeoutMS);
 		rotation.config_kD(0, Parameters.swerveD, R_Talon.kTimeoutMS);
 		
 		traction.init();
-		traction.setInverted(reversedMotor);//TODO Temporary line, only here until electronics are correct
+		traction.setInverted(reversedTraction);
 		traction.setNeutralMode(R_Talon.coast);
 		traction.configContinuousCurrentLimit(45, R_Talon.kTimeoutMS);
 		traction.configPeakCurrentLimit(50, R_Talon.kTimeoutMS);
@@ -120,17 +118,29 @@ public class R_SwerveModule {
 		decapitated = Math.abs(rotation.wornPath(endAngle)) > 90 ? -1 : 1;
 		return decapitated == -1 ? V_Compass.validateAngle(endAngle + 180) : V_Compass.validateAngle(endAngle);
 	}
+
 	
-	public double netDistance() {
-		return traction.getCurrentRevs()*tractionWheelCircumference;
-	}
-	
-	public double getSpeed() {
+	public double tractionSpeed() {//TODO componetize into X, Y, field centric, and robot centric
 		if (hasTractionSensor) {
 			return traction.getCurrentRPM();
 		}else {
 			throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 		}
+	}
+	
+	
+	public double tractionPathLength() {
+		return traction.getCurrentRevs()*tractionWheelCircumference;
+	}
+	
+	
+	public double[] tractionDistance() {
+		final double currentPathLength = tractionPathLength();
+		final double deltaPathLength = currentPathLength - tractionPreviousPathLength;
+		tractionDistanceX += deltaPathLength*Math.cos(Math.toRadians(0.0));//TODO not 0.0
+		tractionDistanceY += deltaPathLength*Math.sin(Math.toRadians(0.0));//TODO not 0.0
+		tractionPreviousPathLength = currentPathLength;
+		return new double[] {tractionDistanceX, tractionDistanceY};//TODO field centric vs robot centric
 	}
 	
 	//TODO getSpeed direction, X, Y, chassis centric, field centric
