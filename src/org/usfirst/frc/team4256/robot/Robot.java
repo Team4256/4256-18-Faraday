@@ -151,6 +151,8 @@ public class Robot extends IterativeRobot {
 			gyro.reset();
 			lockedAngle = gyro.getCurrentAngle();
 			V_PID.clear("spin");
+			elevatorOne.setZero(0.0);
+			elevatorTwo.setZero(0.0);
 		}
 		
 		//{calculating speed}
@@ -181,15 +183,15 @@ public class Robot extends IterativeRobot {
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
-//		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}//ELEVATOR PRESETS
-//		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
-//		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
-//		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
-//		
-//		desiredElevatorHeight -= driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
-//		desiredElevatorHeight += driver.getRawAxis(R_Xbox.AXIS_RT);
-//		
-//		elevators.setInches(desiredElevatorHeight);
+		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}//ELEVATOR PRESETS
+		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
+		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
+		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
+		
+		desiredElevatorHeight -= .5*driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
+		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
+		
+		elevators.setInches(desiredElevatorHeight);
 //
 //		
 //		if (V_Fridge.freeze("shifter", driver.getRawButton(R_Xbox.BUTTON_START))) {
@@ -244,7 +246,7 @@ public class Robot extends IterativeRobot {
 		desiredElevatorHeight -= .5*driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
 		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
 		
-		elevatorOne.setInches(desiredElevatorHeight);
+		elevators.setInches(desiredElevatorHeight);
 		
 		SmartDashboard.putNumber("elevator 1 target", desiredElevatorHeight);
 		

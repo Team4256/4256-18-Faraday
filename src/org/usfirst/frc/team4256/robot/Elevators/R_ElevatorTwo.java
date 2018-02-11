@@ -8,14 +8,14 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class R_ElevatorTwo {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
-	public static final double maximumHeight = 42.0;//inches
+	public static final double maximumHeight = 42.5;//inches
 	private R_Talon master;
 	private DigitalInput sensor;
 	private boolean knowsZero = false;
 	private int maximumEncoderValue;
 	
 	public R_ElevatorTwo(final int masterID, final int sensorID) {
-		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, false);
+		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, true);
 		sensor = new DigitalInput(sensorID);
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
@@ -28,6 +28,7 @@ public class R_ElevatorTwo {
 		master.init();
 		
 		master.setNeutralMode(R_Talon.coast);//TODO which works better?
+		master.setInverted(true);
 		enableSoftLimits();
 	}
 	
@@ -49,7 +50,7 @@ public class R_ElevatorTwo {
 	 * This function sets the elevator to a certain inch value value using PID.
 	**/
 	public void setInches(final double inches) {
-		setRevs(inchesToRevs(inches));
+		setRevs(inchesToRevs(validateInches(inches)));
 	}
 	
 	/**
