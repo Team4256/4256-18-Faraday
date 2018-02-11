@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 public class R_ElevatorOne {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
-	public static final double maximumHeight = 48.0;//inches
+	public static final double maximumHeight = 40.0;//inches
 	private R_Talon master;
 	private VictorSPX followerA;
 	private VictorSPX followerB;
@@ -37,8 +37,7 @@ public class R_ElevatorOne {
 		master.init();
 		
 		master.setNeutralMode(R_Talon.coast);//TODO which works better (brake or coast)?
-		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
-		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
+		enableSoftLimits();
 
 		followerA.follow(master);
 		followerB.follow(master);
@@ -62,7 +61,7 @@ public class R_ElevatorOne {
 	 * This function sets the elevator to a certain inch value value using PID.
 	**/
 	public void setInches(final double inches) {
-		setRevs(inchesToRevs(inches));
+		setRevs(inchesToRevs(validateInches(inches)));
 	}
 	
 	/**
@@ -70,6 +69,16 @@ public class R_ElevatorOne {
 	**/
 	public double getInches() {
 		return revsToInches(getRevs());
+	}
+	
+	public double validateInches(final double inches) {
+		if (inches > maximumHeight) {
+			return maximumHeight;
+		}else if (inches < 0.0) {
+			return 0.0;
+		}else {
+			return inches;
+		}
 	}
 	
 	/**
@@ -82,20 +91,28 @@ public class R_ElevatorOne {
 	/**
 	 *
 	**/
-	public void zero() {
+	public void findZero() {
 		if(!sensor.get()) {//not at zero
 			master.overrideSoftLimitsEnable(true);
 			knowsZero = false;
 			increment(-0.3);
 		}else {//at zero
-			master.quickSet(0, false);
-			master.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
-			master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion (might need to be reversed)
-			master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
+			setZero(0.0);
 			master.overrideSoftLimitsEnable(false);
 			
 			knowsZero = true;
 		}
+	}
+	
+	public void setZero(final double offsetInchesFromCurrent) {
+		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
+	}
+	
+	public void enableSoftLimits() {
+		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
+		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
+		master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
+		master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
 	}
 	
 	/**

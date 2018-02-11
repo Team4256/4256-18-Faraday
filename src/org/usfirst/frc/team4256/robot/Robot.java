@@ -136,11 +136,13 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 	}
 	
+	
+	double maxTractionSpeed = 0.0;
 	@Override
 	public void teleopPeriodic() {
 		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
-			moduleA.setTareAngle(99);	moduleB.setTareAngle(39);	moduleC.setTareAngle(-1);	moduleD.setTareAngle(-1);
-			//practice robot:		99,			39,			-1,			-1
+			moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
+			//practice robot:		100.5,			39.0,			-36.5,			-8.0
 			//competit robot:		??,			??,			???,		?
 			moduleA.swivelTo(0);	moduleB.swivelTo(0);	moduleC.swivelTo(0);	moduleD.swivelTo(0);
 		}
@@ -179,24 +181,26 @@ public class Robot extends IterativeRobot {
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}//ELEVATOR PRESETS
-		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
-		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
-		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
-		
-		desiredElevatorHeight -= driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
-		desiredElevatorHeight += driver.getRawAxis(R_Xbox.AXIS_RT);
-		
-		elevators.setInches(desiredElevatorHeight);
-
-		
-		if (V_Fridge.freeze("shifter", driver.getRawButton(R_Xbox.BUTTON_START))) {
-			elevatorOne.shiftLowGear();
-		}else {
-			elevatorOne.shiftHighGear();
+//		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}//ELEVATOR PRESETS
+//		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
+//		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
+//		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
+//		
+//		desiredElevatorHeight -= driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
+//		desiredElevatorHeight += driver.getRawAxis(R_Xbox.AXIS_RT);
+//		
+//		elevators.setInches(desiredElevatorHeight);
+//
+//		
+//		if (V_Fridge.freeze("shifter", driver.getRawButton(R_Xbox.BUTTON_START))) {
+//			elevatorOne.shiftLowGear();
+//		}else {
+//			elevatorOne.shiftHighGear();
+//		}
+		SmartDashboard.putNumber("traction speed", maxTractionSpeed);
+		if (Math.abs(moduleD.tractionSpeed()) > maxTractionSpeed) {
+			maxTractionSpeed = Math.abs(moduleD.tractionSpeed());
 		}
-		
-		
 //		
 //		if (V_Fridge.freeze("POVSOUTH", driver.getPOV(0) == R_Xbox.POV_SOUTH)) {//GEARER
 //			gearer.set(DoubleSolenoid.Value.kForward);
@@ -227,6 +231,27 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
+		
+		if (driver.getRawButton(R_Xbox.BUTTON_START)) {
+			elevatorOne.setZero(0.0);
+			elevatorTwo.setZero(0.0);
+//			elevatorOne.enableSoftLimits();TODO do not need to enaleSoftLimits each time (it remembers)
+		}
+		SmartDashboard.putNumber("gyro", gyro.getCurrentAngle());
+		SmartDashboard.putNumber("elevator 1 height", elevatorOne.getInches());
+		SmartDashboard.putNumber("elevator 2 height", elevatorTwo.getInches());
+		
+		desiredElevatorHeight -= .5*driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
+		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
+		
+		elevatorOne.setInches(desiredElevatorHeight);
+		
+		SmartDashboard.putNumber("elevator 1 target", desiredElevatorHeight);
+		
+		
+		
+		
+		
 //		metersX = zed.getNumber("x", metersX);
 //		metersY = zed.getNumber("y", metersY);
 //		double expectedX = zed.getNumber("expected x", metersX);

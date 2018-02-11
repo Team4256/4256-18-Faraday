@@ -120,9 +120,9 @@ public class R_SwerveModule {
 	}
 
 	
-	public double tractionSpeed() {//TODO componetize into X, Y, field centric, and robot centric
+	public double tractionSpeed() {//TODO componetize into X, Y, field centric, and robot centric, max around 60
 		if (hasTractionSensor) {
-			return traction.getCurrentRPM();
+			return traction.getCurrentRPM()*60.0*tractionWheelCircumference/12.0;
 		}else {
 			throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 		}

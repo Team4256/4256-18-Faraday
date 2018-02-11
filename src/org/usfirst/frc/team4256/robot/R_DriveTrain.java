@@ -70,6 +70,7 @@ public class R_DriveTrain {
 	}
 	
 	public void holonomic(final double direction, final double speed, final double spin) {//TODO could combine holonomics
+		double actualSpeed = Math.abs(moduleD.tractionSpeed())/65.0;//65.0 is the empirically maximum speed
 //		moduleD.tractionSpeed()
 		//TODO accept 2 speeds, one from ZED and one from driver. Use max()
 		double chassis_fieldAngle = gyro.getCurrentAngle();
