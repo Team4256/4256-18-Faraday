@@ -71,10 +71,6 @@ public abstract class Parameters {
 	
 	public static final byte Gyrometer_updateHz = 50;
 	
-	public static final double swerveP = 2.9;
-	public static final double swerveI = 0.0;
-	public static final double swerveD = 1.2;
-	
 	public static final double spinP = .0025;
 	public static final double spinI = .000015;
 	public static final double spinD = .02;

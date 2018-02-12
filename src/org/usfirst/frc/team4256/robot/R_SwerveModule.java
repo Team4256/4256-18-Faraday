@@ -37,9 +37,9 @@ public class R_SwerveModule {
 		rotation.init();
 		
 		rotation.setNeutralMode(R_Talon.coast);
-		rotation.config_kP(0, Parameters.swerveP, R_Talon.kTimeoutMS);
-		rotation.config_kI(0, Parameters.swerveI, R_Talon.kTimeoutMS);
-		rotation.config_kD(0, Parameters.swerveD, R_Talon.kTimeoutMS);
+		rotation.config_kP(0, 2.9, R_Talon.kTimeoutMS);
+		rotation.config_kI(0, 0.0, R_Talon.kTimeoutMS);
+		rotation.config_kD(0, 1.2, R_Talon.kTimeoutMS);
 		
 		traction.init();
 		traction.setInverted(reversedTraction);
@@ -51,11 +51,19 @@ public class R_SwerveModule {
 	
 	
 	/**
-	 * This offsets the tare angle by the specified amount. Positive means clockwise and negative means counter-clockwise.
+	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.
 	 * Useful when correcting for loose mechanical tolerances.
 	**/
 	public void setTareAngle(final double tareAngle) {
-		rotation.compass.setTareAngle(/*rotation.compass.getTareAngle() + */tareAngle);
+		rotation.compass.setTareAngle(tareAngle);
+	}
+	
+	/**
+	 * This offsets the tare angle by the specified amount. Positive means clockwise and negative means counter-clockwise.
+	 * Useful when correcting for loose mechanical tolerances.
+	**/
+	public void incrementTareAngle(final double incrementAngle) {
+		setTareAngle(rotation.compass.getTareAngle() + incrementAngle);
 	}
 	
 	
@@ -94,7 +102,7 @@ public class R_SwerveModule {
 	
 	
 	/**
-	 * A shortcut to call completeLoopUpdate on all the Talons in the module except for the traction slave.
+	 * A shortcut to call completeLoopUpdate on all the Talons in the module.
 	**/
 	public void completeLoopUpdate() {
 		rotation.completeLoopUpdate();

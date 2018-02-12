@@ -16,7 +16,7 @@ public class R_ElevatorOne {
 	private VictorSPX followerB;
 	private DoubleSolenoid shifter;
 	private DigitalInput sensor;
-	private boolean isLowGear = true;
+	private boolean inLowGear = true;
 	private boolean knowsZero = false;
 	private int maximumEncoderValue;
 
@@ -29,36 +29,79 @@ public class R_ElevatorOne {
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
 	}
+	/**
+	 * 
+	**/
+	public void shiftLowGear() {
+		shifter.set(DoubleSolenoid.Value.kForward);
+		inLowGear = true;
+	}
 	
 	/**
 	 * 
 	**/
+	public void shiftHighGear() {
+		shifter.set(DoubleSolenoid.Value.kReverse);
+		inLowGear = false;
+	}
+	
+	/**
+	 * 
+	**/
+	public boolean inLowGear() {
+		return inLowGear;
+	}
+	
+	/**
+	 * This function prepares each motor individually by enabling soft limits, setting PID values, and commanding followers.
+	**/
 	public void init() {
 		master.init();
 		
-		master.setNeutralMode(R_Talon.coast);//TODO which works better (brake or coast)?
+		master.setNeutralMode(R_Talon.coast);
 		enableSoftLimits();
+		
+		master.config_kP(0, 0.7, R_Talon.kTimeoutMS);
+		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
+		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);
 
 		followerA.follow(master);
 		followerB.follow(master);
 	}
 	
+	private void enableSoftLimits() {
+		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
+		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
+		master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
+		master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
+	}
+	
 	/**
 	 * This function sets the elevator to a certain revolution value using PID.
 	**/
-	public void setRevs(final double revs) {
+	private void setRevs(final double revs) {
 		master.quickSet(revs, false);
 	}
 	
 	/**
-	 * 
+	 * A shortcut to call getCurrentRevs on the master motor.
 	**/
-	public double getRevs() {
+	private double getRevs() {
 		return master.getCurrentRevs();
 	}
 	
+	private double validateInches(final double inches) {
+		if (inches > maximumHeight) {
+			return maximumHeight;
+		}else if (inches < 0.0) {
+			return 0.0;
+		}else {
+			return inches;
+		}
+	}
+	
 	/**
-	 * This function sets the elevator to a certain inch value value using PID.
+	 * This function sends the elevator to a certain height after clipping the input.
 	**/
 	public void setInches(final double inches) {
 		setRevs(inchesToRevs(validateInches(inches)));
@@ -71,20 +114,10 @@ public class R_ElevatorOne {
 		return revsToInches(getRevs());
 	}
 	
-	public double validateInches(final double inches) {
-		if (inches > maximumHeight) {
-			return maximumHeight;
-		}else if (inches < 0.0) {
-			return 0.0;
-		}else {
-			return inches;
-		}
-	}
-	
 	/**
 	 * 
 	**/
-	public void increment(final double inches) {
+	public void increment(final double inches) {//TODO make a boolean to determine whether we are incrementing from current height, or the previous target height
 		setInches(getInches() + inches);
 	}
 	
@@ -108,13 +141,6 @@ public class R_ElevatorOne {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
 	}
 	
-	public void enableSoftLimits() {
-		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
-		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
-		master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
-		master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
-	}
-	
 	/**
 	 * 
 	**/
@@ -124,44 +150,21 @@ public class R_ElevatorOne {
 	
 	
 	/**
-	 * 
+	 * A shortcut to call completeLoopUpdate on all the Talons in the elevator.
 	**/
 	public void completeLoopUpdate() {
 		master.completeLoopUpdate();
 	}
 	
 	/**
-	 * 
-	**/
-	public void shiftLowGear() {
-		shifter.set(DoubleSolenoid.Value.kForward);
-		isLowGear = true;
-	}
-	
-	/**
-	 * 
-	**/
-	public void shiftHighGear() {
-		shifter.set(DoubleSolenoid.Value.kReverse);
-		isLowGear = false;
-	}
-	
-	/**
-	 * 
-	**/
-	public boolean isLowGear() {
-		return isLowGear;
-	}
-	
-	/**
-	 * 
+	 * This function converts inches to revolutions.
 	**/
 	private static double inchesToRevs(final double inches) {
 		return inches/sprocketCircumference;
 	}
 	
 	/**
-	 * 
+	 * This functions converts revolutions to inches.
 	**/
 	private static double revsToInches(final double revs) {
 		return sprocketCircumference*revs;

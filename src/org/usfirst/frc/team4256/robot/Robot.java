@@ -41,7 +41,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final R_Xbox driver = new R_Xbox(0);
-	private static final R_Xbox gunner = new R_Xbox(1);
 	private static double desiredElevatorHeight = ElevatorPresets.FLOOR.height();
 	private static double lockedAngle = 0;
 	//{Robot Input}
@@ -103,20 +102,12 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopInit() {
-//		if (DriverStation.getInstance().getAlliance() != DriverStation.Alliance.Red) {//TODO override all brake modes
-//			Parameters.loadingStation += 90;
-//		}
 		lockedAngle = gyro.getCurrentAngle();
 		V_PID.clear("spin");
 	}
 	
 	@Override
 	public void testInit() {//TODO these numbers should come from the ZED/TK1
-//		zed.putNumber("x", 0);
-//		zed.putNumber("y", 0);
-//		zed.putNumber("expected x", 0);
-//		zed.putNumber("expected y", 0);
-//		zed.putNumber("expected angle", 0);
 	}
 	
 	@Override
@@ -134,100 +125,74 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
+//		elevatorOne.setZero(0.0);//TODO zero elevators at some point
+//		elevatorTwo.setZero(0.0);
 	}
 	
-	
-	double maxTractionSpeed = 0.0;
 	@Override
 	public void teleopPeriodic() {
-		if (driver.getRawButton(R_Xbox.BUTTON_START) && driver.getRawButton(R_Xbox.BUTTON_BACK)) {//SWERVE ALIGNMENT
-			moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
-			//practice robot:		100.5,			39.0,			-36.5,			-8.0
-			//competit robot:		??,			??,			???,		?
-			moduleA.swivelTo(0);	moduleB.swivelTo(0);	moduleC.swivelTo(0);	moduleD.swivelTo(0);
-		}
-		
-		if (gunner.getRawButton(R_Xbox.BUTTON_START) && gunner.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
-			gyro.reset();
-			lockedAngle = gyro.getCurrentAngle();
-			V_PID.clear("spin");
-			elevatorOne.setZero(0.0);
-			elevatorTwo.setZero(0.0);
-		}
+		//{speed multipliers}
+		final boolean turbo = driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT);
+		final boolean snail = driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT);
 		
 		//{calculating speed}
-		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//--turbo mode
-		if (!driver.getRawButton(R_Xbox.BUTTON_RB)) {speed *= .6;}//--------normal mode
-		if (driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT)) {speed *= .5;}//-snail mode
+		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//turbo mode
+		if (!turbo) {speed *= 0.6;}//-------------------------------------normal mode
+		if (snail)  {speed *= 0.5;}//-------------------------------------snail mode
 		speed *= speed;
-		//{calculating raw spin}
-		double spin = driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);
-		spin *= spin*0.5*Math.signum(spin);//-------------------------------normal mode
-		if (driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT)) {
-			spin *= .5;//---------------------------------------------------snail mode
-			if (speed == 0) {speed = .01;}
-			//.01 restrains coast after spinning by hacking holonomic
-		}
+		
+		//{calculating spin}
+		double spin = 0.7*driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);//normal mode
+		if (snail)  {spin  *= 0.7;	lockWheelsInPlace = true;}//----------snail mode//TODO this boolean should do what the hacked holonomic thing did
+		spin *= spin*Math.signum(spin);
+		final boolean handsOffSpinStick = spin == 0.0;
+		
 		//{adding driver aids}
-		if (V_Fridge.becomesTrue("hands off", spin == 0)) {
-			lockedAngle = gyro.getCurrentAngle();
-			//remember angle when driver stops rotating
-			V_PID.clear("spin");
-		}if (spin == 0) {
+		if (handsOffSpinStick) {
 			double spinError = 0;
-			if (speed >= .3) {spinError = gyro.wornPath(lockedAngle);}
 			//stop rotation drift at high speeds
-			if (Math.abs(spinError) > 3) {spin = V_PID.get("spin", spinError);}
+			if (speed >= 0.3) {spinError = gyro.wornPath(lockedAngle);}
+			if (Math.abs(spinError) > 3.0) {spin = V_PID.get("spin", spinError);}
+		}
+		if (V_Fridge.becomesTrue("hands off", handsOffSpinStick)) {
+			//remember angle when driver stops rotating
+			lockedAngle = gyro.getCurrentAngle();
+			V_PID.clear("spin");
 		}
 		
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}//ELEVATOR PRESETS
-		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
-		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
+		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
+		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
 		
 		desiredElevatorHeight -= .5*driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
 		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
 		
 		elevators.setInches(desiredElevatorHeight);
-//
-//		
-//		if (V_Fridge.freeze("shifter", driver.getRawButton(R_Xbox.BUTTON_START))) {
-//			elevatorOne.shiftLowGear();
-//		}else {
-//			elevatorOne.shiftHighGear();
-//		}
-		SmartDashboard.putNumber("traction speed", maxTractionSpeed);
-		if (Math.abs(moduleD.tractionSpeed()) > maxTractionSpeed) {
-			maxTractionSpeed = Math.abs(moduleD.tractionSpeed());
+		
+		
+		if (driver.getRawButton(R_Xbox.BUTTON_START)) {//SWERVE ALIGNMENT
+			moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
+			//practice robot:	 100.5,							 39.0,						 -36.5,							 -8.0
 		}
-//		
-//		if (V_Fridge.freeze("POVSOUTH", driver.getPOV(0) == R_Xbox.POV_SOUTH)) {//GEARER
-//			gearer.set(DoubleSolenoid.Value.kForward);
-//		}else {
-//			gearer.set(DoubleSolenoid.Value.kReverse);
-//		}
-//		
-//		if (V_Fridge.freeze("AXISRT", driver.getAxisPress(R_Xbox.AXIS_RT, .5))) {//CLAMPER
-//			clamp.set(DoubleSolenoid.Value.kForward);
-//		}else {
-//			clamp.set(DoubleSolenoid.Value.kReverse);
-//		}
 		
+		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
+			gyro.reset();
+			lockedAngle = gyro.getCurrentAngle();
+			V_PID.clear("spin");
+		}
 		
-		if (gyro.netAcceleration() >= 1) {
-			driver.setRumble(RumbleType.kLeftRumble, 1);//DANGER RUMBLE
+		if (gyro.netAcceleration() >= 1) {//DANGER RUMBLE
+			driver.setRumble(RumbleType.kLeftRumble, 1);
 		}else {
 			driver.setRumble(RumbleType.kLeftRumble, 0);
 		}
 		
 		//{completing Talon updates}
-		moduleA.completeLoopUpdate();
-		moduleB.completeLoopUpdate();
-		moduleC.completeLoopUpdate();
-		moduleD.completeLoopUpdate();
+		swerve.completeLoopUpdate();
 		elevators.completeLoopUpdate();
 	}
 	

@@ -112,4 +112,11 @@ public class R_DriveTrain {
 	public boolean isThere(final double threshold) {
 		return moduleA.isThere(threshold) && moduleB.isThere(threshold) && moduleC.isThere(threshold) && moduleD.isThere(threshold);
 	}
+	
+	public void completeLoopUpdate() {
+		moduleA.completeLoopUpdate();
+		moduleB.completeLoopUpdate();
+		moduleC.completeLoopUpdate();
+		moduleD.completeLoopUpdate();
+	}
 }
