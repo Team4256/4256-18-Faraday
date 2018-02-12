@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 public class R_ElevatorOne {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
-	public static final double maximumHeight = 40.0;//inches
+	protected static final double maximumHeight = 40.0;//inches
 	private R_Talon master;
 	private VictorSPX followerA;
 	private VictorSPX followerB;
