@@ -33,7 +33,7 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void shiftLowGear() {
-		shifter.set(DoubleSolenoid.Value.kForward);
+		shifter.set(DoubleSolenoid.Value.kReverse);
 		inLowGear = true;
 	}
 	
@@ -41,7 +41,7 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void shiftHighGear() {
-		shifter.set(DoubleSolenoid.Value.kReverse);
+		shifter.set(DoubleSolenoid.Value.kForward);
 		inLowGear = false;
 	}
 	
