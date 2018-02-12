@@ -15,7 +15,7 @@ public class R_Elevators {
 	**/
 	public void setInches(final double desiredInches) {
 		if(!elevatorOne.inLowGear()) {
-			elevatorOne.shiftLowGear();
+			elevatorOne.shiftLowGear();//TODO which one is which, also change PID parameters depending on which one we are using
 		}
 		if(desiredInches > R_ElevatorTwo.maximumHeight) {//stage one needed
 			elevatorTwo.setInches(R_ElevatorTwo.maximumHeight);

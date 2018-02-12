@@ -12,9 +12,8 @@ public class R_SwerveModule {
 	private R_Talon rotation;
 	private R_Talon traction;
 	private boolean hasTractionSensor;
+	private double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
-	private double tractionDistanceX = 0.0;
-	private double tractionDistanceY = 0.0;
 	
 	//This constructor is intended for use with the module which has an encoder on the traction motor.
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction) {
@@ -107,6 +106,10 @@ public class R_SwerveModule {
 	public void completeLoopUpdate() {
 		rotation.completeLoopUpdate();
 		traction.completeLoopUpdate();
+		
+		final double currentPathLength = tractionPathLength();
+		tractionDeltaPathLength = currentPathLength - tractionPreviousPathLength;
+		tractionPreviousPathLength = currentPathLength;
 	}
 	
 	
@@ -142,16 +145,9 @@ public class R_SwerveModule {
 	}
 	
 	
-	public double[] tractionDistance() {
-		final double currentPathLength = tractionPathLength();
-		final double deltaPathLength = currentPathLength - tractionPreviousPathLength;
-		tractionDistanceX += deltaPathLength*Math.cos(Math.toRadians(0.0));//TODO not 0.0
-		tractionDistanceY += deltaPathLength*Math.sin(Math.toRadians(0.0));//TODO not 0.0
-		tractionPreviousPathLength = currentPathLength;
-		return new double[] {tractionDistanceX, tractionDistanceY};//TODO field centric vs robot centric
+	public double deltaDistance() {
+		return tractionDeltaPathLength;
 	}
-	
-	//TODO getSpeed direction, X, Y, chassis centric, field centric
 	
 	
 	/**

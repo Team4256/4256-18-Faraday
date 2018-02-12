@@ -3,13 +3,15 @@ package org.usfirst.frc.team4256.robot;
 import com.cyborgcats.reusable.R_Gyro;
 
 public class R_DriveTrain {
-	//TODO put these distances in params
 	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
 	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
 	private static final double pivotToFront = Math.sqrt(pivotToFrontX*pivotToFrontX + pivotToFrontY*pivotToFrontY);
 	private static final double pivotToAftX = 8.90;//inches, pivot point to aft wheel tip, x
 	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
 	private static final double pivotToAft = Math.sqrt(pivotToAftX*pivotToAftX + pivotToAftY*pivotToAftY);
+	
+	private double moduleD_previousAngle = 0.0;
+	private double drivetrain_previousSpin = 0.0;
 
 	private R_Gyro gyro;
 	private R_SwerveModule moduleA;
@@ -33,6 +35,7 @@ public class R_DriveTrain {
 		moduleC.init(/*reversed traction*/true);
 		moduleD.init(/*reversed traction*/true);
 	}
+	
 	
 	public void holonomicCartesian(final double speedX, final double speedY, final double speedSpin) {
 		final double speed = Math.sqrt(speedX*speedX + speedY*speedY);
@@ -69,13 +72,29 @@ public class R_DriveTrain {
 		}
 	}
 	
+	
+	private double[] speedsFromModuleD() {
+		final double rawSpeed = Math.abs(moduleD.tractionSpeed())/65.0;//65.0 is the empirically maximum speed
+		
+		final double tan = 1/Math.tan(Math.toRadians(moduleD_previousAngle));//TODO need validate angle?
+		final double rawX = rawSpeed/Math.sqrt(1 + tan*tan);
+		final double rawY = rawX*tan;
+		final double drivetrainX = rawX + drivetrain_previousSpin*pivotToAftY/pivotToAft;
+		final double drivetrainY = rawY + drivetrain_previousSpin*pivotToAftX/pivotToAft;
+		
+		return new double[] {drivetrainX, drivetrainY};
+	}
+	
+	
 	public void holonomic(final double direction, final double speed, final double spin) {//TODO could combine holonomics
-		double actualSpeed = Math.abs(moduleD.tractionSpeed())/65.0;//65.0 is the empirically maximum speed
-//		moduleD.tractionSpeed()
-		//TODO accept 2 speeds, one from ZED and one from driver. Use max()
+		//{computing actual speed from encoder value of moduleD}
 		double chassis_fieldAngle = gyro.getCurrentAngle();
-		double speedY = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
-		double speedX = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		double speedY_desired = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		double speedX_desired = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		
+		double[] actualSpeeds = speedsFromModuleD();
+		double speedX = Math.max(speedX_desired, actualSpeeds[0]);
+		double speedY = Math.max(speedY_desired, actualSpeeds[1]);
 		
 		double moduleAX = speedX + spin*pivotToFrontY/pivotToFront;
 		double moduleAY = speedY + spin*pivotToFrontX/pivotToFront;
@@ -86,11 +105,13 @@ public class R_DriveTrain {
 		double moduleDX = moduleCX;//speedX - spin*pivotToAftY/pivotToAft;
 		double moduleDY = speedY - spin*pivotToAftX/pivotToAft;
 		
+		moduleD_previousAngle = Math.toDegrees(Math.atan2(moduleDX, moduleDY));
+		
 		boolean bad = speed == 0 && spin == 0;
 		moduleA.swivelTo(Math.toDegrees(Math.atan2(moduleAX, moduleAY)), bad);
 		moduleB.swivelTo(Math.toDegrees(Math.atan2(moduleBX, moduleBY)), bad);
 		moduleC.swivelTo(Math.toDegrees(Math.atan2(moduleCX, moduleCY)), bad);
-		moduleD.swivelTo(Math.toDegrees(Math.atan2(moduleDX, moduleDY)), bad);
+		moduleD.swivelTo(moduleD_previousAngle, bad);
 		
 		if (isThere(5)) {
 			double speedA = Math.sqrt(moduleAX*moduleAX + moduleAY*moduleAY),
@@ -107,11 +128,15 @@ public class R_DriveTrain {
 				moduleA.set(speedA);	moduleB.set(speedB);	moduleC.set(speedC);	moduleD.set(speedD);
 			}
 		}
+		
+		drivetrain_previousSpin = spin;
 	}
+	
 	
 	public boolean isThere(final double threshold) {
 		return moduleA.isThere(threshold) && moduleB.isThere(threshold) && moduleC.isThere(threshold) && moduleD.isThere(threshold);
 	}
+	
 	
 	public void completeLoopUpdate() {
 		moduleA.completeLoopUpdate();

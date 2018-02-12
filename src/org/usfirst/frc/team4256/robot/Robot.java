@@ -22,7 +22,6 @@ package org.usfirst.frc.team4256.robot;
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
 import org.usfirst.frc.team4256.robot.Elevators.*;
 
-import com.cyborgcats.reusable.Talon.R_Talon;
 import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
@@ -143,7 +142,7 @@ public class Robot extends IterativeRobot {
 		
 		//{calculating spin}
 		double spin = 0.7*driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);//normal mode
-		if (snail)  {spin  *= 0.7;	lockWheelsInPlace = true;}//----------snail mode//TODO this boolean should do what the hacked holonomic thing did
+		if (snail)  {spin  *= 0.7;	/*lockWheelsInPlace = true;*/}//----------snail mode//TODO this boolean should do what the hacked holonomic thing did
 		spin *= spin*Math.signum(spin);
 		final boolean handsOffSpinStick = spin == 0.0;
 		
@@ -198,36 +197,6 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
-		
-		if (driver.getRawButton(R_Xbox.BUTTON_START)) {
-			elevatorOne.setZero(0.0);
-			elevatorTwo.setZero(0.0);
-//			elevatorOne.enableSoftLimits();TODO do not need to enaleSoftLimits each time (it remembers)
-		}
-		SmartDashboard.putNumber("gyro", gyro.getCurrentAngle());
-		SmartDashboard.putNumber("elevator 1 height", elevatorOne.getInches());
-		SmartDashboard.putNumber("elevator 2 height", elevatorTwo.getInches());
-		
-		desiredElevatorHeight -= .5*driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
-		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
-		
-		elevators.setInches(desiredElevatorHeight);
-		
-		SmartDashboard.putNumber("elevator 1 target", desiredElevatorHeight);
-		
-		
-		
-		
-		
-//		metersX = zed.getNumber("x", metersX);
-//		metersY = zed.getNumber("y", metersY);
-//		double expectedX = zed.getNumber("expected x", metersX);
-//		double expectedY = zed.getNumber("expected y", metersY);
-//		double expectedAngle = zed.getNumber("expected angle", gyro.getCurrentAngle());
-//		double xError = expectedX - metersX;
-//		double yError = expectedY - metersY;
-//		double spinError = gyro.wornPath(expectedAngle);
-//		swerve.holonomicCartesian(V_PID.get("forward", yError), V_PID.get("strafe", xError), V_PID.get("spin", spinError));
 	}
 	
 	@Override
