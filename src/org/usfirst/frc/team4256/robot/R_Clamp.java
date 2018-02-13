@@ -10,18 +10,16 @@ public class R_Clamp {
 	
 	private VictorSPX intakeLeft;
 	private VictorSPX intakeRight;
-	private DoubleSolenoid leftClamp;
-	private DoubleSolenoid rightClamp;
+	private DoubleSolenoid clamp;
 	private DigitalInput sensor;
 	private boolean isClampClosed = true;//TODO private?
 	private boolean hasCube = true;//TODO private?
 	private double intakeConstant = 0.5;//TODO test
 	
-	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid leftClamp, final DoubleSolenoid rightClamp, final int sensorID) {
+	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int sensorID) {
 		intakeLeft = new VictorSPX(intakeLeftID);
 		intakeRight = new VictorSPX(intakeRightID);
-		this.leftClamp = leftClamp;
-		this.rightClamp = rightClamp;
+		this.clamp = clamp;
 		sensor = new DigitalInput(sensorID);
 	}
 	
@@ -29,7 +27,7 @@ public class R_Clamp {
 	 * This function "slurps" (intakes) the cube into "clampy"
 	**/
 	public void slurp() {
-		if (!sensor.get()) {
+		if(!sensor.get()) {
 			intakeLeft.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 			intakeRight.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 			hasCube = false;
@@ -52,19 +50,17 @@ public class R_Clamp {
 	/**
 	 * This function closes the clamp 
 	**/
-	public void close() {
-		leftClamp.set(DoubleSolenoid.Value.kReverse);//TODO test (if wrong switch to kForward)
-		rightClamp.set(DoubleSolenoid.Value.kReverse);//TODO test (if wrong switch to kForward)
-		isClampClosed = false;//TODO test could be reversed
+	public void closeClamp() {
+		clamp.set(DoubleSolenoid.Value.kReverse);//TODO test
+		isClampClosed = false;
 	}
 	
 	/**
 	 * This function opens the clamp 
 	**/
-	public void open() {
-		leftClamp.set(DoubleSolenoid.Value.kForward);//TODO test (if wrong switch to kReverse)
-		rightClamp.set(DoubleSolenoid.Value.kForward);//TODO test (if wrong switch to kReverse)
-		isClampClosed = true; //TODO test cold be reversed
+	public void openClamp() {
+		clamp.set(DoubleSolenoid.Value.kForward);//TODO test
+		isClampClosed = true;
 	}
 	
 	/**

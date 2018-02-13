@@ -125,7 +125,7 @@ public class R_ElevatorOne {
 	 *
 	**/
 	public void findZero() {
-		if (!sensor.get()) {//not at zero
+		if(!sensor.get()) {//not at zero
 			master.overrideSoftLimitsEnable(true);
 			knowsZero = false;
 			increment(-0.3);

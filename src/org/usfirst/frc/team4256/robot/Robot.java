@@ -26,10 +26,8 @@ import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
-import org.usfirst.frc.team4256.robot.R_Clamp;
 
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -67,13 +65,7 @@ public class Robot extends IterativeRobot {
 	private static final R_ElevatorTwo elevatorTwo = new R_ElevatorTwo(Parameters.ElevatorTwo_master, Parameters.ElevatorTwo_calibrator);
 	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
 	
-//	private static final DoubleSolenoid rightShifter = new DoubleSolenoid(0, 0, 1);
-//	private static final DoubleSolenoid leftShifter = new DoubleSolenoid(0, 2, 3);
-//	private static final R_Clamp Clamp = new R_Clamp(15, 16, Shifter, 0);
 	
-	private DigitalOutput tx2PowerControl = new DigitalOutput(9);
-	private boolean pulseAmount = false;
-	private Thread thread;
 	@Override
 	public void robotInit() {
 //		nt = NetworkTableInstance.getDefault();
@@ -91,18 +83,9 @@ public class Robot extends IterativeRobot {
 //		climberA.init();
 //		climberA.setVoltageCompensationRampRate(24);
 //		climberB.init(climberA.getDeviceID(), 12f);
-//		climberB.setVoltageCompensationRampRate(24); //TODO
+//		climberB.setVoltageCompensationRampRate(24);
 //		lift.init();
 //		lift.setVoltageRampRate(8);
-
-/*
-		tx2PowerControl.set(true);
-		try { thread.sleep(35); } 
-		catch (InterruptedException e) {// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			tx2PowerControl.set(false);
-*/
 	}
 
 	@Override
@@ -188,15 +171,7 @@ public class Robot extends IterativeRobot {
 		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
 		
 		elevators.setInches(desiredElevatorHeight);
-/*		
-		if (driver.getRawAxis(R_Xbox.AXIS_LT)) {Clamp.spit();}
-		if (driver.getRawAxis(R_Xbox.AXIS_RT)) {Clamp.splurp();}
-		if (V_Fridge.freeze("BUTTON_RB", driver.getRawButton(R_Xbox.BUTTON_RB))) {
-			Clamp.close();//TODO test
-		}else { 
-			Clamp.open();//TODO test
-		}
-*/
+		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_START)) {//SWERVE ALIGNMENT
 			moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
