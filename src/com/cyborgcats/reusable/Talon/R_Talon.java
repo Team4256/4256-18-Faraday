@@ -42,20 +42,7 @@ public class R_Talon extends TalonSRX {
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
-		super(deviceID);
-		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
-			switch(encoder) {
-			case CTRE_MAG_ABSOLUTE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
-			case CTRE_MAG_RELATIVE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
-			default: break;
-			}
-		}else {
-			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
-		}
-		setSensorPhase(flippedSensor);
-		this.controlMode = controlMode;
-		compass = new V_Compass(0, 0);
-		convert = new Convert(encoder.countsPerRev(), gearRatio);
+		this(deviceID, gearRatio, controlMode, encoder, flippedSensor, 0.0, 0.0);
 	}
 	//This constructor is intended for a motor without an encoder.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {

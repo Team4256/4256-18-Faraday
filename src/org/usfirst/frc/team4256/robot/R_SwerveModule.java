@@ -107,9 +107,11 @@ public class R_SwerveModule {
 		rotation.completeLoopUpdate();
 		traction.completeLoopUpdate();
 		
-		final double currentPathLength = tractionPathLength();
-		tractionDeltaPathLength = currentPathLength - tractionPreviousPathLength;
-		tractionPreviousPathLength = currentPathLength;
+		if (hasTractionSensor) {
+			final double currentPathLength = tractionPathLength();
+			tractionDeltaPathLength = currentPathLength - tractionPreviousPathLength;
+			tractionPreviousPathLength = currentPathLength;
+		}
 	}
 	
 	
@@ -141,7 +143,11 @@ public class R_SwerveModule {
 	
 	
 	public double tractionPathLength() {
-		return traction.getCurrentRevs()*tractionWheelCircumference;
+		if (hasTractionSensor) {
+			return traction.getCurrentRevs()*tractionWheelCircumference;
+		}else {
+			return 0.0;
+		}
 	}
 	
 	
