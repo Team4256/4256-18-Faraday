@@ -10,18 +10,16 @@ public class R_Clamp {
 	
 	private VictorSPX intakeLeft;
 	private VictorSPX intakeRight;
-	private DoubleSolenoid clampRight;
-	private DoubleSolenoid clampLeft;
+	private DoubleSolenoid clamp;
 	private DigitalInput sensor;
 	private boolean isClampClosed = true;//TODO private?
 	private boolean hasCube = true;//TODO private?
 	private double intakeConstant = 0.5;//TODO test
 	
-	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clampLeft, final DoubleSolenoid clampRight, final int sensorID) {
+	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int sensorID) {
 		intakeLeft = new VictorSPX(intakeLeftID);
 		intakeRight = new VictorSPX(intakeRightID);
-		this.clampRight = clampRight;
-		this.clampLeft = clampLeft;
+		this.clamp = clamp;
 		sensor = new DigitalInput(sensorID);
 	}
 	
@@ -53,8 +51,7 @@ public class R_Clamp {
 	 * This function closes the clamp 
 	**/
 	public void closeClamp() {
-		clampLeft.set(DoubleSolenoid.Value.kReverse);//TODO test
-		clampRight.set(DoubleSolenoid.Value.kReverse);//TODO test
+		clamp.set(DoubleSolenoid.Value.kReverse);//TODO test
 		isClampClosed = false;
 	}
 	
@@ -62,8 +59,7 @@ public class R_Clamp {
 	 * This function opens the clamp 
 	**/
 	public void openClamp() {
-		clampLeft.set(DoubleSolenoid.Value.kForward);//TODO test
-		clampRight.set(DoubleSolenoid.Value.kForward);//TODO test
+		clamp.set(DoubleSolenoid.Value.kForward);//TODO test
 		isClampClosed = true;
 	}
 	
