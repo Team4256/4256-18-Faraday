@@ -10,6 +10,7 @@ public class R_DriveTrain {
 	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
 	private static final double pivotToAft = Math.sqrt(pivotToAftX*pivotToAftX + pivotToAftY*pivotToAftY);
 	
+	private double moduleD_maxSpeed = 65.0;
 	private double moduleD_previousAngle = 0.0;
 	private double drivetrain_previousSpin = 0.0;
 
@@ -74,10 +75,14 @@ public class R_DriveTrain {
 	
 	
 	private double[] speedsFromModuleD() {
-		final double rawSpeed = Math.abs(moduleD.tractionSpeed())/65.0;//65.0 is the empirically maximum speed
+		double rawSpeed = Math.abs(moduleD.tractionSpeed());
+		if (rawSpeed > moduleD_maxSpeed) {moduleD_maxSpeed = rawSpeed;}
+		rawSpeed /= moduleD_maxSpeed;
 		
-		final double tan = 1/Math.tan(Math.toRadians(moduleD_previousAngle));//TODO need validate angle?
-		final double rawX = rawSpeed/Math.sqrt(1 + tan*tan);
+		double tan = 1.0/Math.tan(Math.toRadians(moduleD_previousAngle));//TODO need validate angle?
+		if (Double.isNaN(tan)) {tan = 0.0;}
+		
+		final double rawX = rawSpeed/Math.sqrt(1.0 + tan*tan);
 		final double rawY = rawX*tan;
 		final double drivetrainX = rawX + drivetrain_previousSpin*pivotToAftY/pivotToAft;
 		final double drivetrainY = rawY + drivetrain_previousSpin*pivotToAftX/pivotToAft;
@@ -85,51 +90,88 @@ public class R_DriveTrain {
 		return new double[] {drivetrainX, drivetrainY};
 	}
 	
+	private double[] computeModuleComponents(final double speedX, final double speedY, final double speedSpin) {
+		final double moduleAX = speedX + speedSpin*pivotToFrontY/pivotToFront,
+					 moduleAY = speedY + speedSpin*pivotToFrontX/pivotToFront,
+					 moduleBX = moduleAX,//speedX + spin*pivotToFrontY/pivotToFront
+					 moduleBY = speedY - speedSpin*pivotToFrontX/pivotToFront,
+					 moduleCX = speedX - speedSpin*pivotToAftY/pivotToAft,
+					 moduleCY = speedY + speedSpin*pivotToAftX/pivotToAft,
+					 moduleDX = moduleCX,//speedX - spin*pivotToAftY/pivotToAft;
+					 moduleDY = speedY - speedSpin*pivotToAftX/pivotToAft;
+		return new double[] {moduleAX, moduleAY, moduleBX, moduleBY, moduleCX, moduleCY, moduleDX, moduleDY};
+	}
 	
-	public void holonomic(final double direction, final double speed, final double spin) {//TODO could combine holonomics
+	private double[] computeModuleAngles(final double[] moduleComponents) {
+		final double angleA = Math.toDegrees(Math.atan2(moduleComponents[0], moduleComponents[1])),
+					 angleB = Math.toDegrees(Math.atan2(moduleComponents[2], moduleComponents[3])),
+					 angleC = Math.toDegrees(Math.atan2(moduleComponents[4], moduleComponents[5])),
+					 angleD = Math.toDegrees(Math.atan2(moduleComponents[6], moduleComponents[7]));
+		return new double[] {angleA, angleB, angleC, angleD};
+	}
+	
+	private double[] computeModuleSpeeds(final double[] moduleComponents) {
+		final double speedA = Math.sqrt(moduleComponents[0]*moduleComponents[0] + moduleComponents[1]*moduleComponents[1]),
+					 speedB = Math.sqrt(moduleComponents[2]*moduleComponents[2] + moduleComponents[3]*moduleComponents[3]),
+					 speedC = Math.sqrt(moduleComponents[4]*moduleComponents[4] + moduleComponents[5]*moduleComponents[5]),
+					 speedD = Math.sqrt(moduleComponents[6]*moduleComponents[6] + moduleComponents[7]*moduleComponents[7]);
+		double max = Math.max(speedA, Math.max(speedB, Math.max(speedC, speedD)));
+		if (max < 1.0) {max = 1.0;}
+		return new double[] {speedA/max, speedB/max, speedC/max, speedD/max};
+	}
+	
+//	private double[] speedsError(final double[] speedsDesired, final double[] speedsActual) {
+//		final double firstIndexDifference = speedsDesired[0] - speedsActual[0];
+//		final double secondIndexDifference = speedsDesired[1] - speedsDesired[1];
+//		return new double[] {firstIndexDifference, secondIndexDifference};
+//	}
+	
+	
+	public void holonomic(final double direction, final double speed, final double speedSpin) {//TODO could combine holonomics
 		//{computing actual speed from encoder value of moduleD}
-		double chassis_fieldAngle = gyro.getCurrentAngle();
-		double speedY_desired = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
-		double speedX_desired = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		final double chassis_fieldAngle = gyro.getCurrentAngle();
+		final double speedY_desired = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
+					 speedX_desired = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		final double[] moduleComps_desired = computeModuleComponents(speedX_desired, speedY_desired, speedSpin);
 		
-		double[] actualSpeeds = speedsFromModuleD();
-		double speedX = Math.max(speedX_desired, actualSpeeds[0]);
-		double speedY = Math.max(speedY_desired, actualSpeeds[1]);
+		final double[] speeds_actual = speedsFromModuleD();
+		final double speed_actual = Math.sqrt(speeds_actual[0]*speeds_actual[0] + speeds_actual[1]*speeds_actual[1]);
 		
-		double moduleAX = speedX + spin*pivotToFrontY/pivotToFront;
-		double moduleAY = speedY + spin*pivotToFrontX/pivotToFront;
-		double moduleBX = moduleAX;//speedX + spin*pivotToFrontY/pivotToFront;
-		double moduleBY = speedY - spin*pivotToFrontX/pivotToFront;
-		double moduleCX = speedX - spin*pivotToAftY/pivotToAft;
-		double moduleCY = speedY + spin*pivotToAftX/pivotToAft;
-		double moduleDX = moduleCX;//speedX - spin*pivotToAftY/pivotToAft;
-		double moduleDY = speedY - spin*pivotToAftX/pivotToAft;
+		final double[] moduleAngles_final;
+		if (speed < speed_actual) {
+			final double[] moduleAngles_desired = computeModuleAngles(moduleComps_desired);
+			final double max_desired = Math.max(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3]))),
+						 min_desired = Math.min(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3])));
+			final double range_desired = max_desired - min_desired;
+			
+			final double[] moduleComps_actual = computeModuleComponents(speeds_actual[0], speeds_actual[1], speedSpin);
+			final double[] moduleAngles_actual = computeModuleAngles(moduleComps_actual);
+			final double max_actual = Math.max(moduleAngles_actual[0], Math.max(moduleAngles_actual[1], Math.max(moduleAngles_actual[2], moduleAngles_actual[3]))),
+						 min_actual = Math.min(moduleAngles_actual[0], Math.max(moduleAngles_actual[1], Math.max(moduleAngles_actual[2], moduleAngles_actual[3])));
+			final double range_actual = max_actual - min_actual;
+			
+			moduleAngles_final = range_desired > range_actual ? moduleAngles_actual : moduleAngles_desired;
+		}else {
+			moduleAngles_final = computeModuleAngles(moduleComps_desired);
+		}
 		
-		moduleD_previousAngle = Math.toDegrees(Math.atan2(moduleDX, moduleDY));
-		
-		boolean bad = speed == 0 && spin == 0;
-		moduleA.swivelTo(Math.toDegrees(Math.atan2(moduleAX, moduleAY)), bad);
-		moduleB.swivelTo(Math.toDegrees(Math.atan2(moduleBX, moduleBY)), bad);
-		moduleC.swivelTo(Math.toDegrees(Math.atan2(moduleCX, moduleCY)), bad);
-		moduleD.swivelTo(moduleD_previousAngle, bad);
+		boolean bad = speed == 0.0 && speedSpin == 0.0;
+		moduleA.swivelTo(moduleAngles_final[0], bad);	moduleB.swivelTo(moduleAngles_final[1], bad);
+		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
+		moduleD_previousAngle = moduleAngles_final[3];
 		
 		if (isThere(5)) {
-			double speedA = Math.sqrt(moduleAX*moduleAX + moduleAY*moduleAY),
-					speedB = Math.sqrt(moduleBX*moduleBX + moduleBY*moduleBY),
-					speedC = Math.sqrt(moduleCX*moduleCX + moduleCY*moduleCY),
-					speedD = Math.sqrt(moduleDX*moduleDX + moduleDY*moduleDY);
+			final double[] moduleSpeeds_final = computeModuleSpeeds(moduleComps_desired);
 			if (bad) {
-				moduleA.set(0);	moduleB.set(0);	moduleC.set(0);	moduleD.set(0);
+				moduleA.set(0.0);						moduleB.set(0.0);
+				moduleC.set(0.0);						moduleD.set(0.0);
 			}else {
-				double max = Math.max(speedA, Math.max(speedB, Math.max(speedC, speedD)));
-				if (max > 1.0) {
-					speedA /= max;	speedB /= max;	speedC /= max;	speedD /= max;
-				}
-				moduleA.set(speedA);	moduleB.set(speedB);	moduleC.set(speedC);	moduleD.set(speedD);
+				moduleA.set(moduleSpeeds_final[0]);		moduleB.set(moduleSpeeds_final[1]);
+				moduleC.set(moduleSpeeds_final[2]);		moduleD.set(moduleSpeeds_final[3]);
 			}
 		}
 		
-		drivetrain_previousSpin = spin;
+		drivetrain_previousSpin = speedSpin;
 	}
 	
 	
