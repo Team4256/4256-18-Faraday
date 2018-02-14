@@ -67,9 +67,8 @@ public class Robot extends IterativeRobot {
 	private static final R_ElevatorTwo elevatorTwo = new R_ElevatorTwo(Parameters.ElevatorTwo_master, Parameters.ElevatorTwo_calibrator);
 	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
 	
-//	private static final DoubleSolenoid rightShifter = new DoubleSolenoid(0, 0, 1);
-//	private static final DoubleSolenoid leftShifter = new DoubleSolenoid(0, 2, 3);
-//	private static final R_Clamp Clamp = new R_Clamp(15, 16, Shifter, 0);
+	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
+	private static final R_Clamp Clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, 0);
 	
 	private DigitalOutput tx2PowerControl = new DigitalOutput(9);
 	private boolean pulseAmount = false;
@@ -188,9 +187,15 @@ public class Robot extends IterativeRobot {
 		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
 		
 		elevators.setInches(desiredElevatorHeight);
-/*		
-		if (driver.getRawAxis(R_Xbox.AXIS_LT)) {Clamp.spit();}
-		if (driver.getRawAxis(R_Xbox.AXIS_RT)) {Clamp.splurp();}
+		
+		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !Clamp.hasCube()) {
+			Clamp.slurp();
+		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
+			Clamp.spit();
+		}else {
+			Clamp.stop();
+		}
+/*
 		if (V_Fridge.freeze("BUTTON_RB", driver.getRawButton(R_Xbox.BUTTON_RB))) {
 			Clamp.close();//TODO test
 		}else { 
