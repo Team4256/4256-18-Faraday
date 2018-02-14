@@ -27,16 +27,13 @@ public class R_Clamp {
 	 * This function "slurps" (intakes) the cube into "clampy"
 	**/
 	public void slurp() {
-		if(!sensor.get()) {
-			intakeLeft.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
-			intakeRight.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
+		if (!sensor.get()) {
 			hasCube = false;
 		}else {
-			intakeLeft.set(ControlMode.PercentOutput, 0);
-			intakeRight.set(ControlMode.PercentOutput, 0);
 			hasCube = true;
 		}
-		
+		intakeLeft.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
+		intakeRight.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 	}
 	
 	/**
@@ -45,6 +42,11 @@ public class R_Clamp {
 	public void spit() {
 		intakeLeft.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
 		intakeRight.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
+	}
+	
+	public void stop() {
+		intakeLeft.set(ControlMode.PercentOutput, 0);//TODO positive?
+		intakeRight.set(ControlMode.PercentOutput, 0);//TODO positive?
 	}
 	
 	/**
