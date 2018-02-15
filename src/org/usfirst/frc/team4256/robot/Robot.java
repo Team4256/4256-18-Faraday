@@ -87,6 +87,9 @@ public class Robot extends IterativeRobot {
 		clamp.init();
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
+		
+		moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
+		//practice robot:	 100.5,							 39.0,						 -36.5,							 -8.0
 
 		tx2PowerControl.set(true);
 		try {Thread.sleep(35);}//milliseconds
@@ -167,21 +170,36 @@ public class Robot extends IterativeRobot {
 		
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
-		
-		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}//ELEVATOR PRESETS
+		//{sending to preset heights}
+		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
 		
-		if (driver.getPOV() == R_Xbox.POV_NORTH) {//ELEVATOR FINE-TUNING
-			desiredElevatorHeight += 1.0;
-		}else if (driver.getPOV() == R_Xbox.POV_SOUTH) {
+		//{incrementing downward}
+		final boolean buttonLB = driver.getRawButton(R_Xbox.BUTTON_LB);
+		final boolean chillLB = V_Fridge.chill("Button LB", buttonLB, 200.0);
+		if (buttonLB && !chillLB) {
+			//it's been held down for a while, increment
 			desiredElevatorHeight -= 1.0;
+		}else if (V_Fridge.becomesTrue("!Button LB", !buttonLB) && chillLB) {
+			desiredElevatorHeight -= 11.0;//inches
+		}
+		
+		//{incrementing upward}
+		final boolean buttonRB = driver.getRawButton(R_Xbox.BUTTON_RB);
+		final boolean chillRB = V_Fridge.chill("Button RB", buttonRB, 200.0);
+		if (buttonRB && !chillRB) {//it's been held down for a while, increment
+			desiredElevatorHeight += 1.0;
+		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRB) && chillRB) {
+			desiredElevatorHeight += 11.0;//inches
 		}
 		if (desiredElevatorHeight > 82.5) {desiredElevatorHeight = 82.5;}
 		if (desiredElevatorHeight < 0.0) {desiredElevatorHeight = 0.0;}//TODO integrate this better, and have an option where elevator 2 MUST be all the way up before elevator 1 moves
 		
-		elevators.setInches(desiredElevatorHeight);
+		elevators.setInches(desiredElevatorHeight);//ELEVATOR
+		
+		
 		
 		
 		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
@@ -198,10 +216,7 @@ public class Robot extends IterativeRobot {
 			clamp.close();
 		}
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_START)) {//SWERVE ALIGNMENT
-			moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
-			//practice robot:	 100.5,							 39.0,						 -36.5,							 -8.0
-		}
+		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
 			gyro.reset();
