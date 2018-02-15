@@ -16,7 +16,9 @@ public class R_Clamp {
 	private boolean isClosed = true;
 	private boolean hasCube = true;
 	private boolean isLookingUp = true;
-	private double intakeConstant = 0.7;//TODO test
+	private final double intakeConstant = 0.7;//TODO test
+	private final double stallCurrent = 10.0;
+	private final double freeCurrent = 0.7;
 	
 	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid look/*, final int sensorID*/) {
 		intakeLeft = new VictorSPX(intakeLeftID);
@@ -27,16 +29,17 @@ public class R_Clamp {
 	}
 	
 	public void init() {
-		//TODO
+		//TODOs
 	}
 	
 	/**
 	 * This function "slurps" (intakes) the cube into "clampy"
 	**/
 	public void slurp() {
+		final double maxCurrent = Math.max(intakeLeft.getOutputCurrent(), intakeRight.getOutputCurrent());
+		hasCube = maxCurrent > stallCurrent;
 		intakeLeft.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 		intakeRight.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
-		
 //		hasCube = sensor.get();//TODO may need to be !
 	}
 	
@@ -44,9 +47,10 @@ public class R_Clamp {
 	 * This function "spits" (outakes) the cube out of "clampy"
 	**/
 	public void spit() {
+		final double maxCurrent = Math.max(intakeLeft.getOutputCurrent(), intakeRight.getOutputCurrent());
+		hasCube = maxCurrent > freeCurrent;
 		intakeLeft.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
 		intakeRight.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
-		
 //		hasCube = sensor.get();
 	}
 	

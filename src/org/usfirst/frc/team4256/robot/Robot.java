@@ -184,7 +184,7 @@ public class Robot extends IterativeRobot {
 		elevators.setInches(desiredElevatorHeight);
 		
 		
-		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
+		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
 			clamp.slurp();
 		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
 			clamp.spit();
