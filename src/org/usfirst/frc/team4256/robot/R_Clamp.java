@@ -54,7 +54,7 @@ public class R_Clamp {
 	/**
 	 * This function closes the clamp 
 	**/
-	public void closeClamp() {
+	public void close() {
 		clamp.set(DoubleSolenoid.Value.kReverse);//TODO test
 		isClosed = true;
 	}
@@ -62,7 +62,7 @@ public class R_Clamp {
 	/**
 	 * This function opens the clamp 
 	**/
-	public void openClamp() {
+	public void open() {
 		clamp.set(DoubleSolenoid.Value.kForward);//TODO test
 		isClosed = false;
 	}
