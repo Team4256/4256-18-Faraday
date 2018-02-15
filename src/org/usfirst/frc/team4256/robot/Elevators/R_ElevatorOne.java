@@ -61,6 +61,7 @@ public class R_ElevatorOne {
 		master.setNeutralMode(R_Talon.coast);
 		enableSoftLimits();
 		
+		//master.configAllowableClosedloopError(0, 0.05, R_Talon.kTimeoutMS);//motion profile slot, allowable error, timeout ms//TODO
 		master.config_kP(0, 0.7, R_Talon.kTimeoutMS);
 		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);

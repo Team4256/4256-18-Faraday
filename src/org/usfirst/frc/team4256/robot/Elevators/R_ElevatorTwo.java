@@ -31,6 +31,7 @@ public class R_ElevatorTwo {
 		master.setInverted(true);
 		enableSoftLimits();
 		
+		//master.configAllowableClosedloopError(0, 0.05, R_Talon.kTimeoutMS);//motion profile slot, allowable error, timeout ms//TODO
 		master.config_kP(0, 0.1, R_Talon.kTimeoutMS);
 		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);

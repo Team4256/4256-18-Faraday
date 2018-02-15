@@ -68,7 +68,8 @@ public class Robot extends IterativeRobot {
 	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
-	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, 0);
+	private static final DoubleSolenoid lookShifter = new DoubleSolenoid(Parameters.Look_module, Parameters.Look_forward, Parameters.Look_reverse);
+	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, lookShifter);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
 //	private Thread thread;
@@ -129,8 +130,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-//		elevatorOne.setZero(0.0);//TODO zero elevators at some point
-//		elevatorTwo.setZero(0.0);
+		elevatorOne.setZero(0.0);//TODO zero elevators at some point
+		elevatorTwo.setZero(0.0);
 	}
 	
 	@Override
@@ -141,7 +142,7 @@ public class Robot extends IterativeRobot {
 		
 		//{calculating speed}
 		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//turbo mode
-		if (!turbo) {speed *= 0.6;}//-------------------------------------normal mode
+		if (!turbo) {speed *= 0.8;}//-------------------------------------normal mode
 		if (snail)  {speed *= 0.5;}//-------------------------------------snail mode
 		speed *= speed;
 		
@@ -173,15 +174,17 @@ public class Robot extends IterativeRobot {
 		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
 		
 		if (driver.getPOV() == R_Xbox.POV_NORTH) {//ELEVATOR FINE-TUNING
-			desiredElevatorHeight += 0.25;
+			desiredElevatorHeight += 1.0;
 		}else if (driver.getPOV() == R_Xbox.POV_SOUTH) {
-			desiredElevatorHeight -= 0.25;
+			desiredElevatorHeight -= 1.0;
 		}
+		if (desiredElevatorHeight > 82.5) {desiredElevatorHeight = 82.5;}
+		if (desiredElevatorHeight < 0.0) {desiredElevatorHeight = 0.0;}//TODO integrate this better, and have an option where elevator 2 MUST be all the way up before elevator 1 moves
 		
 		elevators.setInches(desiredElevatorHeight);
 		
 		
-		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
+		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
 			clamp.slurp();
 		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
 			clamp.spit();
@@ -189,10 +192,10 @@ public class Robot extends IterativeRobot {
 			clamp.stop();
 		}
 
-		if (V_Fridge.freeze("BUTTON_RB", driver.getRawButton(R_Xbox.BUTTON_RB))) {//
-			clamp.close();
-		}else { 
+		if (V_Fridge.freeze("BUTTON_RB", driver.getRawButton(R_Xbox.BUTTON_RB))) {//CLAMP OPEN AND CLOSE
 			clamp.open();
+		}else { 
+			clamp.close();
 		}
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_START)) {//SWERVE ALIGNMENT

@@ -30,8 +30,12 @@ public abstract class Parameters {
 	public static final int ElevatorOne_shifterReverse = 2;//PCM
 	
 	public static final int Clamp_module = 0;//PCM
-	public static final int Clamp_forward = 2;//PCM
-	public static final int Clamp_reverse = 3;//PCM
+	public static final int Clamp_forward = 3;//PCM
+	public static final int Clamp_reverse = 4;//PCM
+	
+	public static final int Look_module = 0;//PCM
+	public static final int Look_forward = 5;//PCM
+	public static final int Look_reverse = 6;//PCM
 	
 	//AUTONOMOUS
 //	public static final double[][] leftInstructions = new double[][] {

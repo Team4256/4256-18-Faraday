@@ -11,18 +11,19 @@ public class R_Clamp {
 	private VictorSPX intakeRight;
 	private DoubleSolenoid clamp;
 	private DoubleSolenoid look;
-	private DigitalInput sensor;
+//	private DigitalInput sensor;
 	
 	private boolean isClosed = true;
 	private boolean hasCube = true;
 	private boolean isLookingUp = true;
-	private double intakeConstant = 0.5;//TODO test
+	private double intakeConstant = 0.7;//TODO test
 	
-	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int sensorID) {
+	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid look/*, final int sensorID*/) {
 		intakeLeft = new VictorSPX(intakeLeftID);
 		intakeRight = new VictorSPX(intakeRightID);
 		this.clamp = clamp;
-		sensor = new DigitalInput(sensorID);
+		this.look = look;
+//		sensor = new DigitalInput(sensorID);
 	}
 	
 	public void init() {
@@ -36,7 +37,7 @@ public class R_Clamp {
 		intakeLeft.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 		intakeRight.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 		
-		hasCube = sensor.get();//TODO may need to be !
+//		hasCube = sensor.get();//TODO may need to be !
 	}
 	
 	/**
@@ -46,12 +47,12 @@ public class R_Clamp {
 		intakeLeft.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
 		intakeRight.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
 		
-		hasCube = sensor.get();
+//		hasCube = sensor.get();
 	}
 	
 	public void stop() {
-		intakeLeft.set(ControlMode.PercentOutput, 0);//TODO positive?
-		intakeRight.set(ControlMode.PercentOutput, 0);//TODO positive?
+		intakeLeft.set(ControlMode.PercentOutput, 0);
+		intakeRight.set(ControlMode.PercentOutput, 0);
 	}
 	
 	/**
