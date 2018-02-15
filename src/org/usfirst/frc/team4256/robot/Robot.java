@@ -68,40 +68,29 @@ public class Robot extends IterativeRobot {
 	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
-	private static final R_Clamp Clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, 0);
+	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, 0);
 	
-	private DigitalOutput tx2PowerControl = new DigitalOutput(9);
-	private boolean pulseAmount = false;
-	private Thread thread;
+	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
+//	private Thread thread;
 	@Override
 	public void robotInit() {
 //		nt = NetworkTableInstance.getDefault();
-//		//{Robot Input}
+		//{Robot Input}
 //		faraday = nt.getTable("Faraday");
 //		targeting = nt.getTable("Targeting");
 //		zed = nt.getTable("ZED");
-//		//{Robot Output}
+		//{Robot Output}
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 		elevators.init();
-//		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
-//		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
-//		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
-//		climberA.init();
-//		climberA.setVoltageCompensationRampRate(24);
-//		climberB.init(climberA.getDeviceID(), 12f);
+		clamp.init();
 //		climberB.setVoltageCompensationRampRate(24); //TODO
-//		lift.init();
 //		lift.setVoltageRampRate(8);
 
-/*
 		tx2PowerControl.set(true);
-		try { thread.sleep(35); } 
-		catch (InterruptedException e) {// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			tx2PowerControl.set(false);
-*/
+		try {Thread.sleep(35);}//milliseconds
+		catch (InterruptedException e) {Thread.currentThread().interrupt();}
+		tx2PowerControl.set(false);
 	}
 
 	@Override
@@ -183,25 +172,28 @@ public class Robot extends IterativeRobot {
 		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
 		
-		desiredElevatorHeight -= .5*driver.getRawAxis(R_Xbox.AXIS_LT);//ELEVATOR FINE-TUNING
-		desiredElevatorHeight += .5*driver.getRawAxis(R_Xbox.AXIS_RT);
+		if (driver.getPOV() == R_Xbox.POV_NORTH) {//ELEVATOR FINE-TUNING
+			desiredElevatorHeight += 0.25;
+		}else if (driver.getPOV() == R_Xbox.POV_SOUTH) {
+			desiredElevatorHeight -= 0.25;
+		}
 		
 		elevators.setInches(desiredElevatorHeight);
 		
-		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !Clamp.hasCube()) {
-			Clamp.slurp();
+		
+		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
+			clamp.slurp();
 		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
-			Clamp.spit();
+			clamp.spit();
 		}else {
-			Clamp.stop();
+			clamp.stop();
 		}
-/*
-		if (V_Fridge.freeze("BUTTON_RB", driver.getRawButton(R_Xbox.BUTTON_RB))) {
-			Clamp.close();//TODO test
+
+		if (V_Fridge.freeze("BUTTON_RB", driver.getRawButton(R_Xbox.BUTTON_RB))) {//
+			clamp.close();
 		}else { 
-			Clamp.open();//TODO test
+			clamp.open();
 		}
-*/
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_START)) {//SWERVE ALIGNMENT
 			moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
@@ -223,6 +215,7 @@ public class Robot extends IterativeRobot {
 		//{completing Talon updates}
 		swerve.completeLoopUpdate();
 		elevators.completeLoopUpdate();
+		//clamp.completeLoopUpdate//TODO
 	}
 	
 	@Override

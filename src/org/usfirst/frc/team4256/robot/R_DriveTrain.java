@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4256.robot;
 
 import com.cyborgcats.reusable.R_Gyro;
+import com.cyborgcats.reusable.V_Compass;
 
 public class R_DriveTrain {
 	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
@@ -10,7 +11,7 @@ public class R_DriveTrain {
 	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
 	private static final double pivotToAft = Math.sqrt(pivotToAftX*pivotToAftX + pivotToAftY*pivotToAftY);
 	
-	private double moduleD_maxSpeed = 65.0;
+	private double moduleD_maxSpeed = 70.0;
 	private double moduleD_previousAngle = 0.0;
 	private double drivetrain_previousSpin = 0.0;
 
@@ -79,13 +80,13 @@ public class R_DriveTrain {
 		if (rawSpeed > moduleD_maxSpeed) {moduleD_maxSpeed = rawSpeed;}
 		rawSpeed /= moduleD_maxSpeed;
 		
-		double tan = 1.0/Math.tan(Math.toRadians(moduleD_previousAngle));//TODO need validate angle?
+		double tan = 1.0/Math.tan(Math.toRadians(V_Compass.validateAngle(moduleD_previousAngle)));
 		if (Double.isNaN(tan)) {tan = 0.0;}
 		
 		final double rawX = rawSpeed/Math.sqrt(1.0 + tan*tan);
 		final double rawY = rawX*tan;
-		final double drivetrainX = rawX + drivetrain_previousSpin*pivotToAftY/pivotToAft;
-		final double drivetrainY = rawY + drivetrain_previousSpin*pivotToAftX/pivotToAft;
+		final double drivetrainX = rawX - Math.abs(drivetrain_previousSpin)*pivotToAftY/pivotToAft;
+		final double drivetrainY = rawY - Math.abs(drivetrain_previousSpin)*pivotToAftX/pivotToAft;
 		
 		return new double[] {drivetrainX, drivetrainY};
 	}
@@ -138,7 +139,7 @@ public class R_DriveTrain {
 		final double speed_actual = Math.sqrt(speeds_actual[0]*speeds_actual[0] + speeds_actual[1]*speeds_actual[1]);
 		
 		final double[] moduleAngles_final;
-		if (speed < speed_actual) {
+		if (speed < Math.floor(speed_actual*10.0)/10.0) {
 			final double[] moduleAngles_desired = computeModuleAngles(moduleComps_desired);
 			final double max_desired = Math.max(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3]))),
 						 min_desired = Math.min(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3])));

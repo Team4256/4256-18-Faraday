@@ -7,15 +7,15 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class R_Clamp {
-	
 	private VictorSPX intakeLeft;
 	private VictorSPX intakeRight;
 	private DoubleSolenoid clamp;
 	private DoubleSolenoid look;
 	private DigitalInput sensor;
-	private boolean isClampClosed = true;//TODO private?
-	private boolean hasCube = true;//TODO private?
-	private boolean isLookingUp = false;//TODO private?
+	
+	private boolean isClosed = true;
+	private boolean hasCube = true;
+	private boolean isLookingUp = true;
 	private double intakeConstant = 0.5;//TODO test
 	
 	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int sensorID) {
@@ -25,17 +25,18 @@ public class R_Clamp {
 		sensor = new DigitalInput(sensorID);
 	}
 	
+	public void init() {
+		//TODO
+	}
+	
 	/**
 	 * This function "slurps" (intakes) the cube into "clampy"
 	**/
 	public void slurp() {
-		if (!sensor.get()) {
-			hasCube = false;
-		}else {
-			hasCube = true;
-		}
 		intakeLeft.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
 		intakeRight.set(ControlMode.PercentOutput, -intakeConstant);//TODO negative?
+		
+		hasCube = sensor.get();//TODO may need to be !
 	}
 	
 	/**
@@ -44,6 +45,8 @@ public class R_Clamp {
 	public void spit() {
 		intakeLeft.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
 		intakeRight.set(ControlMode.PercentOutput, intakeConstant);//TODO positive?
+		
+		hasCube = sensor.get();
 	}
 	
 	public void stop() {
@@ -54,17 +57,17 @@ public class R_Clamp {
 	/**
 	 * This function closes the clamp 
 	**/
-	public void closeClamp() {
+	public void close() {
 		clamp.set(DoubleSolenoid.Value.kReverse);//TODO test
-		isClampClosed = false;
+		isClosed = true;
 	}
 	
 	/**
 	 * This function opens the clamp 
 	**/
-	public void openClamp() {
+	public void open() {
 		clamp.set(DoubleSolenoid.Value.kForward);//TODO test
-		isClampClosed = true;
+		isClosed = false;
 	}
 	
 	/**
@@ -93,8 +96,8 @@ public class R_Clamp {
 	/**
 	 * This function returns if the clamp is closed or not
 	**/
-	public boolean isClampClosed() {
-		return isClampClosed;
+	public boolean isClosed() {
+		return isClosed;
 	}
 	
 	/**
