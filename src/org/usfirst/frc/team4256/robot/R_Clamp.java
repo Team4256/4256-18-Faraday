@@ -11,9 +11,11 @@ public class R_Clamp {
 	private VictorSPX intakeLeft;
 	private VictorSPX intakeRight;
 	private DoubleSolenoid clamp;
+	private DoubleSolenoid look;
 	private DigitalInput sensor;
 	private boolean isClampClosed = true;//TODO private?
 	private boolean hasCube = true;//TODO private?
+	private boolean isLookingUp = false;//TODO private?
 	private double intakeConstant = 0.5;//TODO test
 	
 	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int sensorID) {
@@ -63,6 +65,29 @@ public class R_Clamp {
 	public void openClamp() {
 		clamp.set(DoubleSolenoid.Value.kForward);//TODO test
 		isClampClosed = true;
+	}
+	
+	/**
+	 * This function makes the clamp look up
+	 **/
+	public void lookUp() {
+		look.set(DoubleSolenoid.Value.kForward);
+		isLookingUp = true;
+	}
+	
+	/**
+	 * This function makes the clamp look straight
+	 **/
+	public void lookStraight() {
+		look.set(DoubleSolenoid.Value.kReverse);
+		isLookingUp = false;
+	}
+	
+	/**
+	 * This function returns if the clamp is looking up or straight
+	 **/
+	public boolean isLookingUp() {
+		return isLookingUp;
 	}
 	
 	/**
