@@ -68,8 +68,8 @@ public class Robot extends IterativeRobot {
 	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
-	private static final DoubleSolenoid lookShifter = new DoubleSolenoid(Parameters.Look_module, Parameters.Look_forward, Parameters.Look_reverse);
-	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, lookShifter);
+	private static final DoubleSolenoid extenderShifter = new DoubleSolenoid(Parameters.Extender_module, Parameters.Extender_forward, Parameters.Extender_reverse);
+	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, extenderShifter);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
 	
@@ -200,7 +200,7 @@ public class Robot extends IterativeRobot {
 		
 		
 		
-		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
+		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
 			clamp.slurp();
 		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
 			clamp.spit();

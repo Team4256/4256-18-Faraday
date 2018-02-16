@@ -25,6 +25,7 @@ public class R_ElevatorOne {
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
 	}
+	
 	/**
 	 * 
 	**/
@@ -33,12 +34,14 @@ public class R_ElevatorOne {
 		else shifter.set(DoubleSolenoid.Value.kReverse);
 	}
 	
+	
 	/**
 	 * 
 	**/
 	public boolean hasLotsOfTorque() {
 		return shifter.get().equals(DoubleSolenoid.Value.kForward);
 	}
+	
 	
 	/**
 	 * This function prepares each motor individually by enabling soft limits, setting PID values, and commanding followers.
@@ -57,12 +60,14 @@ public class R_ElevatorOne {
 		followerB.follow(master);
 	}
 	
+	
 	private void enableSoftLimits() {
 		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
 		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
 		master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
 		master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
 	}
+	
 	
 	/**
 	 * This function sets the elevator to a certain revolution value using PID.
@@ -71,12 +76,14 @@ public class R_ElevatorOne {
 		master.quickSet(revs, false);
 	}
 	
+	
 	/**
 	 * A shortcut to call getCurrentRevs on the master motor.
 	**/
 	private double getRevs() {
 		return master.getCurrentRevs();
 	}
+	
 	
 	private double validateInches(final double inches) {
 		if (inches > maximumHeight) {
@@ -88,6 +95,7 @@ public class R_ElevatorOne {
 		}
 	}
 	
+	
 	/**
 	 * This function sends the elevator to a certain height after clipping the input.
 	**/
@@ -95,12 +103,14 @@ public class R_ElevatorOne {
 		setRevs(inchesToRevs(validateInches(inches)));
 	}
 	
+	
 	/**
 	 * 
 	**/
 	public double getInches() {
 		return revsToInches(getRevs());
 	}
+	
 	
 	/**
 	 * 
@@ -111,12 +121,22 @@ public class R_ElevatorOne {
 		setInches(newSetpoint);
 	}
 	
+	
+	/**
+	 * Threshold should be specified in inches. If the elevator is within that many inches of its target, this function returns true.
+	**/
+	public boolean isThere(final double threshold) {
+		return Math.abs(master.getCurrentError(true)) <= threshold;
+	}
+	
+	
 	/**
 	 * A shortcut to call overrideSoftLimits on all the Talons in the elevator.
 	**/
 	public void overrideSoftLimits(final boolean enable) {
 		master.overrideSoftLimitsEnable(enable);
 	}
+	
 	
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
@@ -131,12 +151,14 @@ public class R_ElevatorOne {
 		master.completeLoopUpdate();
 	}
 	
+	
 	/**
 	 * This function converts inches to revolutions.
 	**/
 	private static double inchesToRevs(final double inches) {
 		return inches/sprocketCircumference;
 	}
+	
 	
 	/**
 	 * This functions converts revolutions to inches.

@@ -31,9 +31,9 @@ public abstract class Parameters {
 	public static final int Clamp_forward = 3;//PCM
 	public static final int Clamp_reverse = 4;//PCM
 	
-	public static final int Look_module = 0;//PCM
-	public static final int Look_forward = 5;//PCM
-	public static final int Look_reverse = 6;//PCM
+	public static final int Extender_module = 0;//PCM
+	public static final int Extender_forward = 5;//PCM
+	public static final int Extender_reverse = 6;//PCM
 	
 	//AUTONOMOUS
 //	public static final double[][] leftInstructions = new double[][] {
