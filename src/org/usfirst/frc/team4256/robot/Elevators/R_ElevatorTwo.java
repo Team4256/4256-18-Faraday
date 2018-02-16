@@ -3,20 +3,16 @@ package org.usfirst.frc.team4256.robot.Elevators;
 import com.cyborgcats.reusable.Talon.R_Encoder;
 import com.cyborgcats.reusable.Talon.R_Talon;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-
 public class R_ElevatorTwo {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
 	protected static final double maximumHeight = 42.5;//inches
 	private R_Talon master;
-	private DigitalInput sensor;
-	private boolean knowsZero = false;
 	private int maximumEncoderValue;
+	public boolean knowsZero = false;
 	
-	public R_ElevatorTwo(final int masterID, final int sensorID) {
+	public R_ElevatorTwo(final int masterID) {
 		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, true);
-		sensor = new DigitalInput(sensorID);
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
 	}
@@ -27,11 +23,10 @@ public class R_ElevatorTwo {
 	public void init() {
 		master.init();
 		
-		master.setNeutralMode(R_Talon.coast);
+		master.setNeutralMode(R_Talon.brake);
 		master.setInverted(true);
 		enableSoftLimits();
-		
-		//master.configAllowableClosedloopError(0, 0.05, R_Talon.kTimeoutMS);//motion profile slot, allowable error, timeout ms//TODO
+
 		master.config_kP(0, 0.1, R_Talon.kTimeoutMS);
 		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);
@@ -85,35 +80,22 @@ public class R_ElevatorTwo {
 	/**
 	 * 
 	**/
-	public void increment(final double inches) {//TODO make a boolean to determine whether we are incrementing from current height, or the previous target height
-		setInches(getInches() + inches);
+	public void increment(final double inches, final boolean startingAtPreviousSetpoint) {
+		double newSetpoint = getInches() + inches;
+		if (startingAtPreviousSetpoint) newSetpoint += master.getCurrentError(false);
+		setInches(newSetpoint);
 	}
 	
 	/**
-	 *
+	 * A shortcut to call overrideSoftLimits on all the Talons in the elevator.
 	**/
-	public void findZero() {
-		if (!sensor.get()) {//not at zero
-			master.overrideSoftLimitsEnable(true);
-			knowsZero = false;
-			increment(-0.3);
-		}else {//at zero
-			setZero(0.0);
-			master.overrideSoftLimitsEnable(false);
-			
-			knowsZero = true;
-		}
+	public void overrideSoftLimits(final boolean enable) {
+		master.overrideSoftLimitsEnable(enable);
 	}
 	
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
-	}
-	
-	/**
-	 * 
-	**/
-	public boolean knowsZero() {
-		return knowsZero;
+		knowsZero = true;
 	}
 	
 	

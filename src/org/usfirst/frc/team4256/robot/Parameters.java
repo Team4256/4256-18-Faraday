@@ -17,10 +17,8 @@ public abstract class Parameters {
 	public static final int ElevatorOne_master = 26;//CAN, Talon SRX, Master, PDP 12, First Stage
 	public static final int ElevatorOne_followerA = 27;//CAN, Victor SPX, Follower, PDP 13, First Stage
 	public static final int ElevatorOne_followerB = 28;//CAN, Victor SPX, Follower, PDP 14, First Stage
-	public static final int ElevatorOne_calibrator = 0;//DIO, First Stage
 	
 	public static final int ElevatorTwo_master = 17;//CAN, Talon SRX, PDP 10, Second Stage
-	public static final int ElevatorTwo_calibrator = 1;//DIO, Second Stage
 	
 	public static final int clampyRotator = 29;//CAN, Talon SRX, PDP 15
 	

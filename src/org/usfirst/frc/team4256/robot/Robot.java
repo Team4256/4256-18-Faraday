@@ -46,10 +46,10 @@ public class Robot extends IterativeRobot {
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
-//	private static NetworkTableInstance nt;
-//	private static NetworkTable faraday;
-//	private static NetworkTable targeting;
-//	private static NetworkTable zed;
+	private static NetworkTableInstance nt;
+	private static NetworkTable faraday;
+	private static NetworkTable targeting;
+	private static NetworkTable zed;
 //	private static double metersX = 0;
 //	private static double metersY = 0;
 	
@@ -63,8 +63,8 @@ public class Robot extends IterativeRobot {
 	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
-	private static final R_ElevatorOne elevatorOne = new R_ElevatorOne(Parameters.ElevatorOne_master, Parameters.ElevatorOne_followerA, Parameters.ElevatorOne_followerB, elevatorOneShifter, Parameters.ElevatorOne_calibrator);
-	private static final R_ElevatorTwo elevatorTwo = new R_ElevatorTwo(Parameters.ElevatorTwo_master, Parameters.ElevatorTwo_calibrator);
+	private static final R_ElevatorOne elevatorOne = new R_ElevatorOne(Parameters.ElevatorOne_master, Parameters.ElevatorOne_followerA, Parameters.ElevatorOne_followerB, elevatorOneShifter);
+	private static final R_ElevatorTwo elevatorTwo = new R_ElevatorTwo(Parameters.ElevatorTwo_master);
 	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
@@ -72,14 +72,14 @@ public class Robot extends IterativeRobot {
 	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, lookShifter);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
-//	private Thread thread;
+	
 	@Override
 	public void robotInit() {
-//		nt = NetworkTableInstance.getDefault();
 		//{Robot Input}
-//		faraday = nt.getTable("Faraday");
-//		targeting = nt.getTable("Targeting");
-//		zed = nt.getTable("ZED");
+		nt = NetworkTableInstance.getDefault();
+		faraday = nt.getTable("Faraday");
+		targeting = nt.getTable("Targeting");
+		zed = nt.getTable("ZED");
 		//{Robot Output}
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
@@ -88,8 +88,8 @@ public class Robot extends IterativeRobot {
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
 		
-		moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
-		//practice robot:	 100.5,							 39.0,						 -36.5,							 -8.0
+		moduleA.setTareAngle(67.0);	moduleB.setTareAngle(32.0);	moduleC.setTareAngle(-48.0);	moduleD.setTareAngle(82.0);
+		//practice robot:	 67.0,						 32.0,						 -48.0,							 82.0
 
 		tx2PowerControl.set(true);
 		try {Thread.sleep(35);}//milliseconds
@@ -124,11 +124,9 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotPeriodic() {
-//		faraday.putBoolean("old gear out", gearer.get().equals(DoubleSolenoid.Value.kForward));
-//		faraday.putBoolean("clamp open", clamp.get().equals(DoubleSolenoid.Value.kForward));
-//		faraday.putBoolean("aligning", swerve.isAligning());
-//		faraday.putBoolean("aligned", swerve.isAligned());
-//		faraday.putNumber("match timer", V_Instructions.getSeconds());
+		//faraday.getEntry("aligned").setBoolean(elevators.knowsZero);
+		faraday.getEntry("clamp open").setBoolean(clamp.isOpen());
+		faraday.getEntry("climbing mode").setBoolean(elevatorOne.hasLotsOfTorque());
 	}
 	
 	@Override

@@ -101,8 +101,8 @@ public class R_Clamp {
 	/**
 	 * This function returns if the clamp is closed or not
 	**/
-	public boolean isClosed() {
-		return isClosed;
+	public boolean isOpen() {
+		return clamp.get().equals(DoubleSolenoid.Value.kForward);
 	}
 	
 	/**

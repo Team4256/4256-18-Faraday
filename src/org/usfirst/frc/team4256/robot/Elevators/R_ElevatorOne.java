@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.cyborgcats.reusable.Talon.R_Encoder;
 import com.cyborgcats.reusable.Talon.R_Talon;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class R_ElevatorOne {
@@ -15,16 +14,13 @@ public class R_ElevatorOne {
 	private VictorSPX followerA;
 	private VictorSPX followerB;
 	private DoubleSolenoid shifter;
-	private DigitalInput sensor;
-	private boolean inLowGear = true;
-	private boolean knowsZero = false;
 	private int maximumEncoderValue;
+	public boolean knowsZero = false;
 
-	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter, final int sensorID) {
+	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter) {
 		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, false);
 		followerA = new VictorSPX(followerAID);
 		followerB = new VictorSPX(followerBID);
-		sensor = new DigitalInput(sensorID);
 		this.shifter = shifter;	
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
@@ -32,24 +28,16 @@ public class R_ElevatorOne {
 	/**
 	 * 
 	**/
-	public void shiftLowGear() {
-		shifter.set(DoubleSolenoid.Value.kReverse);
-		inLowGear = true;
+	public void setTorque(final boolean aWholeLot) {
+		if (aWholeLot) shifter.set(DoubleSolenoid.Value.kForward);
+		else shifter.set(DoubleSolenoid.Value.kReverse);
 	}
 	
 	/**
 	 * 
 	**/
-	public void shiftHighGear() {
-		shifter.set(DoubleSolenoid.Value.kForward);
-		inLowGear = false;
-	}
-	
-	/**
-	 * 
-	**/
-	public boolean inLowGear() {
-		return inLowGear;
+	public boolean hasLotsOfTorque() {
+		return shifter.get().equals(DoubleSolenoid.Value.kForward);
 	}
 	
 	/**
@@ -58,10 +46,9 @@ public class R_ElevatorOne {
 	public void init() {
 		master.init();
 		
-		master.setNeutralMode(R_Talon.coast);
+		master.setNeutralMode(R_Talon.brake);
 		enableSoftLimits();
 		
-		//master.configAllowableClosedloopError(0, 0.05, R_Talon.kTimeoutMS);//motion profile slot, allowable error, timeout ms//TODO
 		master.config_kP(0, 0.7, R_Talon.kTimeoutMS);
 		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);
@@ -118,35 +105,22 @@ public class R_ElevatorOne {
 	/**
 	 * 
 	**/
-	public void increment(final double inches) {//TODO make a boolean to determine whether we are incrementing from current height, or the previous target height
-		setInches(getInches() + inches);
+	public void increment(final double inches, final boolean startingAtPreviousSetpoint) {
+		double newSetpoint = getInches() + inches;
+		if (startingAtPreviousSetpoint) newSetpoint += master.getCurrentError(false);
+		setInches(newSetpoint);
 	}
 	
 	/**
-	 *
+	 * A shortcut to call overrideSoftLimits on all the Talons in the elevator.
 	**/
-	public void findZero() {
-		if (!sensor.get()) {//not at zero
-			master.overrideSoftLimitsEnable(true);
-			knowsZero = false;
-			increment(-0.3);
-		}else {//at zero
-			setZero(0.0);
-			master.overrideSoftLimitsEnable(false);
-			
-			knowsZero = true;
-		}
+	public void overrideSoftLimits(final boolean enable) {
+		master.overrideSoftLimitsEnable(enable);
 	}
 	
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
-	}
-	
-	/**
-	 * 
-	**/
-	public boolean knowsZero() {
-		return knowsZero;
+		knowsZero = true;
 	}
 	
 	
