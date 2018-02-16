@@ -236,6 +236,10 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
+		moduleA.swivelTo(0);
+		moduleB.swivelTo(0);
+		moduleC.swivelTo(0);
+		moduleD.swivelTo(0);
 	}
 	
 	@Override
