@@ -88,8 +88,8 @@ public class Robot extends IterativeRobot {
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
 		
-		moduleA.setTareAngle(100.5);	moduleB.setTareAngle(39.0);	moduleC.setTareAngle(-36.5);	moduleD.setTareAngle(-8.0);
-		//practice robot:	 100.5,							 39.0,						 -36.5,							 -8.0
+		moduleA.setTareAngle(67.0);	moduleB.setTareAngle(32.0);	moduleC.setTareAngle(-48.0);	moduleD.setTareAngle(82.0);
+		//practice robot:	 67.0,						 32.0,						 -48.0,							 82.0
 
 		tx2PowerControl.set(true);
 		try {Thread.sleep(35);}//milliseconds
@@ -238,6 +238,10 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
+		moduleA.swivelTo(0);
+		moduleB.swivelTo(0);
+		moduleC.swivelTo(0);
+		moduleD.swivelTo(0);
 	}
 	
 	@Override
