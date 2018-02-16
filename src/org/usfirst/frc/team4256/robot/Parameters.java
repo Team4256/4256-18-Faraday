@@ -60,7 +60,7 @@ public abstract class Parameters {
 		FLOOR(0),
 		SWITCH(12),
 		SCALE_LOW(60),
-		SCALE_HIGH(72);
+		SCALE_HIGH(80);
 		
 		private final int height;
 		
