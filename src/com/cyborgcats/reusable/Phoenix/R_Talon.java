@@ -1,4 +1,4 @@
-package com.cyborgcats.reusable.Talon;
+package com.cyborgcats.reusable.Phoenix;
 
 import com.cyborgcats.reusable.V_Compass;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;

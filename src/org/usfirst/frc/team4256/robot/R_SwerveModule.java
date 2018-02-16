@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4256.robot;
 
-import com.cyborgcats.reusable.Talon.R_Encoder;
-import com.cyborgcats.reusable.Talon.R_Talon;
 import com.cyborgcats.reusable.V_Compass;
+import com.cyborgcats.reusable.Phoenix.R_Encoder;
+import com.cyborgcats.reusable.Phoenix.R_Talon;
 
 public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;

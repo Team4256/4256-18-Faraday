@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4256.robot.Elevators;
 
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.cyborgcats.reusable.Talon.R_Encoder;
-import com.cyborgcats.reusable.Talon.R_Talon;
+import com.cyborgcats.reusable.Phoenix.R_Encoder;
+import com.cyborgcats.reusable.Phoenix.R_Talon;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 

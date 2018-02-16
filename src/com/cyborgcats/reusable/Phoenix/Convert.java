@@ -1,4 +1,4 @@
-package com.cyborgcats.reusable.Talon;
+package com.cyborgcats.reusable.Phoenix;
 
 public class Convert {
 	private double countsPerRev;

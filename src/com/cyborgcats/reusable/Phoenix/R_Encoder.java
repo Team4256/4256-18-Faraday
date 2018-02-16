@@ -1,4 +1,4 @@
-package com.cyborgcats.reusable.Talon;
+package com.cyborgcats.reusable.Phoenix;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
