@@ -18,8 +18,8 @@ public class R_Talon extends TalonSRX {
 	public static final int kTimeoutMS = 10;
 	private ControlMode controlMode;
 	private boolean updated = false;
-	private double lastSetPoint = 0;
-	private double lastLegalDirection = 1;
+	private double lastSetPoint = 0.0;
+	private double lastLegalDirection = 1.0;
 	public V_Compass compass;
 	public Convert convert;
 	
@@ -61,15 +61,15 @@ public class R_Talon extends TalonSRX {
 		selectProfileSlot(0, 0);//first is motion profile slot (things like allowable error), second is PID slot ID
 		configAllowableClosedloopError(0, 0, kTimeoutMS);//motion profile slot, allowable error, timeout ms
 		
-		configNominalOutputForward(0, kTimeoutMS);
-		configNominalOutputReverse(0, kTimeoutMS);
+		configNominalOutputForward(0.0, kTimeoutMS);
+		configNominalOutputReverse(0.0, kTimeoutMS);
 		configPeakOutputForward(Math.abs(maxPercent), kTimeoutMS);
 		configPeakOutputReverse(-Math.abs(maxPercent), kTimeoutMS);
 		
 		if (getControlMode() == follower) {
 			quickSet(masterID, false);
 		}else {
-			quickSet(0, false);
+			quickSet(0.0, false);
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class R_Talon extends TalonSRX {
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
 	**/
 	public void init() {
-		init(0, 1);
+		init(0, 1.0);
 	}
 	
 	
@@ -139,7 +139,7 @@ public class R_Talon extends TalonSRX {
 	}
 
 
-	public void set(double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws IllegalAccessException {
+	public void set(final double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws IllegalAccessException {
 		double currentSetPoint = lastSetPoint;
 		switch (controlMode) {
 		case Current:
@@ -243,7 +243,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentError(final boolean asDegrees) {
 		switch (getControlMode()) {
-		case Current:return getClosedLoopError(0);//arg in getSelectedSensorPosition is PID slot ID
+		case Current:return getClosedLoopError(0);
 		case Position:return asDegrees ? convert.to.DEGREES.afterGears(getClosedLoopError(0)) : convert.to.REVS.afterGears(getClosedLoopError(0));
 		case Velocity:return convert.to.RPM.afterGears(getClosedLoopError(0));
 		default:return 0.0;
