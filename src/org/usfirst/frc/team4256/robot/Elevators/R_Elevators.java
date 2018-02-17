@@ -4,10 +4,16 @@ import org.usfirst.frc.team4256.robot.R_Clamp;
 
 public class R_Elevators {
 	
-	public boolean isClimbing = false;
-	
 	private R_ElevatorOne elevatorOne;
 	private R_ElevatorTwo elevatorTwo;
+	
+	private enum climbModeState {
+		Disabled,
+		Enabling,
+		Enabled
+	}
+	
+	private climbModeState currentClimbModeState = climbModeState.Disabled;
 
 	public R_Elevators (R_ElevatorOne elevatorOne, R_ElevatorTwo elevatorTwo) {
 		this.elevatorOne = elevatorOne;
@@ -46,16 +52,25 @@ public class R_Elevators {
 		}
 	}
 	
-	public void climb(final R_Clamp clamp) {
-		if (!elevatorOne.hasLotsOfTorque()) elevatorOne.setTorque(true);
+	public void setInchesClimb(final double desiredInches) {
+		elevatorOne.setInches(desiredInches);
+	}
+	
+	public void enableClimbMode(final R_Clamp clamp) {
 		elevatorTwo.setInches(8.0);
 		clamp.close();
 		clamp.retract();
-		if (elevatorTwo.isThere(1.0) && !clamp.isExtended() && !clamp.isOpen()) elevatorOne.setInches(0.0);
+		if (!elevatorOne.hasLotsOfTorque()) elevatorOne.setTorque(true);
+		currentClimbModeState = climbModeState.Enabling;
 	}
 	
-	public boolean isClimbing() {
-		return isClimbing;
+	public boolean readyToClimb(final R_Clamp clamp) {
+		if (currentClimbModeState == climbModeState.Enabling) {
+			if(Math.round(elevatorTwo.getInches()) == 8.0  && !clamp.isExtended() && !clamp.isOpen() && elevatorOne.hasLotsOfTorque()) {
+				currentClimbModeState = climbModeState.Enabled;
+			}
+		}
+		return currentClimbModeState == climbModeState.Enabled;
 	}
 	
 	public void completeLoopUpdate() {
