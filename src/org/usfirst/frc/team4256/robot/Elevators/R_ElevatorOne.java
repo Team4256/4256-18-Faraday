@@ -7,6 +7,8 @@ import com.cyborgcats.reusable.Phoenix.R_Talon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class R_ElevatorOne {
+	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kForward;//TODO test all of these
+	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kReverse;
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
 	protected static final double maximumHeight = 40.0;//inches
@@ -30,8 +32,8 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void setTorque(final boolean aWholeLot) {
-		if (aWholeLot) shifter.set(DoubleSolenoid.Value.kForward);
-		else shifter.set(DoubleSolenoid.Value.kReverse);
+		if (aWholeLot) shifter.set(LowGear);
+		else shifter.set(HighGear);
 	}
 	
 	
@@ -39,7 +41,7 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public boolean hasLotsOfTorque() {
-		return shifter.get().equals(DoubleSolenoid.Value.kForward);
+		return shifter.get().equals(LowGear);
 	}
 	
 	
@@ -126,7 +128,7 @@ public class R_ElevatorOne {
 	 * Threshold should be specified in inches. If the elevator is within that many inches of its target, this function returns true.
 	**/
 	public boolean isThere(final double threshold) {
-		return Math.abs(master.getCurrentError(true)) <= threshold;
+		return Math.abs(revsToInches(master.getCurrentError(false))) <= threshold;
 	}
 	
 	

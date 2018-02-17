@@ -98,7 +98,7 @@ public class R_ElevatorTwo {
 	 * Threshold should be specified in inches. If the elevator is within that many inches of its target, this function returns true.
 	**/
 	public boolean isThere(final double threshold) {
-		return Math.abs(master.getCurrentError(true)) <= threshold;
+		return Math.abs(revsToInches(master.getCurrentError(false))) <= threshold;
 	}
 	
 	
