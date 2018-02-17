@@ -42,7 +42,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final R_Xbox driver = new R_Xbox(0);
-	private static double desiredElevatorHeight = ElevatorPresets.FLOOR.height();
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
@@ -172,34 +171,33 @@ public class Robot extends IterativeRobot {
 		
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
+		double desiredElevatorHeight = currentElevatorHeight;
 		//{sending to preset heights}
 		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
 		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
+		elevators.setInches(desiredElevatorHeight);
 		
 		//{incrementing downward}
 		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
 		final boolean chillLT = V_Fridge.chill("Button LB", buttonLT, 200.0);
 		if (/*buttonLT && */!chillLT) {
 			//it's been held down for a while, increment
-			desiredElevatorHeight -= 0.75*driver.getRawAxis(R_Xbox.AXIS_LT);
+			elevators.increment(-0.75*driver.getRawAxis(R_Xbox.AXIS_LT));
 		}else if (V_Fridge.becomesTrue("!Button LB", !buttonLT) && chillLT) {
-			desiredElevatorHeight -= 11.0;//inches
+			elevators.increment(-11.0);//inches
 		}
 		
 		//{incrementing upward}
 		final boolean buttonRT = driver.getAxisPress(R_Xbox.AXIS_RT, 0.9);
 		final boolean chillRT = V_Fridge.chill("Button RB", buttonRT, 200.0);
 		if (/*buttonRT && */!chillRT) {//it's been held down for a while, increment
-			desiredElevatorHeight += 0.75*driver.getRawAxis(R_Xbox.AXIS_RT);
+			elevators.increment(0.75*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRT) && chillRT) {
-			desiredElevatorHeight += 11.0;//inches
+			elevators.increment(11.0);//inches
 		}
-		if (desiredElevatorHeight > 83.5) {desiredElevatorHeight = 83.5;}
-		if (desiredElevatorHeight < 2.0) {desiredElevatorHeight = 2.0;}//TODO integrate this better, and have an option where elevator 2 MUST be all the way up before elevator 1 moves
-		
-		elevators.setInches(desiredElevatorHeight);//ELEVATOR
+
 		
 		
 		
