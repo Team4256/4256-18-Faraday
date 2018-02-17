@@ -1,7 +1,5 @@
 package org.usfirst.frc.team4256.robot.Elevators;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class R_Elevators {
 	
 	private R_ElevatorOne elevatorOne;
@@ -28,20 +26,19 @@ public class R_Elevators {
 		if (elevatorOne.hasLotsOfTorque()) {
 			elevatorOne.setTorque(false);//TODO change PID parameters depending on which one we are using
 		}
-		SmartDashboard.putNumber("el 1", elevatorOne.getInches());
-		SmartDashboard.putNumber("el 2", elevatorTwo.getInches());
-		if (desiredInches > R_ElevatorTwo.maximumHeight) {//stage one needed
-			elevatorTwo.setInches(R_ElevatorTwo.maximumHeight);
-			elevatorOne.setInches(desiredInches - R_ElevatorTwo.maximumHeight);
-		}else if (desiredInches <= R_ElevatorTwo.maximumHeight) {//stage one not needed
-			elevatorTwo.setInches(desiredInches);
-			elevatorOne.setInches(0.0);
-			//if stage one is up, make sure stage two is all the way down before adjusting it
-//			if (elevatorOne.getInches() >= 2.0) elevatorTwo.setInches(0.0);
-			//after stage two is all the way down, move stage one all the way down
-//			if (elevatorTwo.getInches() <= 2.0) elevatorOne.setInches(0.0);//TODO could possibly set stage two to desired position in this if statement
-			//after stage one is all the way down, move stage two to desired position
-//			if (elevatorOne.getInches() < 2.0) elevatorTwo.setInches(desiredInches);
+		
+		final double currentElOnePosition = elevatorOne.getInches();
+		final boolean desiredAboveCurrentElOne = desiredInches > currentElOnePosition;
+		if (desiredAboveCurrentElOne) {
+			if (desiredInches <= currentElOnePosition + R_ElevatorTwo.maximumHeight) {
+				elevatorTwo.setInches(desiredInches - elevatorOne.getInches());
+			}else {
+				elevatorTwo.setInches(R_ElevatorTwo.maximumHeight);
+				if (elevatorTwo.isThere(5.0)) elevatorOne.setInches(desiredInches - elevatorTwo.getInches());
+			}
+		}else {
+			elevatorTwo.setInches(0.0);
+			if (elevatorTwo.isThere(5.0)) elevatorOne.setInches(desiredInches);
 		}
 	}
 	
