@@ -92,7 +92,7 @@ public class Robot extends IterativeRobot {
 		//practice robot:	 60.0,						 -14.0,							 0.0,						 50.0
 
 		tx2PowerControl.set(true);
-		try {Thread.sleep(35);}//milliseconds
+		try {Thread.sleep(50);}//milliseconds
 		catch (InterruptedException e) {Thread.currentThread().interrupt();}
 		tx2PowerControl.set(false);
 	}
