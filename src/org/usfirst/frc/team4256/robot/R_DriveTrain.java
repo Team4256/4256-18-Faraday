@@ -34,7 +34,7 @@ public class R_DriveTrain {
 	public void init() {
 		moduleA.init(/*reversed traction*/true);//TODO remove these params once electronics is correct
 		moduleB.init(/*reversed traction*/false);
-		moduleC.init(/*reversed traction*/false);
+		moduleC.init(/*reversed traction*/true);
 		moduleD.init(/*reversed traction*/true);
 	}
 	
