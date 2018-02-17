@@ -59,7 +59,7 @@ public class R_Victor extends VictorSPX {
 		case Follower:
 			break;
 		case PercentOutput:
-			break;
+			currentSetPoint = setPercent(value);break;
 		case Position:
 			throw new IllegalAccessException("Victor " + Integer.toString(getDeviceID()) + "'s mode is not compatible with Victors");
 		case Velocity:
