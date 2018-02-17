@@ -7,8 +7,8 @@ import com.cyborgcats.reusable.Phoenix.R_Talon;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class R_ElevatorOne {
-	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kForward;//TODO test all of these
-	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kReverse;
+	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kReverse;
+	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kForward;
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
 	protected static final double maximumHeight = 40.0;//inches
