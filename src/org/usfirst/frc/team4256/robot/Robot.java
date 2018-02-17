@@ -99,6 +99,8 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
+		elevatorOne.setInches(elevatorOne.getInches());
+		elevatorTwo.setInches(elevatorTwo.getInches());
 		gyro.reset();
 		V_PID.clear("spin");
 //		autoMode = (int)faraday.getNumber("auto mode", 1);
@@ -110,6 +112,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopInit() {
+		elevatorOne.setInches(elevatorOne.getInches());
+		elevatorTwo.setInches(elevatorTwo.getInches());
 		lockedAngle = gyro.getCurrentAngle();
 		V_PID.clear("spin");
 	}
