@@ -1,8 +1,12 @@
 package org.usfirst.frc.team4256.robot.Elevators;
 
+import org.usfirst.frc.team4256.robot.R_Clamp;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class R_Elevators {
+	
+	public boolean isClimbing = false;
 	
 	private R_ElevatorOne elevatorOne;
 	private R_ElevatorTwo elevatorTwo;
@@ -45,7 +49,17 @@ public class R_Elevators {
 		}
 	}
 	
-
+	public void climb(final R_Clamp clamp) {
+		if (!elevatorOne.hasLotsOfTorque()) elevatorOne.setTorque(true);
+		elevatorTwo.setInches(8.0);
+		clamp.close();
+		clamp.retract();
+		if (elevatorTwo.isThere(1.0) && !clamp.isExtended() && !clamp.isOpen()) elevatorOne.setInches(0.0);
+	}
+	
+	public boolean isClimbing() {
+		return isClimbing;
+	}
 	
 	public void completeLoopUpdate() {
 		elevatorOne.completeLoopUpdate();
