@@ -15,7 +15,7 @@ public class R_Clamp {
 	private DoubleSolenoid clamp;
 	private DoubleSolenoid extender;
 	
-	private final double intakeConstant = 0.7;
+	private final double intakeConstant = 0.85;
 	
 	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid extended) {
 		intakeLeft = new VictorSPX(intakeLeftID);

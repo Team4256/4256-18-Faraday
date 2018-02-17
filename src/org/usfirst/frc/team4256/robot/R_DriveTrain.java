@@ -136,10 +136,11 @@ public class R_DriveTrain {
 		final double[] moduleComps_desired = computeModuleComponents(speedX_desired, speedY_desired, speedSpin);
 		
 		final double[] speeds_actual = speedsFromModuleD();
-		final double speed_actual = Math.sqrt(speeds_actual[0]*speeds_actual[0] + speeds_actual[1]*speeds_actual[1]);
+		double speed_actual = Math.sqrt(speeds_actual[0]*speeds_actual[0] + speeds_actual[1]*speeds_actual[1]);
+		speed_actual = Math.floor(speed_actual*10.0)/10.0;
 		
 		final double[] moduleAngles_final;
-		if (speed < Math.floor(speed_actual*10.0)/10.0) {
+		if ((speed < speed_actual) && (speed_actual > .2)) {
 			final double[] moduleAngles_desired = computeModuleAngles(moduleComps_desired);
 			final double max_desired = Math.max(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3]))),
 						 min_desired = Math.min(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3])));

@@ -147,7 +147,7 @@ public class Robot extends IterativeRobot {
 		
 		//{calculating speed}
 		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//turbo mode
-		if (!turbo) {speed *= 0.8;}//-------------------------------------normal mode
+		if (!turbo) {speed *= 0.7;}//-------------------------------------normal mode
 		if (snail)  {speed *= 0.5;}//-------------------------------------snail mode
 		speed *= speed;
 		
@@ -179,40 +179,40 @@ public class Robot extends IterativeRobot {
 		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
 		
 		//{incrementing downward}
-		final boolean buttonLB = driver.getRawButton(R_Xbox.BUTTON_LB);
-		final boolean chillLB = V_Fridge.chill("Button LB", buttonLB, 200.0);
-		if (buttonLB && !chillLB) {
+		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
+		final boolean chillLT = V_Fridge.chill("Button LB", buttonLT, 200.0);
+		if (/*buttonLT && */!chillLT) {
 			//it's been held down for a while, increment
-			desiredElevatorHeight -= 1.0;
-		}else if (V_Fridge.becomesTrue("!Button LB", !buttonLB) && chillLB) {
+			desiredElevatorHeight -= 0.75*driver.getRawAxis(R_Xbox.AXIS_LT);
+		}else if (V_Fridge.becomesTrue("!Button LB", !buttonLT) && chillLT) {
 			desiredElevatorHeight -= 11.0;//inches
 		}
 		
 		//{incrementing upward}
-		final boolean buttonRB = driver.getRawButton(R_Xbox.BUTTON_RB);
-		final boolean chillRB = V_Fridge.chill("Button RB", buttonRB, 200.0);
-		if (buttonRB && !chillRB) {//it's been held down for a while, increment
-			desiredElevatorHeight += 1.0;
-		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRB) && chillRB) {
+		final boolean buttonRT = driver.getAxisPress(R_Xbox.AXIS_RT, 0.9);
+		final boolean chillRT = V_Fridge.chill("Button RB", buttonRT, 200.0);
+		if (/*buttonRT && */!chillRT) {//it's been held down for a while, increment
+			desiredElevatorHeight += 0.75*driver.getRawAxis(R_Xbox.AXIS_RT);
+		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRT) && chillRT) {
 			desiredElevatorHeight += 11.0;//inches
 		}
-		if (desiredElevatorHeight > 82.5) {desiredElevatorHeight = 82.5;}
-		if (desiredElevatorHeight < 0.0) {desiredElevatorHeight = 0.0;}//TODO integrate this better, and have an option where elevator 2 MUST be all the way up before elevator 1 moves
+		if (desiredElevatorHeight > 83.5) {desiredElevatorHeight = 83.5;}
+		if (desiredElevatorHeight < 2.0) {desiredElevatorHeight = 2.0;}//TODO integrate this better, and have an option where elevator 2 MUST be all the way up before elevator 1 moves
 		
 		elevators.setInches(desiredElevatorHeight);//ELEVATOR
 		
 		
 		
 		
-		if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
+		if (driver.getRawButton(R_Xbox.BUTTON_LB)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
 			clamp.slurp();
-		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
+		}else if (driver.getRawButton(R_Xbox.BUTTON_RB)) {
 			clamp.spit();
 		}else {
 			clamp.stop();
 		}
 
-		if (V_Fridge.freeze("LB and RB", driver.getRawButton(R_Xbox.BUTTON_LB) && driver.getRawButton(R_Xbox.BUTTON_RB))) {//CLAMP OPEN AND CLOSE
+		if (V_Fridge.freeze("STICKLEFTBUTTON", driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT))) {//CLAMP OPEN AND CLOSE
 			clamp.open();
 		}else { 
 			clamp.close();

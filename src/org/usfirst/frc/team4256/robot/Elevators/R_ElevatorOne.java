@@ -11,7 +11,7 @@ public class R_ElevatorOne {
 	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kForward;
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
-	protected static final double maximumHeight = 40.0;//inches
+	protected static final double maximumHeight = 41.0;//inches
 	private R_Talon master;
 	private VictorSPX followerA;
 	private VictorSPX followerB;
@@ -32,8 +32,14 @@ public class R_ElevatorOne {
 	 * 
 	**/
 	public void setTorque(final boolean aWholeLot) {
-		if (aWholeLot) shifter.set(LowGear);
-		else shifter.set(HighGear);
+		if (aWholeLot) {
+			shifter.set(LowGear);
+			master.selectProfileSlot(0, 0);
+		}
+		else {
+			shifter.set(HighGear);
+			master.selectProfileSlot(0, 1);
+		}
 	}
 	
 	
@@ -57,6 +63,9 @@ public class R_ElevatorOne {
 		master.config_kP(0, 0.7, R_Talon.kTimeoutMS);
 		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);
+		master.config_kP(1, .45, R_Talon.kTimeoutMS);
+		master.config_kI(1, 0.0, R_Talon.kTimeoutMS);
+		master.config_kD(1, 10.0, R_Talon.kTimeoutMS);
 
 		followerA.follow(master);
 		followerB.follow(master);
@@ -142,6 +151,7 @@ public class R_ElevatorOne {
 	
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
+		enableSoftLimits();
 		knowsZero = true;
 	}
 	

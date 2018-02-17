@@ -33,13 +33,10 @@ public class R_Elevators {
 	 * This function utilizes both elevators to move the elevator to a certain inch value while maintaining a good center of gravity
 	**/
 	public void setInches(final double desiredInches) {
-		if (elevatorOne.hasLotsOfTorque()) {
-			elevatorOne.setTorque(false);//TODO change PID parameters depending on which one we are using
-		}
-		
 		final double currentElOnePosition = elevatorOne.getInches();
 		final boolean desiredAboveCurrentElOne = desiredInches > currentElOnePosition;
 		if (desiredAboveCurrentElOne) {
+			elevatorOne.setTorque(false);
 			if (desiredInches <= currentElOnePosition + R_ElevatorTwo.maximumHeight) {
 				elevatorTwo.setInches(desiredInches - elevatorOne.getInches());
 			}else {
@@ -47,6 +44,7 @@ public class R_Elevators {
 				if (elevatorTwo.isThere(5.0)) elevatorOne.setInches(desiredInches - elevatorTwo.getInches());
 			}
 		}else {
+			elevatorOne.setTorque(true);
 			elevatorTwo.setInches(0.0);
 			if (elevatorTwo.isThere(5.0)) elevatorOne.setInches(desiredInches);
 		}
