@@ -212,7 +212,7 @@ public class Robot extends IterativeRobot {
 			clamp.stop();
 		}
 
-		if (V_Fridge.freeze("BUTTON_RB", driver.getRawButton(R_Xbox.BUTTON_RB))) {//CLAMP OPEN AND CLOSE
+		if (V_Fridge.freeze("LB and RB", driver.getRawButton(R_Xbox.BUTTON_LB) && driver.getRawButton(R_Xbox.BUTTON_RB))) {//CLAMP OPEN AND CLOSE
 			clamp.open();
 		}else { 
 			clamp.close();
