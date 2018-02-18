@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -78,7 +79,7 @@ public class Robot extends IterativeRobot {
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		targeting = nt.getTable("Targeting");
-		zed = nt.getTable("ZED");
+		zed = nt.getTable("ZED").getSubTable("Position");
 		//{Robot Output}
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
@@ -98,8 +99,6 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
-		elevatorOne.setInches(elevatorOne.getInches());
-		elevatorTwo.setInches(elevatorTwo.getInches());
 		gyro.reset();
 		V_PID.clear("spin");
 //		autoMode = (int)faraday.getNumber("auto mode", 1);
@@ -118,7 +117,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void testInit() {//TODO these numbers should come from the ZED/TK1
+	public void testInit() {
 	}
 	
 	@Override
@@ -127,15 +126,22 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotPeriodic() {
-		//faraday.getEntry("aligned").setBoolean(elevators.knowsZero);
+		faraday.getEntry("zeroed elevators").setBoolean(elevatorOne.knowsZero && elevatorTwo.knowsZero);
 		faraday.getEntry("clamp open").setBoolean(clamp.isOpen());
-		faraday.getEntry("climbing mode").setBoolean(elevatorOne.hasLotsOfTorque());
+		faraday.getEntry("climbing mode").setBoolean(elevators.inClimbingMode());
+		faraday.getEntry("browning out").setBoolean(RobotController.isBrownedOut());//TODO use this elsewhere
+		//TODO put whether we have a cube or not
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
-		elevatorOne.setZero(0.0);//TODO zero elevators at some point
+		final double actualX = zed.getEntry("X").getDouble(0.0);
+		final double actualY = zed.getEntry("Y").getDouble(0.0);
+		final double orientation = gyro.getCurrentAngle();
+		
+		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
+		elevators.setInches(0.0);
 	}
 	
 	@Override
@@ -172,13 +178,11 @@ public class Robot extends IterativeRobot {
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
-//		double desiredElevatorHeight = elevators.getInches();
 		//{sending to preset heights}
 		if (driver.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
 		if (driver.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
 		if (driver.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
 		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
-//		elevators.setInches(desiredElevatorHeight);
 		
 		//{incrementing downward}
 		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
@@ -193,19 +197,17 @@ public class Robot extends IterativeRobot {
 		//{incrementing upward}
 		final boolean buttonRT = driver.getAxisPress(R_Xbox.AXIS_RT, 0.9);
 		final boolean chillRT = V_Fridge.chill("Button RB", buttonRT, 200.0);
-		if (!chillRT) {//it's been held down for a while, increment
+		if (!chillRT) {
+			//it's been held down for a while, increment
 			elevators.increment(0.75*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRT) && chillRT) {
 			elevators.increment(11.0);//inches
 		}
 
 		
-		if (V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {
-			if (!elevators.inClimbingMode()) {
-				elevators.enableClimbMode(clamp);
-			}
-		}else {
-			elevators.disableClimbMode(clamp);
+		if (elevators.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
+			if (elevators.inClimbingMode()) elevators.disableClimbMode(clamp);
+			else elevators.enableClimbMode(clamp);
 		}
 		
 		

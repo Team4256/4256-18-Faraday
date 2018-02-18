@@ -17,7 +17,7 @@ public class R_Elevators {
 	/**
 	 * This function prepares each elevator individually.
 	**/
-	public void init() {
+	public void init() {//TODO set voltage ramp rates or use current limiting
 		elevatorOne.init();
 		elevatorTwo.init();
 	}

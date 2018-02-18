@@ -86,7 +86,7 @@ public class R_Victor extends VictorSPX {
 	}
 	
 	public void completeLoopUpdate() {
-		if (!updated) super.set(controlMode, lastSetPoint);//send a command if there hasn't yet been one, using raw encoder units
+		if (!updated) super.set(controlMode, lastSetPoint);//send a command if there hasn't yet been one
 		
 		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
 	}
