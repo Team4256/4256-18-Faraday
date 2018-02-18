@@ -6,8 +6,8 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class R_Clamp {
-	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kForward;//TODO test all of these
-	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kReverse;
+	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;//TODO test all of these
+	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;
 	private static final DoubleSolenoid.Value UpState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OutState = DoubleSolenoid.Value.kReverse;
 	private VictorSPX intakeLeft;

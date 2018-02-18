@@ -32,17 +32,19 @@ public class R_Elevators {
 	}
 	
 	private double validateInches(final double inches) {
-		final double maximumHeight = climbing ? R_ElevatorOne.maximumHeight : R_ElevatorOne.maximumHeight + R_ElevatorTwo.maximumHeight;
-		return Math.min(Math.max(inches, 0.0), maximumHeight);//clips values to be between 0 and maximumHeight
+		final double minimumHeight = climbing ? elevatorOneHookHeight : 0.0;
+		final double maximumHeight = climbing ? elevatorOneHookHeight + R_ElevatorOne.maximumHeight : R_ElevatorOne.maximumHeight + R_ElevatorTwo.maximumHeight;
+		return Math.min(Math.max(inches, minimumHeight), maximumHeight);//clips values to be between 0 and maximumHeight
 	}
 	
 	public void increment(final double inches) {
-		setInches(currentSetpoint + inches);
+		if (climbing) setInches(currentSetpoint + inches + elevatorOneHookHeight - elevatorTwo.getInches());
+		else setInches(currentSetpoint + inches);
 	}
 	
 	public void setInches(final double desiredInches) {
-		if (climbing) setInches_climb(desiredInches);
-		else setInches_normal(desiredInches);
+		if (climbing) setInches_climb(desiredInches);//desiredInches is relative to hook
+		else setInches_normal(desiredInches);//desiredInches is relative to clampy
 //		switch(currentClimbModeState) {
 //		case Disabled:
 //			setInches_normal(desiredInches);	
@@ -50,6 +52,11 @@ public class R_Elevators {
 //			setInches_climb(desiredInches);
 //		}
 	}
+	
+//	public double getInches() {
+//		if (climbing) return currentSetpoint + elevatorOneHookHeight;
+//		else return currentSetpoint;
+//	}
 	
 	/**
 	 * This function utilizes both elevators to move the elevator to a certain inch value while maintaining a good center of gravity
@@ -76,9 +83,10 @@ public class R_Elevators {
 	}
 	
 	private void setInches_climb(double desiredInches) {
-		desiredInches = validateInches(desiredInches - elevatorOneHookHeight);
-		elevatorOne.setInches(desiredInches);
-		currentSetpoint = desiredInches + elevatorTwo.getInches();//getInches should result in approx. elevatorTwoClimbHeight, bc that's what enableClimbMode made it
+		desiredInches = validateInches(desiredInches);
+		final double elevatorOneDesiredInches = desiredInches - elevatorOneHookHeight;
+		elevatorOne.setInches(elevatorOneDesiredInches);
+		currentSetpoint = elevatorOneDesiredInches + elevatorTwo.getInches();//getInches should result in approx. elevatorTwoClimbHeight, bc that's what enableClimbMode made it
 	}
 	
 	public void enableClimbMode(final R_Clamp clamp) {
@@ -87,6 +95,16 @@ public class R_Elevators {
 		clamp.retract();
 		if (!elevatorOne.hasLotsOfTorque()) elevatorOne.setTorque(true);
 		climbing = true;
+		setInches(81.0);
+	}
+	
+	public void disableClimbMode(final R_Clamp clamp) {
+		clamp.extend();
+		climbing = false;
+	}
+	
+	public boolean inClimbingMode() {
+		return climbing;
 	}
 	
 //	public boolean readyToClimb(final R_Clamp clamp) {

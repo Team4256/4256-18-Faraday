@@ -171,18 +171,19 @@ public class Robot extends IterativeRobot {
 		
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
-		double desiredElevatorHeight = currentElevatorHeight;
+		
+//		double desiredElevatorHeight = elevators.getInches();
 		//{sending to preset heights}
-		if (driver.getRawButton(R_Xbox.BUTTON_A)) {desiredElevatorHeight = ElevatorPresets.FLOOR.height();}
-		if (driver.getRawButton(R_Xbox.BUTTON_X)) {desiredElevatorHeight = ElevatorPresets.SWITCH.height();}
-		if (driver.getRawButton(R_Xbox.BUTTON_B)) {desiredElevatorHeight = ElevatorPresets.SCALE_LOW.height();}
-		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {desiredElevatorHeight = ElevatorPresets.SCALE_HIGH.height();}
-		elevators.setInches(desiredElevatorHeight);
+		if (driver.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
+		if (driver.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
+		if (driver.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
+		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
+//		elevators.setInches(desiredElevatorHeight);
 		
 		//{incrementing downward}
 		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
 		final boolean chillLT = V_Fridge.chill("Button LB", buttonLT, 200.0);
-		if (/*buttonLT && */!chillLT) {
+		if (!chillLT) {
 			//it's been held down for a while, increment
 			elevators.increment(-0.75*driver.getRawAxis(R_Xbox.AXIS_LT));
 		}else if (V_Fridge.becomesTrue("!Button LB", !buttonLT) && chillLT) {
@@ -192,14 +193,20 @@ public class Robot extends IterativeRobot {
 		//{incrementing upward}
 		final boolean buttonRT = driver.getAxisPress(R_Xbox.AXIS_RT, 0.9);
 		final boolean chillRT = V_Fridge.chill("Button RB", buttonRT, 200.0);
-		if (/*buttonRT && */!chillRT) {//it's been held down for a while, increment
+		if (!chillRT) {//it's been held down for a while, increment
 			elevators.increment(0.75*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRT) && chillRT) {
 			elevators.increment(11.0);//inches
 		}
 
 		
-		
+		if (V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {
+			if (!elevators.inClimbingMode()) {
+				elevators.enableClimbMode(clamp);
+			}
+		}else {
+			elevators.disableClimbMode(clamp);
+		}
 		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_LB)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
@@ -210,12 +217,13 @@ public class Robot extends IterativeRobot {
 			clamp.stop();
 		}
 
-		if (V_Fridge.freeze("STICKLEFTBUTTON", driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT))) {//CLAMP OPEN AND CLOSE
-			clamp.open();
-		}else { 
-			clamp.close();
+		if (!elevators.inClimbingMode()) {
+			if (V_Fridge.freeze("STICKLEFTBUTTON", driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT))) {//CLAMP OPEN AND CLOSE
+				clamp.open();
+			}else { 
+				clamp.close();
+			}
 		}
-		
 		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
