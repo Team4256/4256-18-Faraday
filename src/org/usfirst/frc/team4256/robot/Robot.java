@@ -238,10 +238,10 @@ public class Robot extends IterativeRobot {
 			driver.setRumble(RumbleType.kLeftRumble, 0);
 		}
 		
-		//{completing Talon updates}
+		//{completing motor controller updates}
 		swerve.completeLoopUpdate();
 		elevators.completeLoopUpdate();
-		//clamp.completeLoopUpdate//TODO
+		clamp.completeLoopUpdate();
 	}
 	
 	@Override

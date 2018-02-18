@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4256.robot.Elevators;
 
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.cyborgcats.reusable.Phoenix.R_Encoder;
 import com.cyborgcats.reusable.Phoenix.R_Talon;
+import com.cyborgcats.reusable.Phoenix.R_Victor;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
@@ -14,16 +14,16 @@ public class R_ElevatorOne {
 	protected static final double maximumHeight = 41.0;//inches
 	protected static final double hookBaseline = 44.0;//inches
 	private R_Talon master;
-	private VictorSPX followerA;
-	private VictorSPX followerB;
+	private R_Victor followerA;
+	private R_Victor followerB;
 	private DoubleSolenoid shifter;
 	private int maximumEncoderValue;
 	public boolean knowsZero = false;
 
 	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter) {
 		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, false);
-		followerA = new VictorSPX(followerAID);
-		followerB = new VictorSPX(followerBID);
+		followerA = new R_Victor(followerAID, R_Victor.follower);
+		followerB = new R_Victor(followerBID, R_Victor.follower);
 		this.shifter = shifter;	
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
@@ -68,8 +68,8 @@ public class R_ElevatorOne {
 		master.config_kI(1, 0.0, R_Talon.kTimeoutMS);
 		master.config_kD(1, 10.0, R_Talon.kTimeoutMS);
 
-		followerA.follow(master);
-		followerB.follow(master);
+		followerA.init(master);
+		followerB.init(master);
 	}
 	
 	

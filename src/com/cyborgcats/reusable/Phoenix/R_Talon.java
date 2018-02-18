@@ -54,7 +54,7 @@ public class R_Talon extends TalonSRX {
 	
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum percentages.
-	 * It then gets enslaved to the motor at the specified ID.
+	 * If a follower, it then gets enslaved to the motor at the specified ID.
 	**/
 	public void init(final int masterID, final double maxPercent) {
 		clearStickyFaults(kTimeoutMS);//TODO everywhere where we have kTimeoutMS, do error handling
@@ -159,9 +159,7 @@ public class R_Talon extends TalonSRX {
 		}
 		
 		updated = true;
-		if (updateSetPoint) {
-			lastSetPoint = currentSetPoint;
-		}
+		if (updateSetPoint) lastSetPoint = currentSetPoint;
 	}
 
 	
@@ -229,7 +227,7 @@ public class R_Talon extends TalonSRX {
 	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
 	**/
 	public void completeLoopUpdate() {
-		if (!updated) {super.set(controlMode, lastSetPoint);}//send a command if there hasn't yet been one, using raw encoder units
+		if (!updated) super.set(controlMode, lastSetPoint);//send a command if there hasn't yet been one, using raw encoder units
 		
 		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
 	}

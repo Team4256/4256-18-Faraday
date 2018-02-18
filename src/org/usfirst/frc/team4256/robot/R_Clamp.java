@@ -1,7 +1,7 @@
 package org.usfirst.frc.team4256.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.cyborgcats.reusable.Phoenix.R_Victor;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
@@ -10,22 +10,23 @@ public class R_Clamp {
 	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;
 	private static final DoubleSolenoid.Value UpState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OutState = DoubleSolenoid.Value.kReverse;
-	private VictorSPX intakeLeft;
-	private VictorSPX intakeRight;
+	private R_Victor intakeLeft;
+	private R_Victor intakeRight;
 	private DoubleSolenoid clamp;
 	private DoubleSolenoid extender;
 	
 	private final double intakeConstant = 0.85;
 	
 	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid extended) {
-		intakeLeft = new VictorSPX(intakeLeftID);
-		intakeRight = new VictorSPX(intakeRightID);
+		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
+		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
 		this.extender = extended;
 	}
 	
 	public void init() {
-		//TODO
+		intakeLeft.init();
+		intakeRight.init();
 	}
 	
 	
@@ -107,5 +108,14 @@ public class R_Clamp {
 	 **/
 	public boolean isExtended() {
 		return extender.get().equals(OutState);
+	}
+	
+	
+	/**
+	 * A shortcut to call completeLoopUpdate on all the Talons in the elevator.
+	**/
+	public void completeLoopUpdate() {
+		intakeLeft.completeLoopUpdate();
+		intakeRight.completeLoopUpdate();
 	}
 }
