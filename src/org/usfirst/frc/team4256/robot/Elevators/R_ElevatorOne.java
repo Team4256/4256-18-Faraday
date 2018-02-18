@@ -12,6 +12,7 @@ public class R_ElevatorOne {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
 	protected static final double maximumHeight = 41.0;//inches
+	protected static final double hookBaseline = 44.0;//inches
 	private R_Talon master;
 	private VictorSPX followerA;
 	private VictorSPX followerB;
