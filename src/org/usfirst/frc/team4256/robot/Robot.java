@@ -91,6 +91,10 @@ public class Robot extends IterativeRobot {
 		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-39.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
 		//practice robot:	 62.0,						 -39.0,							 0.0,						 50.0
 
+		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
+		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
+		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
+		
 		tx2PowerControl.set(true);
 		try {Thread.sleep(50);}//milliseconds
 		catch (InterruptedException e) {Thread.currentThread().interrupt();}
@@ -100,12 +104,14 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		gyro.reset();
+		V_PID.clear("forward");
+		V_PID.clear("strafe");
 		V_PID.clear("spin");
+		
 //		autoMode = (int)faraday.getNumber("auto mode", 1);
 //		autoStep = 0;
-//		V_PID.clear("forward");
-//		V_PID.clear("strafe");
-//		V_Instructions.resetTimer();
+		
+		V_Instructions.resetTimer();
 	}
 	
 	@Override
@@ -135,9 +141,27 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		final double actualX = zed.getEntry("X").getDouble(0.0);
-		final double actualY = zed.getEntry("Y").getDouble(0.0);
-		final double orientation = gyro.getCurrentAngle();
+		final double actualY = zed.getEntry("Y").getDouble(0.0);//feet
+		final double actualX = zed.getEntry("X").getDouble(0.0);//feet
+		
+		final double desiredY = 4.0;//feet
+		final double desiredX = 0.0;//feet
+		final double desiredOrientation = 0.0;//degrees
+		
+		final double errorY = desiredY - actualY;//feet
+		final double errorX = desiredX - actualX;//feet
+		final double errorOrientation = gyro.wornPath(desiredOrientation);
+		
+		
+		double speedY = V_PID.get("forward", errorY);
+		double speedX = V_PID.get("strafe", errorX);
+		double spin = V_PID.get("spin", errorOrientation);
+		
+		if (Math.abs(speedY) > 1.0) speedY = Math.signum(speedY);
+		if (Math.abs(speedX) > 1.0) speedX = Math.signum(speedX);
+		if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
+		
+		swerve.holonomicCartesian(speedX, speedY, spin);
 		
 		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
@@ -168,6 +192,7 @@ public class Robot extends IterativeRobot {
 			//stop rotation drift at high speeds
 			if (speed >= 0.3) {spinError = gyro.wornPath(lockedAngle);}
 			if (Math.abs(spinError) > 3.0) {spin = V_PID.get("spin", spinError);}
+			if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
 		}
 		if (V_Fridge.becomesTrue("hands off", handsOffSpinStick)) {
 			//remember angle when driver stops rotating
