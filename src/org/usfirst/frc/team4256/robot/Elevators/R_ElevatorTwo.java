@@ -28,7 +28,7 @@ public class R_ElevatorTwo {
 		master.setInverted(true);
 		enableSoftLimits();
 
-		master.config_kP(0, 0.15, R_Talon.kTimeoutMS);
+		master.config_kP(0, 0.17, R_Talon.kTimeoutMS);
 		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);
 	}

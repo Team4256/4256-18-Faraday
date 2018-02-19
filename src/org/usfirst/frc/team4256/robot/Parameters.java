@@ -77,11 +77,11 @@ public abstract class Parameters {
 	public static final double spinI = .000015;
 	public static final double spinD = .02;
 	
-	public static final double forwardP = 0.09;//TODO tune with TK1
+	public static final double forwardP = 0.065;//TODO tne with TK1
 	public static final double forwardI = 0.0;
-	public static final double forwardD = 0.05;
+	public static final double forwardD = 0.0;
 	
-	public static final double strafeP = 0.09;//TODO tune with TK1
+	public static final double strafeP = 0.065;//TODO tune with TK1
 	public static final double strafeI = 0.0;
-	public static final double strafeD = 0.05;
+	public static final double strafeD = 0.0;
 }
