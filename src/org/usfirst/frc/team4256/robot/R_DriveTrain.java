@@ -44,32 +44,11 @@ public class R_DriveTrain {
 		final double chassis_fieldCos = Math.cos(gyro.getCurrentAngle());
 		final double speedX_desired = speedX/chassis_fieldCos,
 					 speedY_desired = speedY/chassis_fieldCos;
-		final double speed = Math.sqrt(speedX_desired*speedX_desired + speedY_desired*speedY_desired);
 		final double[] moduleComps_desired = computeModuleComponents(speedX_desired, speedY_desired, speedSpin);
 		
-		final double[] speeds_actual = speedsFromModuleD();
-		double speed_actual = Math.sqrt(speeds_actual[0]*speeds_actual[0] + speeds_actual[1]*speeds_actual[1]);
-		speed_actual = Math.floor(speed_actual*10.0)/10.0;
+		final double[] moduleAngles_final = computeModuleAngles(moduleComps_desired);
 		
-		final double[] moduleAngles_final;
-		if ((speed < speed_actual) && (speed_actual > .2)) {
-			final double[] moduleAngles_desired = computeModuleAngles(moduleComps_desired);
-			final double max_desired = Math.max(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3]))),
-						 min_desired = Math.min(moduleAngles_desired[0], Math.max(moduleAngles_desired[1], Math.max(moduleAngles_desired[2], moduleAngles_desired[3])));
-			final double range_desired = max_desired - min_desired;
-			
-			final double[] moduleComps_actual = computeModuleComponents(speeds_actual[0], speeds_actual[1], speedSpin);
-			final double[] moduleAngles_actual = computeModuleAngles(moduleComps_actual);
-			final double max_actual = Math.max(moduleAngles_actual[0], Math.max(moduleAngles_actual[1], Math.max(moduleAngles_actual[2], moduleAngles_actual[3]))),
-						 min_actual = Math.min(moduleAngles_actual[0], Math.max(moduleAngles_actual[1], Math.max(moduleAngles_actual[2], moduleAngles_actual[3])));
-			final double range_actual = max_actual - min_actual;
-			
-			moduleAngles_final = range_desired > range_actual ? moduleAngles_actual : moduleAngles_desired;
-		}else {
-			moduleAngles_final = computeModuleAngles(moduleComps_desired);
-		}
-		
-		boolean bad = speed == 0.0 && speedSpin == 0.0;
+		boolean bad = speedX + speedY == 0.0 && speedSpin == 0.0;
 		moduleA.swivelTo(moduleAngles_final[0], bad);	moduleB.swivelTo(moduleAngles_final[1], bad);
 		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
 		moduleD_previousAngle = moduleAngles_final[3];
@@ -193,6 +172,14 @@ public class R_DriveTrain {
 	
 	public boolean isThere(final double threshold) {
 		return moduleA.isThere(threshold) && moduleB.isThere(threshold) && moduleC.isThere(threshold) && moduleD.isThere(threshold);
+	}
+	
+	
+	public void autoMode(final boolean enable) {
+		moduleA.autoMode(enable);
+		moduleB.autoMode(enable);
+		moduleC.autoMode(enable);
+		moduleD.autoMode(enable);
 	}
 	
 	

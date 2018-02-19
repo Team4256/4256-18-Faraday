@@ -48,6 +48,10 @@ public class R_SwerveModule {
 		traction.configPeakCurrentDuration(250, R_Talon.kTimeoutMS);
 	}
 	
+	public void autoMode(final boolean enable) {
+		traction.configOpenloopRamp(2.0, R_Talon.kTimeoutMS);
+	}
+	
 	
 	/**
 	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.

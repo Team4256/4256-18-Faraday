@@ -108,6 +108,7 @@ public class Robot extends IterativeRobot {
 		V_PID.clear("strafe");
 		V_PID.clear("spin");
 		
+		swerve.autoMode(true);
 //		autoMode = (int)faraday.getNumber("auto mode", 1);
 //		autoStep = 0;
 		
@@ -141,8 +142,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		final double actualY = zed.getEntry("Y").getDouble(0.0);//feet
-		final double actualX = zed.getEntry("X").getDouble(0.0);//feet
+		final double actualY = -zed.getEntry("Y").getDouble(0.0);//feet
+		final double actualX = -zed.getEntry("X").getDouble(0.0);//feet
 		
 		final double desiredY = 4.0;//feet
 		final double desiredX = 0.0;//feet
@@ -151,21 +152,19 @@ public class Robot extends IterativeRobot {
 		final double errorY = desiredY - actualY;//feet
 		final double errorX = desiredX - actualX;//feet
 		final double errorOrientation = gyro.wornPath(desiredOrientation);
+		SmartDashboard.putNumber("errorY", errorY);
 		
 		
 		double speedY = V_PID.get("forward", errorY);
 		double speedX = V_PID.get("strafe", errorX);
 		double spin = V_PID.get("spin", errorOrientation);
 		
-		if (Math.abs(speedY) > 1.0) speedY = Math.signum(speedY);
-		if (Math.abs(speedX) > 1.0) speedX = Math.signum(speedX);
-		if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
+		if (Math.abs(speedY) > 0.3) speedY = Math.signum(speedY);
+		if (Math.abs(speedX) > 0.3) speedX = Math.signum(speedX);
+		if (Math.abs(spin) > 0.3) spin = Math.signum(spin);
+		SmartDashboard.putNumber("speedy", speedY);
 		
 		swerve.holonomicCartesian(speedX, speedY, spin);
-		
-		elevatorOne.setZero(0.0);
-		elevatorTwo.setZero(0.0);
-		elevators.setInches(0.0);
 	}
 	
 	@Override
@@ -277,6 +276,9 @@ public class Robot extends IterativeRobot {
 		moduleB.swivelTo(0);
 		moduleC.swivelTo(0);
 		moduleD.swivelTo(0);
+		elevatorOne.setZero(0.0);
+		elevatorTwo.setZero(0.0);
+		elevators.setInches(0.0);
 	}
 	
 	@Override
