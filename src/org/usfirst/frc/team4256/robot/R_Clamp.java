@@ -58,8 +58,8 @@ public class R_Clamp {
 	 * 
 	**/
 	private void setWheelSpeed(final double percent) {
-		intakeLeft.set(ControlMode.PercentOutput, percent);
-		intakeRight.set(ControlMode.PercentOutput, percent);
+		intakeLeft.quickSet(percent);
+		intakeRight.quickSet(percent);
 	}
 	
 	

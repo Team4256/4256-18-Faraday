@@ -88,8 +88,8 @@ public class Robot extends IterativeRobot {
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
 		
-		moduleA.setTareAngle(60.0);	moduleB.setTareAngle(-14.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
-		//practice robot:	 60.0,						 -14.0,							 0.0,						 50.0
+		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-39.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
+		//practice robot:	 62.0,						 -39.0,							 0.0,						 50.0
 
 		tx2PowerControl.set(true);
 		try {Thread.sleep(50);}//milliseconds
