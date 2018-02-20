@@ -86,6 +86,8 @@ public class Robot extends IterativeRobot {
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 		elevators.init();
+		V_Fridge.initialize("!Button LB", true);
+		V_Fridge.initialize("!Button RB", true);
 		clamp.init();
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
@@ -229,10 +231,10 @@ public class Robot extends IterativeRobot {
 		
 		
 		//{sending to preset heights}
-		if (driver.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
-		if (driver.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
-		if (driver.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
-		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
+			 if (driver.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
+		else if (driver.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
+		else if (driver.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
+		else if (driver.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
 		
 		//{incrementing downward}
 		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
