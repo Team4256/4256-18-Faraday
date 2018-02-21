@@ -1,22 +1,3 @@
-//DRIVER
-//start + back: align
-//left stick, both axis: raw speed and direction
-//right stick, x axis: raw spin
-//left stick, press: snail mode drive
-//right stick, press: snail mode spin
-//LB: 
-//LT: increment elevator down
-//RB: turbo mode drive
-//RT: increment elevator up
-//X: elevator low scale preset
-//A: elevator floor preset
-//B: elevator switch preset
-//Y: elevator high scale preset
-//dpad down: 
-
-//GUNNER
-//start + back: gyro reset
-
 package org.usfirst.frc.team4256.robot;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
@@ -34,15 +15,11 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.TableEntryListener;
-import edu.wpi.first.networktables.TableListener;
 
 public class Robot extends IterativeRobot {
 	//{Human Input}
@@ -96,8 +73,7 @@ public class Robot extends IterativeRobot {
 		V_Fridge.initialize("!Button LB", true);
 		V_Fridge.initialize("!Button RB", true);
 		clamp.init();
-//		climberB.setVoltageCompensationRampRate(24); //TODO
-//		lift.setVoltageRampRate(8);
+//		lift.setVoltageRampRate(8);//TODO
 		
 		moduleA.setTareAngle(-68.0);	moduleB.setTareAngle(59.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0

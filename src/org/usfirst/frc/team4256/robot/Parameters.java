@@ -1,3 +1,18 @@
+//DRIVER
+//Back: align gyro
+//left stick, both axis: raw speed and direction
+//right stick, x axis: raw spin
+//left stick, press: turbo mode
+//right stick, press: snail mode
+//LB: slurp (intake in)
+//LT: increment elevator down
+//RB: spit (intake out)
+//RT: increment elevator up
+//B: elevator low scale preset
+//A: elevator floor preset
+//X: elevator switch preset
+//Y: elevator high scale preset
+
 package org.usfirst.frc.team4256.robot;
 
 public abstract class Parameters {
