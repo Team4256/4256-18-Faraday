@@ -88,14 +88,19 @@ public class Robot extends IterativeRobot {
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED").getSubTable("Position");
 		//{Robot Output}
+		compressor.start();
+		compressor.setClosedLoopControl(true);
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 		elevators.init();
+		V_Fridge.initialize("!Button LB", true);
+		V_Fridge.initialize("!Button RB", true);
 		clamp.init();
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
 		
-		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-39.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
+		moduleA.setTareAngle(-68.0);	moduleB.setTareAngle(59.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
+		//competition robot: -68.0							 59.0						 -3.0						 56.0
 		//practice robot:	 62.0,						 -39.0,							 0.0,						 50.0
 
 		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
@@ -238,10 +243,10 @@ public class Robot extends IterativeRobot {
 		
 		
 		//{sending to preset heights}
-		if (driver.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
-		if (driver.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
-		if (driver.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
-		if (driver.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
+			 if (driver.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
+		else if (driver.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
+		else if (driver.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
+		else if (driver.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
 		
 		//{incrementing downward}
 		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
