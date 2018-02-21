@@ -11,7 +11,7 @@ public class R_ElevatorOne {
 	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kForward;
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
-	protected static final double maximumHeight = 41.0;//inches
+	protected static final double maximumHeight = 37.0;//inches
 	protected static final double hookBaseline = 44.0;//inches
 	private R_Talon master;
 	private R_Victor followerA;
@@ -21,7 +21,7 @@ public class R_ElevatorOne {
 	public boolean knowsZero = false;
 
 	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter) {
-		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, false);
+		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, true);
 		followerA = new R_Victor(followerAID, R_Victor.follower);
 		followerB = new R_Victor(followerBID, R_Victor.follower);
 		this.shifter = shifter;	

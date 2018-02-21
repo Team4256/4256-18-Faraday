@@ -83,6 +83,8 @@ public class Robot extends IterativeRobot {
 		targeting = nt.getTable("Targeting");
 		zed = nt.getTable("ZED").getSubTable("Position");
 		//{Robot Output}
+		compressor.start();
+		compressor.setClosedLoopControl(true);
 		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 		elevators.init();
@@ -92,7 +94,8 @@ public class Robot extends IterativeRobot {
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
 		
-		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-39.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
+		moduleA.setTareAngle(-68.0);	moduleB.setTareAngle(59.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
+		//competition robot: -68.0							 59.0						 -3.0						 56.0
 		//practice robot:	 62.0,						 -39.0,							 0.0,						 50.0
 
 		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
