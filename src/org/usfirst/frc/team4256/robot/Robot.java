@@ -94,9 +94,9 @@ public class Robot extends IterativeRobot {
 //		climberB.setVoltageCompensationRampRate(24); //TODO
 //		lift.setVoltageRampRate(8);
 		
-		moduleA.setTareAngle(-68.0);	moduleB.setTareAngle(59.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
+		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-14.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
-		//practice robot:	 62.0,						 -39.0,							 0.0,						 50.0
+		//practice robot:	 62.0,						 -14.0,							 0.0,						 50.0
 
 		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
 		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
@@ -116,8 +116,6 @@ public class Robot extends IterativeRobot {
 		V_PID.clear("spin");
 		
 		swerve.autoMode(true);
-//		autoMode = (int)faraday.getNumber("auto mode", 1);
-//		autoStep = 0;
 		
 		V_Instructions.resetTimer();
 	}
@@ -125,6 +123,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit() {
 		gyro.reset();
+		
+		swerve.autoMode(false);
 		elevatorOne.setInches(elevatorOne.getInches());
 		elevatorTwo.setInches(elevatorTwo.getInches());
 		lockedAngle = gyro.getCurrentAngle();
@@ -246,7 +246,7 @@ public class Robot extends IterativeRobot {
 		final boolean chillLT = V_Fridge.chill("Button LB", buttonLT, 200.0);
 		if (!chillLT) {
 			//it's been held down for a while, increment
-			elevators.increment(-0.75*driver.getRawAxis(R_Xbox.AXIS_LT));
+			elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));
 		}else if (V_Fridge.becomesTrue("!Button LB", !buttonLT) && chillLT) {
 			elevators.increment(-11.0);//inches
 		}
@@ -256,7 +256,7 @@ public class Robot extends IterativeRobot {
 		final boolean chillRT = V_Fridge.chill("Button RB", buttonRT, 200.0);
 		if (!chillRT) {
 			//it's been held down for a while, increment
-			elevators.increment(0.75*driver.getRawAxis(R_Xbox.AXIS_RT));
+			elevators.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRT) && chillRT) {
 			elevators.increment(11.0);//inches
 		}
