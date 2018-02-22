@@ -124,6 +124,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopInit() {
+		gyro.reset();
 		elevatorOne.setInches(elevatorOne.getInches());
 		elevatorTwo.setInches(elevatorTwo.getInches());
 		lockedAngle = gyro.getCurrentAngle();
@@ -140,6 +141,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotPeriodic() {
+		faraday.getEntry("gyro").setNumber(gyro.getCurrentAngle());
 		faraday.getEntry("pressure").setNumber(pressureGauge.getAverageVoltage()*39.875 - 54.375);
 		faraday.getEntry("zeroed elevators").setBoolean(elevatorOne.knowsZero && elevatorTwo.knowsZero);
 		faraday.getEntry("clamp open").setBoolean(clamp.isOpen());
@@ -206,7 +208,7 @@ public class Robot extends IterativeRobot {
 		
 		//{calculating speed}
 		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//turbo mode
-		if (!turbo) {speed *= 0.7;}//-------------------------------------normal mode
+		if (!turbo) {speed *= 1.0/*0.7*/;}//-------------------------------------normal mode
 		if (snail)  {speed *= 0.5;}//-------------------------------------snail mode
 		speed *= speed;
 		
@@ -220,7 +222,7 @@ public class Robot extends IterativeRobot {
 		if (handsOffSpinStick) {
 			double spinError = 0;
 			//stop rotation drift at high speeds
-			if (speed >= 0.3) {spinError = gyro.wornPath(lockedAngle);}
+			if (speed >= 0.6) {spinError = gyro.wornPath(lockedAngle);}
 			if (Math.abs(spinError) > 3.0) {spin = V_PID.get("spin", spinError);}
 			if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
 		}

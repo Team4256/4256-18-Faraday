@@ -59,7 +59,7 @@ public class R_Clamp {
 	**/
 	private void setWheelSpeed(final double percent) {
 		intakeLeft.quickSet(percent);
-		intakeRight.quickSet(percent);
+		intakeRight.quickSet(-percent);
 	}
 	
 	
