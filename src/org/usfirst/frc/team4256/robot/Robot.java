@@ -1,22 +1,3 @@
-//DRIVER
-//start + back: align
-//left stick, both axis: raw speed and direction
-//right stick, x axis: raw spin
-//left stick, press: snail mode drive
-//right stick, press: snail mode spin
-//LB: 
-//LT: increment elevator down
-//RB: turbo mode drive
-//RT: increment elevator up
-//X: elevator low scale preset
-//A: elevator floor preset
-//B: elevator switch preset
-//Y: elevator high scale preset
-//dpad down: 
-
-//GUNNER
-//start + back: gyro reset
-
 package org.usfirst.frc.team4256.robot;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
@@ -34,10 +15,9 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -50,8 +30,11 @@ public class Robot extends IterativeRobot {
 	private static final AnalogInput pressureGauge = new AnalogInput(0);
 	private static NetworkTableInstance nt;
 	private static NetworkTable faraday;
-	private static NetworkTable targeting;
 	private static NetworkTable zed;
+	private static boolean updatedFeetX = false;
+	private static boolean updatedFeetY = false;
+	private static double actualFeetX = 0.0;
+	private static double actualFeetY = 0.0;
 //	private static double metersX = 0;
 //	private static double metersY = 0;
 	
@@ -80,7 +63,6 @@ public class Robot extends IterativeRobot {
 		//{Robot Input}
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
-		targeting = nt.getTable("Targeting");
 		zed = nt.getTable("ZED").getSubTable("Position");
 		//{Robot Output}
 		compressor.start();
@@ -91,8 +73,7 @@ public class Robot extends IterativeRobot {
 		V_Fridge.initialize("!Button LB", true);
 		V_Fridge.initialize("!Button RB", true);
 		clamp.init();
-//		climberB.setVoltageCompensationRampRate(24); //TODO
-//		lift.setVoltageRampRate(8);
+//		lift.setVoltageRampRate(8);//TODO
 		
 		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-14.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
@@ -118,6 +99,15 @@ public class Robot extends IterativeRobot {
 		swerve.autoMode(true);
 		
 		V_Instructions.resetTimer();
+		
+		zed.addEntryListener("X", (zed, key, entry, value, flags) -> {
+			actualFeetX = value.getDouble();
+			updatedFeetX = true;
+		}, EntryListenerFlags.kUpdate);
+		zed.addEntryListener("Y", (zed, key, entry, value, flags) -> {
+			actualFeetY = value.getDouble();
+			updatedFeetY = true;
+		}, EntryListenerFlags.kUpdate);
 	}
 	
 	@Override
@@ -156,11 +146,34 @@ public class Robot extends IterativeRobot {
 	private static double prev_orient = 0.0;
 	@Override
 	public void autonomousPeriodic() {
-		final double time = V_Instructions.getSeconds();
+		if (updatedFeetX && updatedFeetY) {
+			
+			double desiredX = prev_x;//feet
+			double desiredY = prev_y;//feet
+			double desiredOrientation = prev_orient;//degrees
+			
+			final double errorY = desiredY - actualFeetY;//feet
+			final double errorX = desiredX - actualFeetX;//feet
+			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
+			
+			double speedY = V_PID.get("forward", errorY);
+			double speedX = V_PID.get("strafe", errorX);
+			double spin = V_PID.get("spin", errorOrientation);
+			
+			if (Math.abs(speedY) > 0.3) speedY = .3*Math.signum(speedY);
+			if (Math.abs(speedX) > 0.3) speedX = .3*Math.signum(speedX);
+			if (Math.abs(spin) > 0.3) spin = .3*Math.signum(spin);
+			
+			swerve.holonomicCartesian(speedX, speedY, spin);
+			
+			
+			prev_x = desiredX;
+			prev_y = desiredY;
+			prev_orient = desiredOrientation;
+			updatedFeetX = false; updatedFeetY = false;
+		}
 		
-		double desiredX = prev_x;
-		double desiredY = prev_y;
-		double desiredOrientation = prev_orient;
+//		final double time = V_Instructions.getSeconds();
 //		if (time < 3) {
 //			desiredX = 6.75 - 6.75*Math.pow(Math.cos(time*Math.PI/6.0), 2);//feet
 //			desiredY = 7.0*Math.pow(Math.sin(time*Math.PI/6.0), 2);//feet
@@ -170,34 +183,6 @@ public class Robot extends IterativeRobot {
 //			desiredY = -7.0*Math.sin(time*Math.PI/6.0) + 7.0;//feet
 //			desiredOrientation = 0;//-60.0*(time - 3.0);//degrees
 //		}
-		SmartDashboard.putNumber("desiredX", desiredX);
-		SmartDashboard.putNumber("desiredY", desiredY);
-		
-		final double actualY = zed.getEntry("Y").getDouble(0.0);//feet
-		final double actualX = zed.getEntry("X").getDouble(0.0);//feet
-		
-		
-		final double errorY = desiredY - actualY;//feet
-		final double errorX = desiredX - actualX;//feet
-		final double errorOrientation = gyro.wornPath(desiredOrientation);
-		SmartDashboard.putNumber("errorX", errorX);
-		SmartDashboard.putNumber("errorY", errorY);
-		
-		
-		double speedY = V_PID.get("forward", errorY);
-		double speedX = V_PID.get("strafe", errorX);
-		double spin = V_PID.get("spin", errorOrientation);
-		
-		if (Math.abs(speedY) > 0.3) speedY = .3*Math.signum(speedY);
-		if (Math.abs(speedX) > 0.3) speedX = .3*Math.signum(speedX);
-		if (Math.abs(spin) > 0.3) spin = Math.signum(spin);
-		SmartDashboard.putNumber("speedy", speedY);
-		
-		swerve.holonomicCartesian(speedX, speedY, spin);
-		
-		prev_x = desiredX;
-		prev_y = desiredY;
-		prev_orient = desiredOrientation;
 	}
 	
 	@Override
