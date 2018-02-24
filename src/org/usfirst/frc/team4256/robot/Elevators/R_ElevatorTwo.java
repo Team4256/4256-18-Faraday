@@ -23,6 +23,7 @@ public class R_ElevatorTwo {
 	**/
 	public void init() {
 		master.init();
+		master.configAllowableClosedloopError(0, (int)master.convert.from.REVS.afterGears(inchesToRevs(.5)), R_Talon.kTimeoutMS);//TODO
 		
 		master.setNeutralMode(R_Talon.brake);
 		master.setInverted(true);

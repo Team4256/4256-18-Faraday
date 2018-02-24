@@ -11,10 +11,12 @@ import org.usfirst.frc.team4256.robot.R_Clamp;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.networktables.EntryListenerFlags;
@@ -28,6 +30,7 @@ public class Robot extends IterativeRobot {
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
 	private static final AnalogInput pressureGauge = new AnalogInput(0);
+	private static final DigitalInput tx2PowerSensor = new DigitalInput(8);
 	private static NetworkTableInstance nt;
 	private static NetworkTable faraday;
 	private static NetworkTable zed;
@@ -35,11 +38,9 @@ public class Robot extends IterativeRobot {
 	private static boolean updatedFeetY = false;
 	private static double actualFeetX = 0.0;
 	private static double actualFeetY = 0.0;
-//	private static double metersX = 0;
-//	private static double metersY = 0;
 	
 	//{Robot Output}
-	private static final Compressor compressor = new Compressor(0);
+//	private static final Compressor compressor = new Compressor(0);
 	
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
 	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB);
@@ -54,7 +55,7 @@ public class Robot extends IterativeRobot {
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
 	private static final DoubleSolenoid extenderShifter = new DoubleSolenoid(Parameters.Extender_module, Parameters.Extender_forward, Parameters.Extender_reverse);
-	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, extenderShifter);
+	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, extenderShifter, Parameters.ultrasonic);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
 	
@@ -65,9 +66,9 @@ public class Robot extends IterativeRobot {
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED").getSubTable("Position");
 		//{Robot Output}
-		compressor.start();
-		compressor.setClosedLoopControl(true);
-		compressor.clearAllPCMStickyFaults();
+//		compressor.start();
+//		compressor.setClosedLoopControl(true);
+//		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 		elevators.init();
 		V_Fridge.initialize("!Button LB", true);
@@ -137,6 +138,7 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("clamp open").setBoolean(clamp.isOpen());
 		faraday.getEntry("climbing mode").setBoolean(elevators.inClimbingMode());
 		faraday.getEntry("browning out").setBoolean(RobotController.isBrownedOut());//TODO use this elsewhere
+		faraday.getEntry("TX2 Powered On").setBoolean(tx2PowerSensor.get());
 		//TODO put whether we have a cube or not
 	}
 	
@@ -144,9 +146,12 @@ public class Robot extends IterativeRobot {
 	private static double prev_x = 0.0;
 	private static double prev_y = 0.0;
 	private static double prev_orient = 0.0;
+	private static int counter = 0;
 	@Override
 	public void autonomousPeriodic() {
 		if (updatedFeetX && updatedFeetY) {
+			counter++;
+			SmartDashboard.putNumber("counter", counter);
 			
 			double desiredX = prev_x;//feet
 			double desiredY = prev_y;//feet
@@ -154,17 +159,19 @@ public class Robot extends IterativeRobot {
 			
 			final double errorY = desiredY - actualFeetY;//feet
 			final double errorX = desiredX - actualFeetX;//feet
-			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
+			SmartDashboard.putNumber("errorY", errorY);
+			SmartDashboard.putNumber("errorX", errorX);
+			//final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
 			
-			double speedY = V_PID.get("forward", errorY);
-			double speedX = V_PID.get("strafe", errorX);
-			double spin = V_PID.get("spin", errorOrientation);
+			double speedY = 0.065*errorY;//V_PID.get("forward", errorY);
+			double speedX = 0.065*errorX;//V_PID.get("strafe", errorX);
+			//double spin = V_PID.get("spin", errorOrientation);
 			
 			if (Math.abs(speedY) > 0.3) speedY = .3*Math.signum(speedY);
 			if (Math.abs(speedX) > 0.3) speedX = .3*Math.signum(speedX);
-			if (Math.abs(spin) > 0.3) spin = .3*Math.signum(spin);
+			//if (Math.abs(spin) > 0.3) spin = .3*Math.signum(spin);
 			
-			swerve.holonomicCartesian(speedX, speedY, spin);
+			swerve.holonomicCartesian(speedX, speedY, 0.0);
 			
 			
 			prev_x = desiredX;

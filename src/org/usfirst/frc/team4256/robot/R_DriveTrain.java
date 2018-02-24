@@ -33,7 +33,7 @@ public class R_DriveTrain {
 	**/
 	public void init() {
 		moduleA.init(/*reversed traction*/true);//practice: true, comp: true
-		moduleB.init(/*reversed traction*/false);//practice: false, comp: false
+		moduleB.init(/*reversed traction*/true);//practice: true, comp: false
 		moduleC.init(/*reversed traction*/true);//practice: true, comp: false
 		moduleD.init(/*reversed traction*/true);//practice: true, comp: false
 	}
@@ -41,7 +41,7 @@ public class R_DriveTrain {
 	
 	public void holonomicCartesian(final double speedX, final double speedY, final double speedSpin) {//TODO could combine holonomics
 		//{computing actual speed from encoder value of moduleD}
-		final double chassis_fieldCos = Math.cos(gyro.getCurrentAngle());
+		final double chassis_fieldCos = Math.cos(Math.toRadians(gyro.getCurrentAngle()));
 		final double speedX_desired = speedX/chassis_fieldCos,
 					 speedY_desired = speedY/chassis_fieldCos;
 		final double[] moduleComps_desired = computeModuleComponents(speedX_desired, speedY_desired, speedSpin);

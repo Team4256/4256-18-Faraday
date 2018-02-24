@@ -37,6 +37,8 @@ public abstract class Parameters {
 	
 	public static final int clampyRotator = 29;//CAN, Talon SRX, PDP 15
 	
+	public static final int ultrasonic = 1;//AIO
+	
 	//PNEUMATICS
 	public static final int ElevatorOne_shifterModule = 0;//PCM
 	public static final int ElevatorOne_shifterForward = 1;//PCM

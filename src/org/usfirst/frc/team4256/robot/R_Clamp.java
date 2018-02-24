@@ -2,7 +2,9 @@ package org.usfirst.frc.team4256.robot;
 
 import com.cyborgcats.reusable.Phoenix.R_Victor;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class R_Clamp {
 	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;
@@ -13,14 +15,16 @@ public class R_Clamp {
 	private R_Victor intakeRight;
 	private DoubleSolenoid clamp;
 	private DoubleSolenoid extender;
+	private AnalogInput ultrasonic;
 	
 	private final double intakeConstant = 0.85;
 	
-	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid extended) {
+	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid extended, final int ultrasonicPort) {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
 		this.extender = extended;
+		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
 	public void init() {
@@ -116,5 +120,6 @@ public class R_Clamp {
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
+		SmartDashboard.putNumber("ultrasonic", 147.2*ultrasonic.getAverageVoltage() - 6.3);
 	}
 }
