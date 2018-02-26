@@ -160,7 +160,7 @@ public class Robot extends IterativeRobot {
 			final double errorX = desiredX - actualFeetX;//feet
 //			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
 			
-			final double errorDirection = Math.atan2(-errorX, errorY);
+			final double errorDirection = Math.toDegrees(Math.atan2(-errorX, errorY));
 			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
 			
 			SmartDashboard.putNumber("errorY", errorY);
@@ -171,6 +171,7 @@ public class Robot extends IterativeRobot {
 			
 			if (Math.abs(speed) > 0.3) speed = .3*Math.signum(speed);
 			//if (Math.abs(spin) > 0.3) spin = .3*Math.signum(spin);
+			SmartDashboard.putNumber("direction", errorDirection);
 			
 			swerve.holonomicPlain(errorDirection, speed, 0.0);
 			
