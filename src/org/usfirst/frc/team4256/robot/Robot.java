@@ -10,7 +10,6 @@ import com.cyborgcats.reusable.V_PID;
 import org.usfirst.frc.team4256.robot.R_Clamp;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -159,19 +158,21 @@ public class Robot extends IterativeRobot {
 			
 			final double errorY = desiredY - actualFeetY;//feet
 			final double errorX = desiredX - actualFeetX;//feet
+//			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
+			
+			final double errorDirection = Math.atan2(-errorX, errorY);
+			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
+			
 			SmartDashboard.putNumber("errorY", errorY);
 			SmartDashboard.putNumber("errorX", errorX);
-			//final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
 			
-			double speedY = 0.065*errorY;//V_PID.get("forward", errorY);
-			double speedX = 0.065*errorX;//V_PID.get("strafe", errorX);
+			double speed = 0.0919*errorMagnitude;//V_PID.get("forward", errorY);
 			//double spin = V_PID.get("spin", errorOrientation);
 			
-			if (Math.abs(speedY) > 0.3) speedY = .3*Math.signum(speedY);
-			if (Math.abs(speedX) > 0.3) speedX = .3*Math.signum(speedX);
+			if (Math.abs(speed) > 0.3) speed = .3*Math.signum(speed);
 			//if (Math.abs(spin) > 0.3) spin = .3*Math.signum(spin);
 			
-			swerve.holonomicCartesian(speedX, speedY, 0.0);
+			swerve.holonomicPlain(errorDirection, speed, 0.0);
 			
 			
 			prev_x = desiredX;

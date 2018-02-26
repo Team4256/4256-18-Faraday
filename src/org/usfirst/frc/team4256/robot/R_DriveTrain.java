@@ -39,21 +39,19 @@ public class R_DriveTrain {
 	}
 	
 	
-	public void holonomicCartesian(final double speedX, final double speedY, final double speedSpin) {//TODO could combine holonomics
+	public void holonomicPlain(final double direction, final double speed, final double speedSpin) {
 		//{computing actual speed from encoder value of moduleD}
-		final double chassis_fieldCos = Math.cos(Math.toRadians(gyro.getCurrentAngle()));
-		final double speedX_desired = speedX/chassis_fieldCos,
-					 speedY_desired = speedY/chassis_fieldCos;
+		final double chassis_fieldAngle = gyro.getCurrentAngle();
+		final double speedY_desired = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
+					 speedX_desired = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
 		final double[] moduleComps_desired = computeModuleComponents(speedX_desired, speedY_desired, speedSpin);
 		
 		final double[] moduleAngles_final = computeModuleAngles(moduleComps_desired);
-		
-		boolean bad = speedX + speedY == 0.0 && speedSpin == 0.0;
+		boolean bad = speed == 0.0 && speedSpin == 0.0;
 		moduleA.swivelTo(moduleAngles_final[0], bad);	moduleB.swivelTo(moduleAngles_final[1], bad);
 		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
-		moduleD_previousAngle = moduleAngles_final[3];
 		
-		if (isThere(5)) {
+		if (isThere(5.0)) {
 			final double[] moduleSpeeds_final = computeModuleSpeeds(moduleComps_desired);
 			if (bad) {
 				moduleA.set(0.0);						moduleB.set(0.0);
@@ -155,7 +153,7 @@ public class R_DriveTrain {
 		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
 		moduleD_previousAngle = moduleAngles_final[3];
 		
-		if (isThere(5)) {
+		if (isThere(5.0)) {
 			final double[] moduleSpeeds_final = computeModuleSpeeds(moduleComps_desired);
 			if (bad) {
 				moduleA.set(0.0);						moduleB.set(0.0);
