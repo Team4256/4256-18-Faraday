@@ -61,6 +61,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		//{Robot Input}
+		gyro.reset();
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED").getSubTable("Position");
@@ -79,19 +80,20 @@ public class Robot extends IterativeRobot {
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
 		//practice robot:	 62.0,						 -14.0,							 0.0,						 50.0
 
-		V_PID.set("forward", Parameters.forwardP, Parameters.forwardI, Parameters.forwardD);
-		V_PID.set("strafe", Parameters.strafeP, Parameters.strafeI, Parameters.strafeD);
+		V_PID.set("zed", Parameters.zedP, Parameters.zedI, Parameters.zedD);
 		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
 		
-		tx2PowerControl.set(true);
-		try {Thread.sleep(50);}//milliseconds
-		catch (InterruptedException e) {Thread.currentThread().interrupt();}
-		tx2PowerControl.set(false);
+		if (!tx2PowerSensor.get()) {
+			tx2PowerControl.set(true);
+			try {Thread.sleep(50);}//milliseconds
+			catch (InterruptedException e) {Thread.currentThread().interrupt();}
+			tx2PowerControl.set(false);
+		}
 	}
 
 	@Override
 	public void autonomousInit() {
-		gyro.reset();
+//		gyro.reset();
 		V_PID.clear("forward");
 		V_PID.clear("strafe");
 		V_PID.clear("spin");
@@ -112,7 +114,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopInit() {
-		gyro.reset();
+//		gyro.reset();
 		
 		swerve.autoMode(false);
 		elevatorOne.setInches(elevatorOne.getInches());
@@ -158,22 +160,23 @@ public class Robot extends IterativeRobot {
 			
 			final double errorY = desiredY - actualFeetY;//feet
 			final double errorX = desiredX - actualFeetX;//feet
-//			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
+			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
 			
-			final double errorDirection = Math.toDegrees(Math.atan2(-errorX, errorY));
+			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
 			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
 			
 			SmartDashboard.putNumber("errorY", errorY);
 			SmartDashboard.putNumber("errorX", errorX);
+			SmartDashboard.putNumber("errorOrient", errorOrientation);
 			
-			double speed = 0.0919*errorMagnitude;//V_PID.get("forward", errorY);
-			//double spin = V_PID.get("spin", errorOrientation);
+			double speed = V_PID.get("zed", errorMagnitude);
+			double spin = V_PID.get("spin", errorOrientation);
 			
-			if (Math.abs(speed) > 0.3) speed = .3*Math.signum(speed);
-			//if (Math.abs(spin) > 0.3) spin = .3*Math.signum(spin);
+			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
+			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
 			SmartDashboard.putNumber("direction", errorDirection);
 			
-			swerve.holonomicPlain(errorDirection, speed, 0.0);
+			swerve.holonomicPlain(errorDirection, speed, spin);
 			
 			
 			prev_x = desiredX;
