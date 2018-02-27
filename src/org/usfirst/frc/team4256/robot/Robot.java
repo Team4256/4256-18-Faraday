@@ -149,11 +149,14 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		if (updatedFeetX && updatedFeetY) {
-			counter++;
-			SmartDashboard.putNumber("counter", counter);
+			final double time = V_Instructions.getSeconds();
 			
 			double desiredX = prev_x;//feet
 			double desiredY = prev_y;//feet
+			if (time < 1.57) {
+				desiredX = 5*(1 - Math.cos(time));
+				desiredY = 5*Math.sin(time);
+			}
 			double desiredOrientation = prev_orient;//degrees
 			
 			final double errorY = desiredY - actualFeetY;//feet
