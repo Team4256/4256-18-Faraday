@@ -32,7 +32,7 @@ public class R_SwerveModule {
 	/**
 	 * This function prepares each motor individually, including setting PID values for the rotator.
 	**/
-	public void init(final boolean reversedTraction) {//TODO config ramp rates
+	public void init(final boolean reversedTraction) {
 		rotation.init();
 		
 		rotation.setNeutralMode(R_Talon.coast);
@@ -49,8 +49,8 @@ public class R_SwerveModule {
 	}
 	
 	public void autoMode(final boolean enable) {
-		if (enable) traction.configOpenloopRamp(2.0, R_Talon.kTimeoutMS);//TODO
-		else traction.configOpenloopRamp(0.0, R_Talon.kTimeoutMS);
+		if (enable) traction.configOpenloopRamp(2.0, R_Talon.kTimeoutMS);//TODO testing
+		else traction.configOpenloopRamp(1.0, R_Talon.kTimeoutMS);
 	}
 	
 	
@@ -138,7 +138,7 @@ public class R_SwerveModule {
 	}
 
 	
-	public double tractionSpeed() {//TODO componetize into X, Y, field centric, and robot centric, max around 60
+	public double tractionSpeed() {
 		if (hasTractionSensor) {
 			return traction.getCurrentRPM()*60.0*tractionWheelCircumference/12.0;
 		}else {
