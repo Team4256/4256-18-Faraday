@@ -155,13 +155,12 @@ public class Robot extends IterativeRobot {
 			
 			double desiredX = prev_x;//feet
 			double desiredY = prev_y;//feet
-			if (time < 3.14) {
-				desiredX = 5*(1 - Math.cos(time/2.));
-				desiredY = 5*Math.sin(time/2.);
-			}else if (time < 6.28) {
-				desiredX = 5*(1 - Math.cos(time/2.));
-				desiredY = -(time/2. - 5)*(time/2. - 5) + 16.76;
-			}else if (time < 9.42) {
+			if (time < 2) {
+				desiredY = -8*(1 - Math.cos(time));
+				desiredX = -5*Math.sin(time);
+			}else if (time < 5) {
+				desiredY = -6*(1 - Math.cos(time));
+				desiredX = (time - 5)*(time - 5) - 24;
 			}
 			double desiredOrientation = prev_orient;//degrees
 			
