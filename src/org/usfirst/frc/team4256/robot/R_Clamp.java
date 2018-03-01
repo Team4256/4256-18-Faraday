@@ -16,6 +16,7 @@ public class R_Clamp {
 	private DoubleSolenoid clamp;
 	private DoubleSolenoid extender;
 	private AnalogInput ultrasonic;
+	private static int counter;
 	
 	private final double intakeConstant = 0.85;
 	
@@ -30,6 +31,7 @@ public class R_Clamp {
 	public void init() {
 		intakeLeft.init();
 		intakeRight.init();
+		counter = 0;
 	}
 	
 	
@@ -37,7 +39,15 @@ public class R_Clamp {
 	 * This function attempts to "slurp" nearby cubes into the clamp.
 	**/
 	public void slurp() {
-		setWheelSpeed(-intakeConstant);
+		if (!cubeInReach()) {
+			clamp.set(OpenState);
+			setWheelSpeed(-intakeConstant);
+		} else {
+			clamp.set(CloseState);
+			if (hasCube()) {
+				setWheelSpeed(0.0);
+			}
+		}
 	}
 	
 	
@@ -91,6 +101,32 @@ public class R_Clamp {
 	
 	
 	/**
+	 * This function returns if the cube is in the clamp or not
+	 **/
+	public boolean hasCube() {
+		if (ultrasonic.getAverageValue() < 55) {
+			++counter;
+			if (counter > 10) {
+				return true;
+			} else return false;
+		} else {
+			counter = 0;
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * This function returns if the cube is in reach of the clamp or not
+	 **/
+	public boolean cubeInReach() {
+		if (ultrasonic.getAverageValue() < 70) {
+			return true;
+		} else return false;
+	}
+	
+	
+	/**
 	 * 
 	**/
 	public void extend() {
@@ -120,6 +156,7 @@ public class R_Clamp {
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
-		SmartDashboard.putNumber("ultrasonic", 147.2*ultrasonic.getAverageVoltage() - 6.3);
+		SmartDashboard.putNumber("ultrasonic", ultrasonic.getAverageValue());
+		SmartDashboard.putBoolean("in reach", cubeInReach());
 	}
 }

@@ -271,21 +271,25 @@ public class Robot extends IterativeRobot {
 		}
 		
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_LB)/* && !clamp.hasCube()*/) {//CLAMP SLURP AND SPIT
+		if (driver.getRawButton(R_Xbox.BUTTON_LB) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
 			clamp.slurp();
 		}else if (driver.getRawButton(R_Xbox.BUTTON_RB)) {
 			clamp.spit();
 		}else {
 			clamp.stop();
 		}
+		
+		if (driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT)) {
+			clamp.open();
+		}
 
-		if (!elevators.inClimbingMode()) {
+/*		if (!elevators.inClimbingMode()) {
 			if (V_Fridge.freeze("STICKLEFTBUTTON", driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT))) {//CLAMP OPEN AND CLOSE
 				clamp.open();
 			}else { 
 				clamp.close();
 			}
-		}
+		}*/
 		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
