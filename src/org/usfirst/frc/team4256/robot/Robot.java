@@ -36,10 +36,9 @@ public class Robot extends IterativeRobot {
 	private static boolean updatedFeetY = false;
 	private static double actualFeetX = 0.0;
 	private static double actualFeetY = 0.0;
+	private static Leash leash = new Leash(/*leash length*/5.0, /*growth rate*/0.1);
 	
 	//{Robot Output}
-//	private static final Compressor compressor = new Compressor(0);
-	
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
 	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB);
 	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC);
@@ -65,15 +64,12 @@ public class Robot extends IterativeRobot {
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED").getSubTable("Position");
 		//{Robot Output}
-//		compressor.start();
-//		compressor.setClosedLoopControl(true);
-//		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 		elevators.init();
+		clamp.init();
+		
 		V_Fridge.initialize("!Button LB", true);
 		V_Fridge.initialize("!Button RB", true);
-		clamp.init();
-//		lift.setVoltageRampRate(8);//TODO
 		
 		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-14.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
@@ -92,9 +88,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
-//		gyro.reset();
-		V_PID.clear("forward");
-		V_PID.clear("strafe");
+		V_PID.clear("zed");
 		V_PID.clear("spin");
 		
 		swerve.autoMode(true);
@@ -113,11 +107,9 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopInit() {
-		swerve.autoMode(false);
-		elevatorOne.setInches(elevatorOne.getInches());
-		elevatorTwo.setInches(elevatorTwo.getInches());
-		lockedAngle = gyro.getCurrentAngle();
 		V_PID.clear("spin");
+		swerve.autoMode(false);
+		lockedAngle = gyro.getCurrentAngle();
 	}
 	
 	@Override
@@ -135,50 +127,36 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Zeroed Elevators").setBoolean(elevatorOne.knowsZero && elevatorTwo.knowsZero);
 		faraday.getEntry("Clamp Open").setBoolean(clamp.isOpen());
 		faraday.getEntry("Climbing Mode").setBoolean(elevators.inClimbingMode());
-		faraday.getEntry("Browning Out").setBoolean(RobotController.isBrownedOut());//TODO use this elsewhere
+		faraday.getEntry("Browning Out").setBoolean(RobotController.isBrownedOut());
 		faraday.getEntry("TX2 Powered On").setBoolean(tx2PowerSensor.get());
 		//TODO put whether we have a cube or not
 	}
 	
-	
-	private static double prev_x = 0.0;
-	private static double prev_y = 0.0;
-	private static double prev_orient = 0.0;
 	@Override
 	public void autonomousPeriodic() {
-		if (updatedFeetX && updatedFeetY) {
-			final double time = V_Instructions.getSeconds();
-			
-			double desiredX = prev_x;//feet
-			double desiredY = prev_y;//feet
-			if (time < 2) {
-				desiredY = -8*(1 - Math.cos(time));
-				desiredX = -5*Math.sin(time);
-			}else if (time < 5) {
-				desiredY = -6*(1 - Math.cos(time));
-				desiredX = (time - 5)*(time - 5) - 24;
-			}
-			double desiredOrientation = prev_orient;//degrees
-			
-			final double errorY = desiredY - actualFeetY;//feet TODO actualX and Y could change mid funtion, make sure to get once
-			final double errorX = desiredX - actualFeetX;//feet
-			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
+		if (updatedFeetX && updatedFeetY) {//TODO test whether this works with || instead of &&
+			final double actualX = actualFeetX,		  actualY = actualFeetY;
+			leash.maintainLength(actualX, actualY);
+			final double desiredX = leash.getX(), 	  desiredY = leash.getY();
+			final double errorX = desiredX - actualX, errorY = desiredY - actualY;
 			
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
 			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
 			
+			
+//			double desiredOrientation = prev_orient;//degrees
+//			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
+			
+			
+			
 			double speed = V_PID.get("zed", errorMagnitude);
-			double spin = V_PID.get("spin", errorOrientation);
+//			double spin = V_PID.get("spin", errorOrientation);
 			
 			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
-			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
+//			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
 			
-			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
+			swerve.holonomic_encoderIgnorant(errorDirection, speed, 0.0/*spin*/);
 			
-			
-			prev_x = desiredX;
-			prev_y = desiredY;
-			prev_orient = desiredOrientation;
 			updatedFeetX = false; updatedFeetY = false;
 		}
 	}

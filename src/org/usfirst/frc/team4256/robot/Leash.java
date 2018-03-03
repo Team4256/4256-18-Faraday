@@ -28,7 +28,7 @@ public class Leash {
 	}
 	
 	private void increment(final double amount) {
-		if (!path[currentSegment].increment(amount)) currentSegment++;
+		if (!path[currentSegment].increment(amount) && currentSegment + 1 < path.length) currentSegment++;
 	}
 	
 	private double getActualLength(final double currentX, final double currentY) {

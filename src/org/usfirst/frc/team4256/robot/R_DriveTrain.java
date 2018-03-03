@@ -3,6 +3,8 @@ package org.usfirst.frc.team4256.robot;
 import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.V_Compass;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class R_DriveTrain {
 	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
 	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
@@ -11,7 +13,7 @@ public class R_DriveTrain {
 	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
 	private static final double pivotToAft = Math.sqrt(pivotToAftX*pivotToAftX + pivotToAftY*pivotToAftY);
 	
-	private double moduleD_maxSpeed = 70.0;//always put max slightly higher than max observed; TODO test on comp robot
+	private double moduleD_maxSpeed = 13.0;//always put max slightly higher than max observed; TODO test on comp robot
 	private double moduleD_previousAngle = 0.0;
 	private double drivetrain_previousSpin = 0.0;
 
@@ -43,6 +45,7 @@ public class R_DriveTrain {
 	private double[] speedsFromModuleD() {
 		double rawSpeed = Math.abs(moduleD.tractionSpeed());
 		if (rawSpeed > moduleD_maxSpeed) {moduleD_maxSpeed = rawSpeed;}
+		SmartDashboard.putNumber("max speed", moduleD_maxSpeed);
 		rawSpeed /= moduleD_maxSpeed;
 		
 		double tan = 1.0/Math.tan(Math.toRadians(V_Compass.validateAngle(moduleD_previousAngle)));
