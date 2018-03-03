@@ -10,13 +10,11 @@ public class Leash {
 	Segment two = new Segment(x -> 6.0*(1.0 - Math.cos(x)),
 							  y -> 10.0*Math.sin(y - Math.PI/2.0) + 5.0,
 							  Math.PI/2.0, Math.PI);
-	Segment three = new Segment(x -> 12.0 + 0.0*x,
-								y -> 15.0 + 0.0*y,
-								Math.PI, 200);
 	
 	//Create an array of segments; represents a full path.
-	private final Segment[] path = new Segment[] {one, two, three};
+	private final Segment[] path = new Segment[] {one, two};
 	private int currentSegment = 0;
+	private boolean doneGeneratingTargets = false;
 	
 	
 	private final double desiredLength;
@@ -31,7 +29,10 @@ public class Leash {
 	}
 	
 	private void increment(final double amount) {
-		if (!path[currentSegment].increment(amount) && currentSegment + 1 < path.length) currentSegment++;
+		if (!path[currentSegment].increment(amount)) {
+			if (currentSegment + 1 < path.length) currentSegment++;
+			else doneGeneratingTargets = true;
+		}
 	}
 	
 	private double getActualLength(final double currentX, final double currentY) {
@@ -41,13 +42,14 @@ public class Leash {
 	}
 	
 	public void maintainLength(final double currentX, final double currentY) {
-		while (getActualLength(currentX, currentY) < desiredLength) {
+		while (!doneGeneratingTargets && getActualLength(currentX, currentY) < desiredLength) {
 			increment(growthRate);
 		}
 	}
 	
 	public double getX() {return path[currentSegment].getX();}
 	public double getY() {return path[currentSegment].getY();}
+	public boolean doneGeneratingTargets() {return doneGeneratingTargets;}
 	
 	
 	

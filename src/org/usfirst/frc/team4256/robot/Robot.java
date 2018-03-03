@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.networktables.EntryListenerFlags;
@@ -53,7 +52,6 @@ public class Robot extends IterativeRobot {
 	private static final R_Elevators elevators = new R_Elevators(elevatorOne, elevatorTwo);
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
-	private static final DoubleSolenoid extenderShifter = new DoubleSolenoid(Parameters.Extender_module, Parameters.Extender_forward, Parameters.Extender_reverse);
 	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
@@ -136,7 +134,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		if (updatedFeetX && updatedFeetY) {//TODO test whether this works with || instead of &&
+		if (updatedFeetX || updatedFeetY) {//TODO test whether this works with || instead of &&
 			final double actualX = actualFeetX,		  actualY = actualFeetY;
 			leash.maintainLength(actualX, actualY);
 			final double desiredX = leash.getX(), 	  desiredY = leash.getY();
@@ -148,13 +146,6 @@ public class Robot extends IterativeRobot {
 			
 //			double desiredOrientation = prev_orient;//degrees
 //			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
-			
-			SmartDashboard.putNumber("error X", errorX);
-			SmartDashboard.putNumber("error y", errorY);
-			SmartDashboard.putNumber("actual X", actualX);
-			SmartDashboard.putNumber("actual y", actualY);
-			SmartDashboard.putNumber("desired X", desiredX);
-			SmartDashboard.putNumber("desired y", desiredY);
 			
 			double speed = V_PID.get("zed", errorMagnitude);
 //			double spin = V_PID.get("spin", errorOrientation);
@@ -217,9 +208,9 @@ public class Robot extends IterativeRobot {
 			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
 				 
 				 
-			if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) clamp.slurp();//CLAMP SLURP AND SPIT
-			else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) clamp.spit();
-			else clamp.stop();
+				 if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) clamp.slurp();//CLAMP SLURP AND SPIT
+			else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) 					   clamp.spit();
+			else 																   clamp.stop();
 			
 				 if (driver.getRawButton(R_Xbox.BUTTON_LB)) clamp.open();//CLAMP OPEN AND CLOSE OVERRIDE
 			else if (driver.getRawButton(R_Xbox.BUTTON_RB)) clamp.close();

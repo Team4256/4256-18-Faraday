@@ -53,9 +53,9 @@ public abstract class Parameters {
 	public static final int Extender_reverse = 6;//PCM
 	
 	//AUTONOMOUS
-//	public static final double[][] leftInstructions = new double[][] {
+//	public static final double[][] gettingToScale = new double[][] {
 //		//duration ms, direction, speed, orientation
-//		{2150, -20, .2, Parameters.leftGear},
+//		{X, Y, threshold, action},
 //		{700, 0, 0, Parameters.leftGear},
 //		{250, Parameters.leftGear, .15, Parameters.leftGear}
 //	};
