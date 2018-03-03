@@ -1,5 +1,9 @@
 package org.usfirst.frc.team4256.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.cyborgcats.reusable.Phoenix.R_Encoder;
+import com.cyborgcats.reusable.Phoenix.R_Talon;
 import com.cyborgcats.reusable.Phoenix.R_Victor;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -9,21 +13,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class R_Clamp {
 	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;
-	private static final DoubleSolenoid.Value UpState = DoubleSolenoid.Value.kForward;
-	private static final DoubleSolenoid.Value OutState = DoubleSolenoid.Value.kReverse;
 	private R_Victor intakeLeft;
 	private R_Victor intakeRight;
 	private DoubleSolenoid clamp;
-	private DoubleSolenoid extender;
+	private R_Talon rotator;
 	private AnalogInput ultrasonic;
+	private static int counter = 0;
 	
 	private final double intakeConstant = 0.85;
 	
-	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid extended, final int ultrasonicPort) {
+	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int rotatorID, final int ultrasonicPort) {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.PercentOutput, R_Encoder.CTRE_MAG_ABSOLUTE, false);
 		this.clamp = clamp;
-		this.extender = extended;
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
@@ -37,7 +40,15 @@ public class R_Clamp {
 	 * This function attempts to "slurp" nearby cubes into the clamp.
 	**/
 	public void slurp() {
-		setWheelSpeed(-intakeConstant);
+		if (!cubeInReach()) {
+			clamp.set(OpenState);
+			setWheelSpeed(-intakeConstant);
+		} else {
+			clamp.set(CloseState);
+			if (hasCube()) {
+				setWheelSpeed(0.0);
+			}
+		}
 	}
 	
 	
@@ -91,27 +102,38 @@ public class R_Clamp {
 	
 	
 	/**
+	 * This function returns if the cube is in the clamp or not
+	 **/
+	public boolean hasCube() {
+		if (ultrasonic.getAverageValue() < 55) {
+			counter++;
+			return counter > 10;
+		} else {
+			counter = 0;
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * This function returns if the cube is in reach of the clamp or not
+	 **/
+	public boolean cubeInReach() {
+		return ultrasonic.getAverageValue() < 70;
+	}
+	
+	/**
 	 * 
 	**/
 	public void extend() {
-		extender.set(OutState);
 	}
-	
 	
 	/**
 	 * 
 	**/
 	public void retract() {
-		extender.set(UpState);
 	}
 	
-	
-	/**
-	 * This function returns if the clamp is looking up or straight
-	 **/
-	public boolean isExtended() {
-		return extender.get().equals(OutState);
-	}
 	
 	
 	/**
@@ -120,6 +142,6 @@ public class R_Clamp {
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
-		SmartDashboard.putNumber("ultrasonic", 147.2*ultrasonic.getAverageVoltage() - 6.3);
+		rotator.completeLoopUpdate();
 	}
 }

@@ -21,7 +21,7 @@ public class R_ElevatorOne {
 	public boolean knowsZero = false;
 
 	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter) {
-		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, false);//practice: false, comp: true
+		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, true);//practice: true, comp: true
 		followerA = new R_Victor(followerAID, R_Victor.follower);
 		followerB = new R_Victor(followerBID, R_Victor.follower);
 		this.shifter = shifter;	
