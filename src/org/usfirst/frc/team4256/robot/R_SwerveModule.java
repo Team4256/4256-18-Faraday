@@ -140,7 +140,7 @@ public class R_SwerveModule {
 	
 	public double tractionSpeed() {
 		if (hasTractionSensor) {
-			return traction.getCurrentRPM()*60.0*tractionWheelCircumference;
+			return traction.getCurrentRPM()*60.0*tractionWheelCircumference/12.0;
 		}else {
 			throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 		}

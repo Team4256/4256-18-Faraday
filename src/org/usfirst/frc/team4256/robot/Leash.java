@@ -4,15 +4,18 @@ public class Leash {
 	/*Define segments of the path using lambda functions for x and y, as well as a start and end value
 	for what might be thought of as time. Though the syntax makes it look like x and y are generated
 	from themselves, it is actually the time-like incrementer that gets passed in.*/
-	Segment one = new Segment(x -> 7.0*(1.0 - Math.cos(x)),
-							  y -> 10.0*Math.sin(y),
+	Segment one = new Segment(x -> 6.0*(1.0 - Math.cos(x)),
+							  y -> 5.0*Math.sin(y),
 							  0.0, Math.PI/2.0);
-	Segment two = new Segment(x -> 7.0*(1.0 - Math.cos(x)),
-							  y -> 10.0*(2.0 - Math.sin(y)),
+	Segment two = new Segment(x -> 6.0*(1.0 - Math.cos(x)),
+							  y -> 10.0*Math.sin(y - Math.PI/2.0) + 5.0,
 							  Math.PI/2.0, Math.PI);
+	Segment three = new Segment(x -> 12.0 + 0.0*x,
+								y -> 15.0 + 0.0*y,
+								Math.PI, 200);
 	
 	//Create an array of segments; represents a full path.
-	private final Segment[] path = new Segment[] {one, two};
+	private final Segment[] path = new Segment[] {one, two, three};
 	private int currentSegment = 0;
 	
 	

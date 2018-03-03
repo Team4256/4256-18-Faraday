@@ -41,10 +41,10 @@ public class R_Clamp {
 	**/
 	public void slurp() {
 		if (!cubeInReach()) {
-			clamp.set(OpenState);
+			open();
 			setWheelSpeed(-intakeConstant);
 		} else {
-			clamp.set(CloseState);
+			close();
 			if (hasCube()) {
 				setWheelSpeed(0.0);
 			}

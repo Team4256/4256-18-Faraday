@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.networktables.EntryListenerFlags;
@@ -72,7 +73,7 @@ public class Robot extends IterativeRobot {
 		V_Fridge.initialize("!Button LT", true);
 		V_Fridge.initialize("!Button RT", true);
 		
-		moduleA.setTareAngle(92.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
+		moduleA.setTareAngle(-13.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(5.0);	moduleD.setTareAngle(45.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
 		//practice robot:	 62.0,						 -14.0,							 0.0,						 50.0
 
@@ -148,7 +149,12 @@ public class Robot extends IterativeRobot {
 //			double desiredOrientation = prev_orient;//degrees
 //			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
 			
-			
+			SmartDashboard.putNumber("error X", errorX);
+			SmartDashboard.putNumber("error y", errorY);
+			SmartDashboard.putNumber("actual X", actualX);
+			SmartDashboard.putNumber("actual y", actualY);
+			SmartDashboard.putNumber("desired X", desiredX);
+			SmartDashboard.putNumber("desired y", desiredY);
 			
 			double speed = V_PID.get("zed", errorMagnitude);
 //			double spin = V_PID.get("spin", errorOrientation);
@@ -209,11 +215,19 @@ public class Robot extends IterativeRobot {
 			else if (gunner.getRawButton(R_Xbox.BUTTON_RB)) elevators.increment(11.0);
 			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
 			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
+				 
+				 
+			if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) clamp.slurp();//CLAMP SLURP AND SPIT
+			else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) clamp.spit();
+			else clamp.stop();
+			
+				 if (driver.getRawButton(R_Xbox.BUTTON_LB)) clamp.open();//CLAMP OPEN AND CLOSE OVERRIDE
+			else if (driver.getRawButton(R_Xbox.BUTTON_RB)) clamp.close();
 		
 		}else {
 				 //{incrementing upward and downward}
 				 if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));
-			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
+			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}
 /*		
 		//{incrementing downward}
@@ -226,15 +240,6 @@ public class Robot extends IterativeRobot {
 			elevators.increment(-11.0);//inches
 		}
 */
-//		if (!elevators.inClimbingMode() && gunner.getRawButton(R_Xbox.BUTTON_LB)) {
-//			elevators.increment(-11.0);//inches
-//		}else if (!elevators.inClimbingMode() && gunner.getRawButton(R_Xbox.BUTTON_RB)) {
-//			elevators.increment(11.0);
-//		}else if (!elevators.inClimbingMode() && gunner.getAxisPress(R_Xbox.AXIS_LT, 0.3)) {
-//			elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
-//		}else if (!elevators.inClimbingMode() && gunner.getAxisPress(R_Xbox.AXIS_RT, 0.3)) {
-//			elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
-//		}
 /*		
 		//{incrementing upward}
 		final boolean buttonRT = driver.getAxisPress(R_Xbox.AXIS_RT, 0.9);
@@ -250,20 +255,6 @@ public class Robot extends IterativeRobot {
 			if (elevators.inClimbingMode()) elevators.disableClimbMode(clamp);
 			else elevators.enableClimbMode(clamp);
 		}
-
-		
-		
-		if (driver.getRawButton(R_Xbox.BUTTON_RB) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
-			clamp.slurp();
-		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
-			clamp.spit();
-		}else {
-			clamp.stop();
-		}
-		
-		
-		if (driver.getRawButton(R_Xbox.BUTTON_LB)) clamp.open();//CLAMP OPEN AND CLOSE OVERRIDE
-		else if (driver.getRawButton(R_Xbox.BUTTON_RB)) clamp.close();
 
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
@@ -292,8 +283,8 @@ public class Robot extends IterativeRobot {
 		moduleB.swivelTo(0);
 		moduleC.swivelTo(0);
 		moduleD.swivelTo(0);
-		elevatorOne.setZero(-1.0);
-		elevatorTwo.setZero(-1.0);
+		elevatorOne.setZero(-0.5);
+		elevatorTwo.setZero(0.0);
 		elevators.setInches(0.0);
 	}
 	
