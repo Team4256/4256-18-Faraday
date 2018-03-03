@@ -94,7 +94,7 @@ public abstract class Parameters {
 	public static final double spinI = .000015;
 	public static final double spinD = .02;
 	
-	public static final double zedP = 0.0919;
-	public static final double zedI = 0.00002;
+	public static final double zedP = 0.1838;
+	public static final double zedI = 0.0;
 	public static final double zedD = 1.0;
 }

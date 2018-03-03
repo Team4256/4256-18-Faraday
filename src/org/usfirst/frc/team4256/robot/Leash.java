@@ -4,11 +4,11 @@ public class Leash {
 	/*Define segments of the path using lambda functions for x and y, as well as a start and end value
 	for what might be thought of as time. Though the syntax makes it look like x and y are generated
 	from themselves, it is actually the time-like incrementer that gets passed in.*/
-	Segment one = new Segment(x -> 6.0*(1.0 - Math.cos(x)),
+	Segment one = new Segment(x -> -11.0*(1.0 - Math.cos(x)),
 							  y -> 5.0*Math.sin(y),
 							  0.0, Math.PI/2.0);
-	Segment two = new Segment(x -> 6.0*(1.0 - Math.cos(x)),
-							  y -> 10.0*Math.sin(y - Math.PI/2.0) + 5.0,
+	Segment two = new Segment(x -> -11.0 + x*0.0,
+							  y -> 18.0*Math.sin(y - Math.PI/2.0) + 5.0,
 							  Math.PI/2.0, Math.PI);
 	
 	//Create an array of segments; represents a full path.
@@ -26,6 +26,10 @@ public class Leash {
 	public Leash(final double desiredLength, final double growthRate) {
 		this.desiredLength = desiredLength;
 		this.growthRate = growthRate;
+	}
+	
+	public void init() {
+		currentSegment = 0;
 	}
 	
 	private void increment(final double amount) {
@@ -49,6 +53,7 @@ public class Leash {
 	
 	public double getX() {return path[currentSegment].getX();}
 	public double getY() {return path[currentSegment].getY();}
+	public double getIndependentVariable() {return path[currentSegment].getIndependentVariable();}
 	public boolean doneGeneratingTargets() {return doneGeneratingTargets;}
 	
 	
@@ -69,13 +74,10 @@ public class Leash {
 			return independentVariable < end;
 		}
 		
-		public double getX() {
-			return x.at(independentVariable);
-		}
+		public double getX() {return x.at(independentVariable);}
+		public double getY() {return y.at(independentVariable);}
 		
-		public double getY() {
-			return y.at(independentVariable);
-		}
+		public double getIndependentVariable() {return independentVariable;}
 	}
 	
 	private interface Function {

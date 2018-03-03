@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -37,7 +38,9 @@ public class Robot extends IterativeRobot {
 	private static boolean updatedFeetY = false;
 	private static double actualFeetX = 0.0;
 	private static double actualFeetY = 0.0;
-	private static Leash leash = new Leash(/*leash length*/5.0, /*growth rate*/0.1);
+	private static Leash leash = new Leash(/*leash length*/3.0, /*growth rate*/0.1);
+	private static boolean switchRight = false;
+	private static boolean scaleRight = false;
 	
 	//{Robot Output}
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
@@ -71,9 +74,9 @@ public class Robot extends IterativeRobot {
 		V_Fridge.initialize("!Button LT", true);
 		V_Fridge.initialize("!Button RT", true);
 		
-		moduleA.setTareAngle(-13.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(5.0);	moduleD.setTareAngle(45.0);
+		moduleA.setTareAngle(-66.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(5.0);	moduleD.setTareAngle(45.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
-		//practice robot:	 62.0,						 -14.0,							 0.0,						 50.0
+		//practice robot:	 -66.0,						 	 -43.0,							 5.0,						 45.0
 
 		V_PID.set("zed", Parameters.zedP, Parameters.zedI, Parameters.zedD);
 		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
@@ -93,6 +96,7 @@ public class Robot extends IterativeRobot {
 		
 		swerve.autoMode(true);
 		
+		leash.init();
 		V_Instructions.resetTimer();
 		
 		zed.addEntryListener("X", (zed, key, entry, value, flags) -> {
@@ -103,6 +107,26 @@ public class Robot extends IterativeRobot {
 			actualFeetY = value.getDouble();
 			updatedFeetY = true;
 		}, EntryListenerFlags.kUpdate);
+		
+		
+		
+		
+		String gameData;
+		gameData = DriverStation.getInstance().getGameSpecificMessage();
+		if (gameData.length()>0) {
+			if (gameData.charAt(0) == 'R') {
+				switchRight = true;
+			}
+			else {
+				switchRight = false;
+			}
+			if (gameData.charAt(1) == 'R') {
+				scaleRight = true;
+			}
+			else {
+				scaleRight = false;
+			}
+		}
 	}
 	
 	@Override
@@ -134,7 +158,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		if (updatedFeetX || updatedFeetY) {//TODO test whether this works with || instead of &&
+		if (updatedFeetX && updatedFeetY) {
 			final double actualX = actualFeetX,		  actualY = actualFeetY;
 			leash.maintainLength(actualX, actualY);
 			final double desiredX = leash.getX(), 	  desiredY = leash.getY();
@@ -142,18 +166,32 @@ public class Robot extends IterativeRobot {
 			
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
 			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
-			
-			
-//			double desiredOrientation = prev_orient;//degrees
-//			final double errorOrientation = gyro.wornPath(desiredOrientation);//degrees
-			
 			double speed = V_PID.get("zed", errorMagnitude);
-//			double spin = V_PID.get("spin", errorOrientation);
-			
 			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
-//			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
 			
-			swerve.holonomic_encoderIgnorant(errorDirection, speed, 0.0/*spin*/);
+			
+			double desiredOrientation = gyro.getCurrentAngle();
+			
+			
+			Events.check(leash.getIndependentVariable());
+			SmartDashboard.putNumber("pi thing", leash.getIndependentVariable());
+			SmartDashboard.putNumber("step", Events.counter);
+			switch(Events.counter) {
+			case(0): desiredOrientation = 0.0;break;
+			case(1): 
+				elevators.setInches(ElevatorPresets.SCALE_HIGH.height());
+				desiredOrientation = 90.0;
+				break;
+			case(2): clamp.spit();break;
+			}
+			
+			
+			final double errorOrientation = gyro.wornPath(desiredOrientation);
+			double spin = V_PID.get("spin", errorOrientation);
+			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
+			
+			
+			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
 			
 			updatedFeetX = false; updatedFeetY = false;
 		}
@@ -202,8 +240,8 @@ public class Robot extends IterativeRobot {
 			else if (gunner.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
 		
 				 //{incrementing upward and downward}
-				 if (gunner.getRawButton(R_Xbox.BUTTON_LB)) elevators.increment(-11.0);
-			else if (gunner.getRawButton(R_Xbox.BUTTON_RB)) elevators.increment(11.0);
+				 if (V_Fridge.becomesTrue("Button LB", gunner.getRawButton(R_Xbox.BUTTON_LB))) elevators.increment(-11.0);
+			else if (V_Fridge.becomesTrue("Button RB", gunner.getRawButton(R_Xbox.BUTTON_RB))) elevators.increment(11.0);
 			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
 			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
 				 

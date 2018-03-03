@@ -33,7 +33,7 @@ public class R_DriveTrain {
 	 * This function prepares each swerve module individually.
 	**/
 	public void init() {
-		moduleA.init(/*reversed traction*/false);//practice: true, comp: true
+		moduleA.init(/*reversed traction*/true);//practice: true, comp: true
 		moduleB.init(/*reversed traction*/false);//practice: false, comp: false
 		moduleC.init(/*reversed traction*/true);//practice: true, comp: false
 		moduleD.init(/*reversed traction*/false);//practice: true, comp: false
