@@ -13,14 +13,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class R_Clamp {
 	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;
-	private static final DoubleSolenoid.Value UpState = DoubleSolenoid.Value.kForward;
-	private static final DoubleSolenoid.Value OutState = DoubleSolenoid.Value.kReverse;
 	private R_Victor intakeLeft;
 	private R_Victor intakeRight;
 	private DoubleSolenoid clamp;
 	private R_Talon rotator;
 	private AnalogInput ultrasonic;
-	private static int counter;
+	private static int counter = 0;
 	
 	private final double intakeConstant = 0.85;
 	
@@ -35,7 +33,6 @@ public class R_Clamp {
 	public void init() {
 		intakeLeft.init();
 		intakeRight.init();
-		counter = 0;
 	}
 	
 	
@@ -137,13 +134,6 @@ public class R_Clamp {
 	public void retract() {
 	}
 	
-	public void rotatorStop() {
-	}
-	
-	
-	/**
-	 * This function returns if the clamp is looking up or straight
-	 **/
 	
 	
 	/**
@@ -152,9 +142,6 @@ public class R_Clamp {
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
-		rotator.completeLoopUpdate();//TODO maybe not?
-		SmartDashboard.putNumber("rotator REVS", rotator.getCurrentRevs());
-		SmartDashboard.putNumber("ultrasonic", ultrasonic.getAverageValue());
-		SmartDashboard.putBoolean("in reach", cubeInReach());
+		rotator.completeLoopUpdate();
 	}
 }

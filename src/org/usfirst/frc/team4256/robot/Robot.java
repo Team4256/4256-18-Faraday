@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final R_Xbox driver = new R_Xbox(0);
+	private static final R_Xbox gunner = new R_Xbox(1);
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
@@ -71,12 +72,12 @@ public class Robot extends IterativeRobot {
 //		compressor.clearAllPCMStickyFaults();
 		swerve.init();
 		elevators.init();
-		V_Fridge.initialize("!Button LB", true);
-		V_Fridge.initialize("!Button RB", true);
+		V_Fridge.initialize("!Button LT", true);
+		V_Fridge.initialize("!Button RT", true);
 		clamp.init();
 //		lift.setVoltageRampRate(8);//TODO
 		
-		moduleA.setTareAngle(62.0);	moduleB.setTareAngle(-14.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
+		moduleA.setTareAngle(92.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(0.0);	moduleD.setTareAngle(50.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
 		//practice robot:	 62.0,						 -14.0,							 0.0,						 50.0
 
@@ -238,62 +239,74 @@ public class Robot extends IterativeRobot {
 		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
-		//{sending to preset heights}
-			 if (driver.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
-		else if (driver.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
-		else if (driver.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
-		else if (driver.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
+		if (!elevators.inClimbingMode()) {
+				 //{sending to preset heights}
+				 if (gunner.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
+			else if (gunner.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
+			else if (gunner.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
+			else if (gunner.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
 		
+				 //{incrementing upward and downward}
+				 if (gunner.getRawButton(R_Xbox.BUTTON_LB)) elevators.increment(-11.0);
+			else if (gunner.getRawButton(R_Xbox.BUTTON_RB)) elevators.increment(11.0);
+			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
+			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
+		
+		}else {
+				 //{incrementing upward and downward}
+				 if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));
+			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
+		}
+/*		
 		//{incrementing downward}
 		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
 		final boolean chillLT = V_Fridge.chill("Button LB", buttonLT, 200.0);
 		if (!chillLT) {
 			//it's been held down for a while, increment
 			elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));
-		}else if (V_Fridge.becomesTrue("!Button LB", !buttonLT) && chillLT) {
+		}else if (V_Fridge.becomesTrue("!Button LT", !buttonLT) && chillLT) {
 			elevators.increment(-11.0);//inches
 		}
-		
+*/
+//		if (!elevators.inClimbingMode() && gunner.getRawButton(R_Xbox.BUTTON_LB)) {
+//			elevators.increment(-11.0);//inches
+//		}else if (!elevators.inClimbingMode() && gunner.getRawButton(R_Xbox.BUTTON_RB)) {
+//			elevators.increment(11.0);
+//		}else if (!elevators.inClimbingMode() && gunner.getAxisPress(R_Xbox.AXIS_LT, 0.3)) {
+//			elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
+//		}else if (!elevators.inClimbingMode() && gunner.getAxisPress(R_Xbox.AXIS_RT, 0.3)) {
+//			elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
+//		}
+/*		
 		//{incrementing upward}
 		final boolean buttonRT = driver.getAxisPress(R_Xbox.AXIS_RT, 0.9);
 		final boolean chillRT = V_Fridge.chill("Button RB", buttonRT, 200.0);
 		if (!chillRT) {
 			//it's been held down for a while, increment
 			elevators.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
-		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRT) && chillRT) {
+		}else if (V_Fridge.becomesTrue("!Button RT", !buttonRT) && chillRT) {
 			elevators.increment(11.0);//inches
 		}
-		
+*/		
 		if (elevators.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
 			if (elevators.inClimbingMode()) elevators.disableClimbMode(clamp);
 			else elevators.enableClimbMode(clamp);
 		}
+
 		
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_LB) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
+		if (driver.getRawButton(R_Xbox.BUTTON_RB) && !clamp.hasCube()) {//CLAMP SLURP AND SPIT
 			clamp.slurp();
-		}else if (driver.getRawButton(R_Xbox.BUTTON_RB)) {
+		}else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) {
 			clamp.spit();
 		}else {
 			clamp.stop();
 		}
 		
 		
-		if(!elevators.inClimbingMode()) {
-			if (driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT)) {
-				clamp.open();
-			}
-		}
+		if (driver.getRawButton(R_Xbox.BUTTON_LB)) clamp.open();//CLAMP OPEN AND CLOSE OVERRIDE
+		else if (driver.getRawButton(R_Xbox.BUTTON_RB)) clamp.close();
 
-/*
-		if (!elevators.inClimbingMode()) {
-			if (V_Fridge.freeze("STICKLEFTBUTTON", driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT))) {//CLAMP OPEN AND CLOSE
-				clamp.open();
-			}else { 
-				clamp.close();
-			}
-		}
-*/		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
 			gyro.reset();
@@ -301,11 +314,13 @@ public class Robot extends IterativeRobot {
 			V_PID.clear("spin");
 		}
 		
+		
 		if (gyro.netAcceleration() >= 1) {//DANGER RUMBLE
 			driver.setRumble(RumbleType.kLeftRumble, 1);
 		}else {
 			driver.setRumble(RumbleType.kLeftRumble, 0);
 		}
+		
 		
 		//{completing motor controller updates}
 		swerve.completeLoopUpdate();
