@@ -85,7 +85,7 @@ public class R_Talon extends TalonSRX {
 	/**
 	 * This function returns the current position in revolutions.
 	**/
-	public double getCurrentRevs() {
+	public double getCurrentRevs() {//TODO ignores tare angle, possible good
 		return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
@@ -93,7 +93,7 @@ public class R_Talon extends TalonSRX {
 	/**
 	 * This function returns the current position in degrees. If wraparound is true, the output will be between 0 and 359.999...
 	**/
-	public double getCurrentAngle(final boolean wraparound) {//ANGLE
+	public double getCurrentAngle(final boolean wraparound) {//ANGLE	TODO ignores tare angle
 		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	

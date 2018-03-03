@@ -17,13 +17,13 @@ public class R_Elevators {
 	/**
 	 * This function prepares each elevator individually.
 	**/
-	public void init() {//TODO set voltage ramp rates or use current limiting
+	public void init() {//TODO set voltage ramp rates or use current limiting??
 		elevatorOne.init();
 		elevatorTwo.init();
 	}
 	
 	
-//	public double getInches() {
+//	public double getInches() {//TODO
 //	if (climbing) return currentSetpoint + R_ElevatorOne.hookHeight;
 //	else return currentSetpoint;
 //}
@@ -35,7 +35,7 @@ public class R_Elevators {
 	 * Outside climbing mode, minimum is 0 and maximum is (El1.maxHeight + El2.maxHeight).
 	**/
 	private double validateInches(final double inches) {
-		final double minimumHeight = climbing ? R_ElevatorOne.hookBaseline : 0.0;
+		final double minimumHeight = climbing ? R_ElevatorOne.hookBaseline : 0.1;//ideally 0, but .1 helps avoid encoder noise around 0
 		final double maximumHeight = climbing ? R_ElevatorOne.hookBaseline + R_ElevatorOne.maximumHeight : R_ElevatorOne.maximumHeight + R_ElevatorTwo.maximumHeight;
 		return Math.min(Math.max(inches, minimumHeight), maximumHeight);//clips values outside of [minimumHeight, maximumHeight]
 	}
