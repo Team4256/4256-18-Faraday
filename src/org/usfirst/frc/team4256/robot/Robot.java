@@ -54,7 +54,7 @@ public class Robot extends IterativeRobot {
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
 	private static final DoubleSolenoid extenderShifter = new DoubleSolenoid(Parameters.Extender_module, Parameters.Extender_forward, Parameters.Extender_reverse);
-	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, extenderShifter, Parameters.ultrasonic);
+	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
 	
@@ -263,7 +263,6 @@ public class Robot extends IterativeRobot {
 		}else if (V_Fridge.becomesTrue("!Button RB", !buttonRT) && chillRT) {
 			elevators.increment(11.0);//inches
 		}
-
 		
 		if (elevators.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
 			if (elevators.inClimbingMode()) elevators.disableClimbMode(clamp);
@@ -279,18 +278,22 @@ public class Robot extends IterativeRobot {
 			clamp.stop();
 		}
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT)) {
-			clamp.open();
+		
+		if(!elevators.inClimbingMode()) {
+			if (driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT)) {
+				clamp.open();
+			}
 		}
 
-/*		if (!elevators.inClimbingMode()) {
+/*
+		if (!elevators.inClimbingMode()) {
 			if (V_Fridge.freeze("STICKLEFTBUTTON", driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT))) {//CLAMP OPEN AND CLOSE
 				clamp.open();
 			}else { 
 				clamp.close();
 			}
-		}*/
-		
+		}
+*/		
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
 			gyro.reset();

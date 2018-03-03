@@ -1,5 +1,9 @@
 package org.usfirst.frc.team4256.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.cyborgcats.reusable.Phoenix.R_Encoder;
+import com.cyborgcats.reusable.Phoenix.R_Talon;
 import com.cyborgcats.reusable.Phoenix.R_Victor;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -14,17 +18,17 @@ public class R_Clamp {
 	private R_Victor intakeLeft;
 	private R_Victor intakeRight;
 	private DoubleSolenoid clamp;
-	private DoubleSolenoid extender;
+	private R_Talon rotator;
 	private AnalogInput ultrasonic;
 	private static int counter;
 	
 	private final double intakeConstant = 0.85;
 	
-	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final DoubleSolenoid extended, final int ultrasonicPort) {
+	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int rotatorID, final int ultrasonicPort) {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.PercentOutput, R_Encoder.CTRE_MAG_ABSOLUTE, false);
 		this.clamp = clamp;
-		this.extender = extended;
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
@@ -105,10 +109,8 @@ public class R_Clamp {
 	 **/
 	public boolean hasCube() {
 		if (ultrasonic.getAverageValue() < 55) {
-			++counter;
-			if (counter > 10) {
-				return true;
-			} else return false;
+			counter++;
+			return counter > 10;
 		} else {
 			counter = 0;
 			return false;
@@ -120,34 +122,28 @@ public class R_Clamp {
 	 * This function returns if the cube is in reach of the clamp or not
 	 **/
 	public boolean cubeInReach() {
-		if (ultrasonic.getAverageValue() < 70) {
-			return true;
-		} else return false;
+		return ultrasonic.getAverageValue() < 70;
 	}
-	
 	
 	/**
 	 * 
 	**/
 	public void extend() {
-		extender.set(OutState);
 	}
-	
 	
 	/**
 	 * 
 	**/
 	public void retract() {
-		extender.set(UpState);
+	}
+	
+	public void rotatorStop() {
 	}
 	
 	
 	/**
 	 * This function returns if the clamp is looking up or straight
 	 **/
-	public boolean isExtended() {
-		return extender.get().equals(OutState);
-	}
 	
 	
 	/**
@@ -156,6 +152,8 @@ public class R_Clamp {
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
+		rotator.completeLoopUpdate();//TODO maybe not?
+		SmartDashboard.putNumber("rotator REVS", rotator.getCurrentRevs());
 		SmartDashboard.putNumber("ultrasonic", ultrasonic.getAverageValue());
 		SmartDashboard.putBoolean("in reach", cubeInReach());
 	}
