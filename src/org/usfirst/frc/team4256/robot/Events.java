@@ -1,7 +1,7 @@
 package org.usfirst.frc.team4256.robot;
 
 public class Events {
-	public static final double[] oneScaleAuto = new double[] {0.0, 2.0*Math.PI/3.0, Math.PI};//list of values where independentVariable triggers an action
+	public static final double[] oneScaleAuto = new double[] {0.0, 3.0*Math.PI/4.0, Math.PI};//list of values where independentVariable triggers an action
 	
 	public static int counter = -1;
 	public static boolean doneRunning = false;

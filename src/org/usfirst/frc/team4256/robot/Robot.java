@@ -138,6 +138,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testInit() {
+		SmartDashboard.putNumber("desiredOrientation", 0.0);
 	}
 	
 	@Override
@@ -177,10 +178,13 @@ public class Robot extends IterativeRobot {
 			SmartDashboard.putNumber("pi thing", leash.getIndependentVariable());
 			SmartDashboard.putNumber("step", Events.counter);
 			switch(Events.counter) {
-			case(0): desiredOrientation = 0.0;break;
+			case(0):
+				desiredOrientation = 0.0;
+				clamp.close();
+				break;
 			case(1): 
 				elevators.setInches(ElevatorPresets.SCALE_HIGH.height());
-				desiredOrientation = 90.0;
+				desiredOrientation = -90.0;//90.0;
 				break;
 			case(2): clamp.spit();break;
 			}
@@ -286,7 +290,7 @@ public class Robot extends IterativeRobot {
 		}
 
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_BACK)) {//GYRO RESET
+		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
 			gyro.reset();
 			lockedAngle = gyro.getCurrentAngle();
 			V_PID.clear("spin");
@@ -306,15 +310,29 @@ public class Robot extends IterativeRobot {
 		clamp.completeLoopUpdate();
 	}
 	
+	private static double previousGyroVal = 0.0;
+	private static double previousSpin = 0.0;
 	@Override
 	public void testPeriodic() {
-		moduleA.swivelTo(0);
-		moduleB.swivelTo(0);
-		moduleC.swivelTo(0);
-		moduleD.swivelTo(0);
+//		moduleA.swivelTo(0);
+//		moduleB.swivelTo(0);
+//		moduleC.swivelTo(0);
+//		moduleD.swivelTo(0);
 		elevatorOne.setZero(-0.5);
 		elevatorTwo.setZero(0.0);
 		elevators.setInches(0.0);
+		double desiredOrientation = SmartDashboard.getNumber("desiredOrientation", 0.0);
+		
+		if (gyro.getCurrentAngle() != previousGyroVal) {
+			final double errorOrientation = gyro.wornPath(desiredOrientation);
+			SmartDashboard.putNumber("error", errorOrientation);
+			previousSpin = V_PID.get("spin", errorOrientation);
+			if (Math.abs(previousSpin) > 0.5) previousSpin = 0.5*Math.signum(previousSpin);
+			previousGyroVal = gyro.getCurrentAngle();
+		}
+		
+		
+		swerve.holonomic_encoderIgnorant(0, 0, previousSpin);
 	}
 	
 	@Override

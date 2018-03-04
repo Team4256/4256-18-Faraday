@@ -39,7 +39,7 @@ public class R_ElevatorOne {
 		}
 		else {
 			shifter.set(HighGear);
-			master.selectProfileSlot(0, 1);
+			master.selectProfileSlot(1, 0);
 		}
 	}
 	
