@@ -9,8 +9,10 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class R_Clamp {
+	private enum CubePosition {Absent, WithinReach, Present;}
 	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;
+	private CubePosition cubePosition = CubePosition.Absent;
 	private R_Victor intakeLeft;
 	private R_Victor intakeRight;
 	private DoubleSolenoid clamp;
@@ -38,14 +40,22 @@ public class R_Clamp {
 	 * This function attempts to "slurp" nearby cubes into the clamp.
 	**/
 	public void slurp() {
-		if (!cubeInReach()) {
+		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
+		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
+		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
+		if (cubePosition.equals(CubePosition.WithinReach) && hasCube()) cubePosition = CubePosition.Present;
+		//{do stuff based on the enum}
+		switch (cubePosition) {
+		case Absent://open and begin intaking
 			open();
 			setWheelSpeed(-intakeConstant);
-		} else {
+			break;
+		case WithinReach://hug cube
 			close();
-			if (hasCube()) {
-				setWheelSpeed(0.0);
-			}
+			break;
+		case Present://stop intaking
+			stop();
+			break;
 		}
 	}
 	
@@ -55,6 +65,7 @@ public class R_Clamp {
 	**/
 	public void spit() {
 		setWheelSpeed(intakeConstant);
+		cubePosition = CubePosition.Absent;
 	}
 	
 	
@@ -100,24 +111,20 @@ public class R_Clamp {
 	
 	
 	/**
-	 * This function returns if the cube is in the clamp or not
+	 * This function returns if the cube is in the clamp or not.
 	 **/
 	public boolean hasCube() {
-		if (ultrasonic.getAverageValue() < 55) {
-			counter++;
-			return counter > 10;
-		} else {
-			counter = 0;
-			return false;
-		}
+		if (ultrasonic.getAverageValue() <= 55) counter++;
+		else counter = 0;
+		return counter > 10;
 	}
 	
 	
 	/**
-	 * This function returns if the cube is in reach of the clamp or not
-	 **/
+	 * This function returns if the cube is in reach of the clamp or not.
+	**/
 	public boolean cubeInReach() {
-		return ultrasonic.getAverageValue() < 70;
+		return ultrasonic.getAverageValue() <= 70;
 	}
 	
 	/**
