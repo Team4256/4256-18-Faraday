@@ -4,11 +4,11 @@ import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.V_Compass;
 
 public class R_DriveTrain {
-	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
-	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
+	private static final double pivotToFrontX = 8.75;//inches, pivot point to front wheel tip, x
+	private static final double pivotToFrontY = 4.625;//inches, pivot point to front wheel tip, y
 	private static final double pivotToFront = Math.sqrt(pivotToFrontX*pivotToFrontX + pivotToFrontY*pivotToFrontY);
-	private static final double pivotToAftX = 8.90;//inches, pivot point to aft wheel tip, x
-	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
+	private static final double pivotToAftX = 8.75;//inches, pivot point to aft wheel tip, x
+	private static final double pivotToAftY = 20.125;//inches, pivot point to aft wheel tip, y
 	private static final double pivotToAft = Math.sqrt(pivotToAftX*pivotToAftX + pivotToAftY*pivotToAftY);
 	
 	private double moduleD_maxSpeed = 70.0;//always put max slightly higher than max observed; TODO test on comp robot

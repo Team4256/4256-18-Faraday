@@ -26,7 +26,7 @@ public class R_Gyro extends AHRS {
 	 * It will ignore changes to the tare angle until hardware calibration is complete.
 	**/
 	public double getCurrentAngle() {//TODO ignores tare angle, getFusedHeading seems laggy
-		double currentAngle = V_Compass.validateAngle((double)getFusedHeading());
+		double currentAngle = V_Compass.validateAngle((double)getAngle());
 		if (!isCalibrating()) {
 			if (0 <= currentAngle && currentAngle <= compass.getTareAngle()) {
 				currentAngle += 360 - compass.getTareAngle();
