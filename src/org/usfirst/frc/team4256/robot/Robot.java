@@ -9,8 +9,9 @@ import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.Autonomous.Events;
-import org.usfirst.frc.team4256.robot.Autonomous.Instructions;
+import org.usfirst.frc.team4256.robot.Autonomous.V_Events;
+import org.usfirst.frc.team4256.robot.Autonomous.V_Odometer;
+import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -20,7 +21,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -31,16 +31,13 @@ public class Robot extends IterativeRobot {
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
-	private static final AnalogInput pressureGauge = new AnalogInput(0);
-	private static final DigitalInput tx2PowerSensor = new DigitalInput(8);
-	private static Instructions instructions;
+	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.pressureGauge);
+	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.tx2PowerSensor);
+	
+	private static V_Instructions instructions;
 	private static NetworkTableInstance nt;
-	private static NetworkTable faraday;
-	private static NetworkTable zed;
-	private static boolean updatedFeetX = false;
-	private static boolean updatedFeetY = false;
-	private static double actualFeetX = 0.0;
-	private static double actualFeetY = 0.0;
+	private static NetworkTable faraday, zed;
+	private static V_Odometer odometer;
 
 	//{Robot Output}
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
@@ -57,7 +54,7 @@ public class Robot extends IterativeRobot {
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
 	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
 	
-	private static final DigitalOutput tx2PowerControl = new DigitalOutput(9);
+	private static final DigitalOutput tx2PowerControl = new DigitalOutput(Parameters.tx2PowerControl);
 	
 	@Override
 	public void robotInit() {
@@ -66,6 +63,8 @@ public class Robot extends IterativeRobot {
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED").getSubTable("Position");
+		odometer = new V_Odometer(zed);
+		odometer.init();
 		//{Robot Output}
 		swerve.init();
 		elevators.init();
@@ -88,30 +87,26 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
+		//{Robot Input}
+		odometer.setOrigin(odometer.getX() - 1.5, odometer.getY() - 1.0);
+		//{Robot Output}
+		swerve.autoMode(true);
+		
 		V_PID.clear("zed");
 		V_PID.clear("spin");
 		
-		swerve.autoMode(true);
-		
-		zed.addEntryListener("X", (zed, key, entry, value, flags) -> {
-			actualFeetX = value.getDouble();
-			updatedFeetX = true;
-		}, EntryListenerFlags.kUpdate);
-		zed.addEntryListener("Y", (zed, key, entry, value, flags) -> {
-			actualFeetY = value.getDouble();
-			updatedFeetY = true;
-		}, EntryListenerFlags.kUpdate);
-		
-		
 		final String gameData = DriverStation.getInstance().getGameSpecificMessage();
-		if (gameData.length() > 0) instructions = new Instructions(gameData);
+		if (gameData.length() > 0) instructions = new V_Instructions(gameData);
 	}
 	
 	@Override
 	public void teleopInit() {
-		V_PID.clear("spin");
-		swerve.autoMode(false);
+		//{Robot Input}
 		lockedAngle = gyro.getCurrentAngle();
+		//{Robot Output}
+		swerve.autoMode(false);
+		
+		V_PID.clear("spin");
 		
 		V_Fridge.initialize("!Button LT", true);
 		V_Fridge.initialize("!Button RT", true);
@@ -139,8 +134,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		if (updatedFeetX && updatedFeetY) {
-			final double actualX = actualFeetX,		  actualY = actualFeetY;
+		if (odometer.newX() && odometer.newY()) {
+			final double actualX = odometer.getX(),		  actualY = odometer.getY();
 			instructions.getLeash().maintainLength(actualX, actualY);
 			final double desiredX = instructions.getLeash().getX(), 	  desiredY = instructions.getLeash().getY();
 			final double errorX = desiredX - actualX, errorY = desiredY - actualY;
@@ -154,9 +149,9 @@ public class Robot extends IterativeRobot {
 			double desiredOrientation = gyro.getCurrentAngle();
 			
 			
-			Events.check(instructions.getLeash().getIndependentVariable());
+			V_Events.check(instructions.getLeash().getIndependentVariable());
 			
-			switch(Events.counter) {
+			switch(V_Events.counter) {
 			case(0):
 				desiredOrientation = 0.0;
 				clamp.close();
@@ -174,8 +169,6 @@ public class Robot extends IterativeRobot {
 			
 			
 			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
-			
-			updatedFeetX = false; updatedFeetY = false;
 		}
 	}
 	

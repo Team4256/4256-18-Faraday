@@ -1,6 +1,6 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
-public class Events {
+public class V_Events {
 	public static final double[] oneScaleAuto = new double[] {0.0, 1.0, 5.4};//list of values where independentVariable triggers an action
 	
 	public static int counter = -1;

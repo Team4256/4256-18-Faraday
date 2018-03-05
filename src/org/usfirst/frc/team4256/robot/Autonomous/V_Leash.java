@@ -1,18 +1,18 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
-public class Leash {
+public class V_Leash {
 	private int currentSegment = 0;
 	private boolean doneGeneratingTargets = false;
 	
 	//an array of segments represents a full path
-	private final Segment[] path;
+	private final V_Segment[] path;
 	private final double desiredLength;
 	private final double growthRate;
 	/**
 	 * Leash will try to keep the distance between desired and actual coordinates as close to desiredLength as possible.
 	 * growthRate tells it how quickly to increment the time-like parameter that helps generate new X and Y values.
 	**/
-	public Leash(final Segment[] path, final double desiredLength, final double growthRate) {
+	public V_Leash(final V_Segment[] path, final double desiredLength, final double growthRate) {
 		this.path = path;
 		this.desiredLength = desiredLength;
 		this.growthRate = growthRate;

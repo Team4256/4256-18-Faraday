@@ -37,7 +37,10 @@ public abstract class Parameters {
 	
 	public static final int clampyRotator = 29;//CAN, Talon SRX, PDP 15
 	
+	public static final int pressureGauge = 0;//AIO
 	public static final int ultrasonic = 1;//AIO
+	public static final int tx2PowerSensor = 8;//DIO
+	public static final int tx2PowerControl = 9;//DIO
 	
 	//PNEUMATICS
 	public static final int ElevatorOne_shifterModule = 0;//PCM
