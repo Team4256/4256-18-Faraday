@@ -151,7 +151,7 @@ public class R_ElevatorOne {
 	
 	
 	public void setZero(final double offsetInchesFromCurrent) {
-		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
+		master.setSelectedSensorPosition((int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
 		enableSoftLimits();
 		knowsZero = true;
 	}

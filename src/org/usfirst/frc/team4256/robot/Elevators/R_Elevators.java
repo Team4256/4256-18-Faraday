@@ -100,7 +100,7 @@ public class R_Elevators {
 	public void enableClimbMode(final R_Clamp clamp) {
 		elevatorTwo.setInches(R_ElevatorTwo.climbingHeight);
 		clamp.close();
-		clamp.retract();
+		clamp.rotateTo(90.0);
 		elevatorOne.setTorque(true);
 		climbing = true;
 		setInches(initialClimbingHeight);
@@ -108,7 +108,6 @@ public class R_Elevators {
 	
 	
 	public void disableClimbMode(final R_Clamp clamp) {
-		clamp.extend();
 		climbing = false;
 	}
 	

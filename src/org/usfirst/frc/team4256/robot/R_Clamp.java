@@ -19,6 +19,7 @@ public class R_Clamp {
 	private R_Talon rotator;
 	private AnalogInput ultrasonic;
 	private static int counter = 0;
+	public boolean knowsZero = false;
 	
 	private final double intakeConstant = 0.85;
 	
@@ -26,13 +27,30 @@ public class R_Clamp {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
-		rotator = new R_Talon(rotatorID, 1.0, ControlMode.PercentOutput, R_Encoder.CTRE_MAG_ABSOLUTE, false);
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false, 0.0, 90.0);
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
 	public void init() {
 		intakeLeft.init();
 		intakeRight.init();
+		rotator.setInverted(true);
+		rotator.setNeutralMode(R_Talon.brake);
+		
+		rotator.config_kP(0, 0.2, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kI(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kD(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kP(1, 2.5, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kI(1, 0.0, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kD(1, 100.0, R_Talon.kTimeoutMS);//TODO tune
+	}
+	
+	/**
+	 * This function defines zero for the rotator.
+	**/
+	public void setZero() {
+		rotator.setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, R_Talon.kTimeoutMS);
+		knowsZero = true;
 	}
 	
 	
@@ -128,17 +146,19 @@ public class R_Clamp {
 	}
 	
 	/**
-	 * 
+	 * This function checks if the rotator is within a threshold of the desired angle.
+	 * Threshold should be specified in degrees.
 	**/
-	public void extend() {
+	public boolean isThere(final double threshold) {
+		return Math.abs(rotator.getCurrentError(true)) <= threshold;
 	}
 	
-	/**
-	 * 
-	**/
-	public void retract() {
+	public void rotateTo(double desiredAngle) {
+		desiredAngle = rotator.compass.legalizeAngle(desiredAngle);
+		if (desiredAngle == 0.0) rotator.selectProfileSlot(0, 0);
+		else rotator.selectProfileSlot(1, 0);
+		rotator.quickSet(desiredAngle, true);
 	}
-	
 	
 	
 	/**

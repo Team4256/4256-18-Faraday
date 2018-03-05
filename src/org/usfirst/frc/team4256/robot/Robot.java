@@ -236,6 +236,10 @@ public class Robot extends IterativeRobot {
 			if (elevators.inClimbingMode()) elevators.disableClimbMode(clamp);
 			else elevators.enableClimbMode(clamp);
 		}
+		
+			 if (gunner.getPOV(0) == R_Xbox.POV_NORTH) clamp.rotateTo(90.0);
+		else if (gunner.getPOV(0) == R_Xbox.POV_EAST)  clamp.rotateTo(45.0);
+		else if (gunner.getPOV(0) == R_Xbox.POV_SOUTH) clamp.rotateTo(0.0);
 
 		
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
@@ -267,6 +271,7 @@ public class Robot extends IterativeRobot {
 		elevatorOne.setZero(-0.5);
 		elevatorTwo.setZero(0.0);
 		elevators.setInches(0.0);
+		clamp.setZero();
 	}
 	
 	@Override
