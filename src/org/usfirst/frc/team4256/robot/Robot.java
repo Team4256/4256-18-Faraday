@@ -7,7 +7,10 @@ import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
+
 import org.usfirst.frc.team4256.robot.R_Clamp;
+import org.usfirst.frc.team4256.robot.Autonomous.Events;
+import org.usfirst.frc.team4256.robot.Autonomous.Instructions;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -17,7 +20,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -31,6 +33,7 @@ public class Robot extends IterativeRobot {
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
 	private static final AnalogInput pressureGauge = new AnalogInput(0);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(8);
+	private static Instructions instructions;
 	private static NetworkTableInstance nt;
 	private static NetworkTable faraday;
 	private static NetworkTable zed;
@@ -38,10 +41,7 @@ public class Robot extends IterativeRobot {
 	private static boolean updatedFeetY = false;
 	private static double actualFeetX = 0.0;
 	private static double actualFeetY = 0.0;
-	private static Leash leash = new Leash(/*leash length*/3.0, /*growth rate*/0.1);
-	private static boolean switchRight = false;
-	private static boolean scaleRight = false;
-	
+
 	//{Robot Output}
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
 	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB);
@@ -71,9 +71,6 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		V_Fridge.initialize("!Button LT", true);
-		V_Fridge.initialize("!Button RT", true);
-		
 		moduleA.setTareAngle(-66.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(5.0);	moduleD.setTareAngle(45.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
 		//practice robot:	 -66.0,						 	 -43.0,							 5.0,						 45.0
@@ -96,9 +93,6 @@ public class Robot extends IterativeRobot {
 		
 		swerve.autoMode(true);
 		
-		leash.init();
-		V_Instructions.resetTimer();
-		
 		zed.addEntryListener("X", (zed, key, entry, value, flags) -> {
 			actualFeetX = value.getDouble();
 			updatedFeetX = true;
@@ -109,24 +103,8 @@ public class Robot extends IterativeRobot {
 		}, EntryListenerFlags.kUpdate);
 		
 		
-		
-		
-		String gameData;
-		gameData = DriverStation.getInstance().getGameSpecificMessage();
-		if (gameData.length()>0) {
-			if (gameData.charAt(0) == 'R') {
-				switchRight = true;
-			}
-			else {
-				switchRight = false;
-			}
-			if (gameData.charAt(1) == 'R') {
-				scaleRight = true;
-			}
-			else {
-				scaleRight = false;
-			}
-		}
+		final String gameData = DriverStation.getInstance().getGameSpecificMessage();
+		if (gameData.length() > 0) instructions = new Instructions(gameData);
 	}
 	
 	@Override
@@ -134,11 +112,13 @@ public class Robot extends IterativeRobot {
 		V_PID.clear("spin");
 		swerve.autoMode(false);
 		lockedAngle = gyro.getCurrentAngle();
+		
+		V_Fridge.initialize("!Button LT", true);
+		V_Fridge.initialize("!Button RT", true);
 	}
 	
 	@Override
 	public void testInit() {
-		SmartDashboard.putNumber("desiredOrientation", 0.0);
 	}
 	
 	@Override
@@ -161,8 +141,8 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		if (updatedFeetX && updatedFeetY) {
 			final double actualX = actualFeetX,		  actualY = actualFeetY;
-			leash.maintainLength(actualX, actualY);
-			final double desiredX = leash.getX(), 	  desiredY = leash.getY();
+			instructions.getLeash().maintainLength(actualX, actualY);
+			final double desiredX = instructions.getLeash().getX(), 	  desiredY = instructions.getLeash().getY();
 			final double errorX = desiredX - actualX, errorY = desiredY - actualY;
 			
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
@@ -174,9 +154,8 @@ public class Robot extends IterativeRobot {
 			double desiredOrientation = gyro.getCurrentAngle();
 			
 			
-			Events.check(leash.getIndependentVariable());
-			SmartDashboard.putNumber("pi thing", leash.getIndependentVariable());
-			SmartDashboard.putNumber("step", Events.counter);
+			Events.check(instructions.getLeash().getIndependentVariable());
+			
 			switch(Events.counter) {
 			case(0):
 				desiredOrientation = 0.0;
@@ -184,13 +163,12 @@ public class Robot extends IterativeRobot {
 				break;
 			case(1): 
 				elevators.setInches(ElevatorPresets.SCALE_HIGH.height());
-				desiredOrientation = -90.0;//90.0;
 				break;
 			case(2): clamp.spit();break;
 			}
 			
 			
-			final double errorOrientation = gyro.wornPath(desiredOrientation);
+			final double errorOrientation = gyro.wornPath(desiredOrientation)/180.0;
 			double spin = V_PID.get("spin", errorOrientation);
 			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
 			
@@ -209,13 +187,13 @@ public class Robot extends IterativeRobot {
 		
 		//{calculating speed}
 		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//turbo mode
-		if (!turbo) {speed *= 1.0/*0.7*/;}//-------------------------------------normal mode
+		if (!turbo) {speed *= 0.7;}//-------------------------------------normal mode
 		if (snail)  {speed *= 0.5;}//-------------------------------------snail mode
 		speed *= speed;
 		
 		//{calculating spin}
 		double spin = 0.7*driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);//normal mode
-		if (snail)  {spin  *= 0.7;	/*lockWheelsInPlace = true;*/}//----------snail mode//TODO this boolean should face all wheels forward or in an X position rather than coasting
+		if (snail)  {spin  *= 0.7;	/*lockWheelsInPlace = true;*/}//------snail mode//TODO this boolean should face all wheels forward or in an X position rather than coasting
 		spin *= spin*Math.signum(spin);
 		final boolean handsOffSpinStick = spin == 0.0;
 		
@@ -237,14 +215,12 @@ public class Robot extends IterativeRobot {
 		
 		
 		if (!elevators.inClimbingMode()) {
-				 //{sending to preset heights}
-				 if (gunner.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}
+				 if (gunner.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}//ELEVATOR PRESETS
 			else if (gunner.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
 			else if (gunner.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
 			else if (gunner.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
 		
-				 //{incrementing upward and downward}
-				 if (V_Fridge.becomesTrue("Button LB", gunner.getRawButton(R_Xbox.BUTTON_LB))) elevators.increment(-11.0);
+				 if (V_Fridge.becomesTrue("Button LB", gunner.getRawButton(R_Xbox.BUTTON_LB))) elevators.increment(-11.0);//ELEVATOR INCREMENTS (gunner)
 			else if (V_Fridge.becomesTrue("Button RB", gunner.getRawButton(R_Xbox.BUTTON_RB))) elevators.increment(11.0);
 			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
 			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
@@ -258,32 +234,11 @@ public class Robot extends IterativeRobot {
 			else if (driver.getRawButton(R_Xbox.BUTTON_RB)) clamp.close();
 		
 		}else {
-				 //{incrementing upward and downward}
-				 if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));
+				 if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));//ELEVATOR INCREMENTS (driver)
 			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}
-/*		
-		//{incrementing downward}
-		final boolean buttonLT = driver.getAxisPress(R_Xbox.AXIS_LT, 0.9);
-		final boolean chillLT = V_Fridge.chill("Button LB", buttonLT, 200.0);
-		if (!chillLT) {
-			//it's been held down for a while, increment
-			elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));
-		}else if (V_Fridge.becomesTrue("!Button LT", !buttonLT) && chillLT) {
-			elevators.increment(-11.0);//inches
-		}
-*/
-/*		
-		//{incrementing upward}
-		final boolean buttonRT = driver.getAxisPress(R_Xbox.AXIS_RT, 0.9);
-		final boolean chillRT = V_Fridge.chill("Button RB", buttonRT, 200.0);
-		if (!chillRT) {
-			//it's been held down for a while, increment
-			elevators.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
-		}else if (V_Fridge.becomesTrue("!Button RT", !buttonRT) && chillRT) {
-			elevators.increment(11.0);//inches
-		}
-*/		
+
+		
 		if (elevators.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
 			if (elevators.inClimbingMode()) elevators.disableClimbMode(clamp);
 			else elevators.enableClimbMode(clamp);
@@ -298,9 +253,9 @@ public class Robot extends IterativeRobot {
 		
 		
 		if (gyro.netAcceleration() >= 1) {//DANGER RUMBLE
-			driver.setRumble(RumbleType.kLeftRumble, 1);
+			driver.setRumble(RumbleType.kLeftRumble, 1.0);
 		}else {
-			driver.setRumble(RumbleType.kLeftRumble, 0);
+			driver.setRumble(RumbleType.kLeftRumble, 0.0);
 		}
 		
 		
@@ -310,29 +265,15 @@ public class Robot extends IterativeRobot {
 		clamp.completeLoopUpdate();
 	}
 	
-	private static double previousGyroVal = 0.0;
-	private static double previousSpin = 0.0;
 	@Override
 	public void testPeriodic() {
-//		moduleA.swivelTo(0);
-//		moduleB.swivelTo(0);
-//		moduleC.swivelTo(0);
-//		moduleD.swivelTo(0);
+		moduleA.swivelTo(0);
+		moduleB.swivelTo(0);
+		moduleC.swivelTo(0);
+		moduleD.swivelTo(0);
 		elevatorOne.setZero(-0.5);
 		elevatorTwo.setZero(0.0);
 		elevators.setInches(0.0);
-		double desiredOrientation = SmartDashboard.getNumber("desiredOrientation", 0.0);
-		
-		if (gyro.getCurrentAngle() != previousGyroVal) {
-			final double errorOrientation = gyro.wornPath(desiredOrientation);
-			SmartDashboard.putNumber("error", errorOrientation);
-			previousSpin = V_PID.get("spin", errorOrientation);
-			if (Math.abs(previousSpin) > 0.5) previousSpin = 0.5*Math.signum(previousSpin);
-			previousGyroVal = gyro.getCurrentAngle();
-		}
-		
-		
-		swerve.holonomic_encoderIgnorant(0, 0, previousSpin);
 	}
 	
 	@Override

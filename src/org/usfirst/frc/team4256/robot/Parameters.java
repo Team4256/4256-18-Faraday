@@ -52,23 +52,6 @@ public abstract class Parameters {
 	public static final int Extender_forward = 5;//PCM
 	public static final int Extender_reverse = 6;//PCM
 	
-	//AUTONOMOUS
-//	public static final double[][] gettingToScale = new double[][] {
-//		//duration ms, direction, speed, orientation
-//		{X, Y, threshold, action},
-//		{700, 0, 0, Parameters.leftGear},
-//		{250, Parameters.leftGear, .15, Parameters.leftGear}
-//	};
-//	public static final double[][] middleInstructions = new double[][] {
-//		//duration ms, direction, speed, orientation
-//		{1000, 0, .15, 0}
-//	};
-//	public static final double[][] rightInstructions = new double[][] {
-//		//duration ms, direction, speed, orientation
-//		{2000, 20, .2, Parameters.rightGear},
-//		{500, 0.01, 0, Parameters.rightGear},
-//		{300, Parameters.rightGear, .15, Parameters.rightGear}
-//	};
 	
 	//VALUES
 	public static enum ElevatorPresets {//TODO get accurate numbers
@@ -90,9 +73,9 @@ public abstract class Parameters {
 	
 	public static final byte Gyrometer_updateHz = 50;
 	
-	public static final double spinP = .0025;
+	public static final double spinP = 0.75;
 	public static final double spinI = .000015;
-	public static final double spinD = .02;
+	public static final double spinD = 2.0;
 	
 	public static final double zedP = 0.1838;
 	public static final double zedI = 0.0;

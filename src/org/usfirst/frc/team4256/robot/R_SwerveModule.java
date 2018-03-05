@@ -49,7 +49,7 @@ public class R_SwerveModule {
 	}
 	
 	public void autoMode(final boolean enable) {
-		if (enable) traction.configOpenloopRamp(2.0, R_Talon.kTimeoutMS);//TODO testing
+		if (enable) traction.configOpenloopRamp(2.0, R_Talon.kTimeoutMS);
 		else traction.configOpenloopRamp(1.0, R_Talon.kTimeoutMS);
 	}
 	

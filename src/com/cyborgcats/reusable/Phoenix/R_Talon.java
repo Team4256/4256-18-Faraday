@@ -84,16 +84,18 @@ public class R_Talon extends TalonSRX {
 	
 	/**
 	 * This function returns the current position in revolutions.
+	 * TODO this currently ignores tareAngle, which might be functional but isn't logical
 	**/
-	public double getCurrentRevs() {//TODO ignores tare angle, possible good
+	public double getCurrentRevs() {
 		return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
 	
 	/**
 	 * This function returns the current position in degrees. If wraparound is true, the output will be between 0 and 359.999...
+	 * TODO this currently ignores tareAngle, which might be functional but isn't logical
 	**/
-	public double getCurrentAngle(final boolean wraparound) {//ANGLE	TODO ignores tare angle
+	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	

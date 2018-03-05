@@ -5,8 +5,8 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
 
 public class R_Gyro extends AHRS {
-	private double lastMeasuredAngle = 0;
-	private double lastLegalDirection = 1;
+	private double lastMeasuredAngle = 0.0;
+	private double lastLegalDirection = 11.0;
 	public V_Compass compass;
 	
 	public R_Gyro(final byte updateHz, final double protectedZoneStart, final double protectedZoneSize) {
@@ -25,7 +25,7 @@ public class R_Gyro extends AHRS {
 	 * This function returns the current angle based on the tare angle.
 	 * It will ignore changes to the tare angle until hardware calibration is complete.
 	**/
-	public double getCurrentAngle() {//TODO ignores tare angle
+	public double getCurrentAngle() {//TODO ignores tare angle, getFusedHeading seems laggy
 		double currentAngle = V_Compass.validateAngle((double)getFusedHeading());
 		if (!isCalibrating()) {
 			if (0 <= currentAngle && currentAngle <= compass.getTareAngle()) {
