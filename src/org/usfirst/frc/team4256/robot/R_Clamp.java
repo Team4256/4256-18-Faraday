@@ -50,6 +50,7 @@ public class R_Clamp {
 	**/
 	public void setZero() {
 		rotator.setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, R_Talon.kTimeoutMS);
+		rotator.quickSet(90.0, true);
 		knowsZero = true;
 	}
 	

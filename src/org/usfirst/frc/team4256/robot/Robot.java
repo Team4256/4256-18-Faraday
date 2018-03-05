@@ -88,7 +88,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		//{Robot Input}
-		odometer.setOrigin(odometer.getX() - 1.5, odometer.getY() - 1.0);
+		odometer.setOrigin(odometer.getX() + .599, odometer.getY() + 1.11);
 		//{Robot Output}
 		swerve.autoMode(true);
 		
