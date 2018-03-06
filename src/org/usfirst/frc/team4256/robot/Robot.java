@@ -268,7 +268,7 @@ public class Robot extends IterativeRobot {
 		moduleB.swivelTo(0);
 		moduleC.swivelTo(0);
 		moduleD.swivelTo(0);
-		elevatorOne.setZero(-0.5);
+		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
 		elevators.setInches(0.0);
 		clamp.setZero();

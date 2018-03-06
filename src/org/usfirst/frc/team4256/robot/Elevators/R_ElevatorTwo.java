@@ -7,7 +7,7 @@ public class R_ElevatorTwo {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
 	protected static final double maximumHeight = 42.5 - 2.0;//inches
-	protected static final double climbingHeight = 8.0;//inches
+	protected static final double climbingHeight = 0.0;//inches
 	private R_Talon master;
 	private int maximumEncoderValue;
 	public boolean knowsZero = false;
@@ -23,7 +23,7 @@ public class R_ElevatorTwo {
 	**/
 	public void init() {
 		master.init();
-//		master.configAllowableClosedloopError(0, (int)master.convert.from.REVS.afterGears(inchesToRevs(0.2)), R_Talon.kTimeoutMS);//TODO
+		master.configAllowableClosedloopError(0, (int)master.convert.from.REVS.afterGears(inchesToRevs(0.5)), R_Talon.kTimeoutMS);//TODO
 		
 		master.setNeutralMode(R_Talon.brake);
 		master.setInverted(true);
@@ -114,7 +114,7 @@ public class R_ElevatorTwo {
 	
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
-		master.quickSet(inchesToRevs(offsetInchesFromCurrent), false);
+		setInches(offsetInchesFromCurrent);
 		knowsZero = true;
 	}
 	

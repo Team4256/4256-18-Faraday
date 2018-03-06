@@ -27,7 +27,7 @@ public class R_Clamp {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
-		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false, 0.0, 90.0);
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false);
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
@@ -110,6 +110,7 @@ public class R_Clamp {
 	**/
 	public void open() {
 		clamp.set(OpenState);
+		cubePosition = CubePosition.Absent;
 	}
 	
 	

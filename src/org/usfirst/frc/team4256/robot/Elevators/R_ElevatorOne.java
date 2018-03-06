@@ -11,7 +11,7 @@ public class R_ElevatorOne {
 	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kForward;
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
-	protected static final double maximumHeight = 40.0;//inches
+	protected static final double maximumHeight = 44.0;//inches
 	protected static final double hookBaseline = 44.0;//inches
 	private R_Talon master;
 	private R_Victor followerA;
@@ -152,7 +152,7 @@ public class R_ElevatorOne {
 	
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition((int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
-		master.quickSet(inchesToRevs(offsetInchesFromCurrent), false);
+		setInches(offsetInchesFromCurrent);
 		enableSoftLimits();
 		knowsZero = true;
 	}
