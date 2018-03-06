@@ -29,7 +29,7 @@ public class V_Odometer {
 	
 	private class ConsumableDouble {
 		private boolean isNew = false;
-		private double value;
+		private double value = 0.0;
 		
 		public void set(final double value) {this.value = value;	isNew = true;}
 		public double get() {isNew = false;		return value;}
