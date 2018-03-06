@@ -70,7 +70,7 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-66.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(5.0);	moduleD.setTareAngle(45.0);
+		moduleA.setTareAngle(-26.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(75.0);	moduleD.setTareAngle(45.0);
 		//competition robot: -68.0							 59.0						 -3.0						 56.0
 		//practice robot:	 -66.0,						 	 -43.0,							 5.0,						 45.0
 
@@ -134,7 +134,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		if (odometer.newX() && odometer.newY()) {
+  		if (odometer.newX() && odometer.newY()) {
 			final double actualX = odometer.getX(),		  actualY = odometer.getY();
 			instructions.getLeash().maintainLength(actualX, actualY);
 			final double desiredX = instructions.getLeash().getX(), 	  desiredY = instructions.getLeash().getY();
