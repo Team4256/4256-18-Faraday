@@ -13,8 +13,8 @@ public class V_Odometer {
 	}
 	
 	public void init() {
-		zed.addEntryListener("X", (zed, key, entry, value, flags) -> {onUpdatedX(value.getDouble());}, EntryListenerFlags.kUpdate);
-		zed.addEntryListener("Y", (zed, key, entry, value, flags) -> {onUpdatedY(value.getDouble());}, EntryListenerFlags.kUpdate);
+		zed.addEntryListener("X", (zed, key, entry, value, flags) -> {this.onUpdatedX(value.getDouble());}, EntryListenerFlags.kUpdate);
+		zed.addEntryListener("Y", (zed, key, entry, value, flags) -> {this.onUpdatedY(value.getDouble());}, EntryListenerFlags.kUpdate);
 	}
 	
 	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
@@ -29,7 +29,7 @@ public class V_Odometer {
 	
 	private class ConsumableDouble {
 		private boolean isNew = false;
-		private double value;
+		private double value = 0.0;
 		
 		public void set(final double value) {this.value = value;	isNew = true;}
 		public double get() {isNew = false;		return value;}

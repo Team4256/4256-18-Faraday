@@ -29,7 +29,7 @@ public class Convert {
 				switch(unit) {
 				case REVS_UNIT: return encoderCounts/countsPerRev;
 				case DEGREES_UNIT: return 360.0*encoderCounts/countsPerRev;
-				case RPM_UNIT: return encoderCounts/countsPerRev;
+				case RPM_UNIT: return encoderCounts/countsPerRev;//TODO this isn't really correct
 				default: return encoderCounts;
 				}
 			}

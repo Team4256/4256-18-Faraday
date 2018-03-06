@@ -19,6 +19,7 @@ public class R_Clamp {
 	private R_Talon rotator;
 	private AnalogInput ultrasonic;
 	private static int counter = 0;
+	private static double currentSetpoint = 0.0;
 	public boolean knowsZero = false;
 	
 	private final double intakeConstant = 0.85;
@@ -27,7 +28,7 @@ public class R_Clamp {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
-		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false);
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false, 90.0, 270.0);
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
@@ -42,16 +43,7 @@ public class R_Clamp {
 		rotator.config_kD(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kP(1, 2.5, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kI(1, 0.0, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kD(1, 100.0, R_Talon.kTimeoutMS);//TODO tune
-	}
-	
-	/**
-	 * This function defines zero for the rotator.
-	**/
-	public void setZero() {
-		rotator.setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, R_Talon.kTimeoutMS);
-		rotator.quickSet(90.0, true);
-		knowsZero = true;
+		rotator.config_kD(1, 80.0, R_Talon.kTimeoutMS);//TODO tune
 	}
 	
 	
@@ -62,7 +54,7 @@ public class R_Clamp {
 		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
 		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
 		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
-		if (cubePosition.equals(CubePosition.WithinReach) && hasCube()) cubePosition = CubePosition.Present;
+		if (cubePosition.equals(CubePosition.WithinReach) && cubeLikelyPresent()) cubePosition = CubePosition.Present;
 		//{do stuff based on the enum}
 		switch (cubePosition) {
 		case Absent://open and begin intaking
@@ -129,11 +121,13 @@ public class R_Clamp {
 		return clamp.get().equals(OpenState);
 	}
 	
+	public boolean hasCube() {return cubePosition.equals(CubePosition.Present);}
+	
 	
 	/**
 	 * This function returns if the cube is in the clamp or not.
 	 **/
-	public boolean hasCube() {
+	private boolean cubeLikelyPresent() {
 		if (ultrasonic.getAverageValue() <= 55) counter++;
 		else counter = 0;
 		return counter > 10;
@@ -143,7 +137,7 @@ public class R_Clamp {
 	/**
 	 * This function returns if the cube is in reach of the clamp or not.
 	**/
-	public boolean cubeInReach() {
+	private boolean cubeInReach() {
 		return ultrasonic.getAverageValue() <= 70;
 	}
 	
@@ -155,11 +149,25 @@ public class R_Clamp {
 		return Math.abs(rotator.getCurrentError(true)) <= threshold;
 	}
 	
+	/**
+	 * This function defines zero for the rotator.
+	**/
+	public void setZero() {
+		rotator.compass.setTareAngle(-90.0);//setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, R_Talon.kTimeoutMS);
+		rotator.quickSet(90.0, true);
+		knowsZero = true;
+	}
+	
+	public void increment(final double degrees) {
+		rotateTo(currentSetpoint + degrees);
+	}
+	
 	public void rotateTo(double desiredAngle) {
 		desiredAngle = rotator.compass.legalizeAngle(desiredAngle);
 		if (desiredAngle == 0.0) rotator.selectProfileSlot(0, 0);
 		else rotator.selectProfileSlot(1, 0);
 		rotator.quickSet(desiredAngle, true);
+		currentSetpoint = desiredAngle;
 	}
 	
 	

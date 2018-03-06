@@ -6,7 +6,7 @@ import com.cyborgcats.reusable.Phoenix.R_Talon;
 public class R_ElevatorTwo {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
-	protected static final double maximumHeight = 42.5 - 2.0;//inches
+	protected static final double maximumHeight = 40.5;//inches
 	protected static final double climbingHeight = 0.0;//inches
 	private R_Talon master;
 	private int maximumEncoderValue;
@@ -114,7 +114,6 @@ public class R_ElevatorTwo {
 	
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
-		setInches(offsetInchesFromCurrent);
 		knowsZero = true;
 	}
 	

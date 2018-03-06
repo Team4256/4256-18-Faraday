@@ -46,32 +46,4 @@ public class V_Leash {
 	public double getY() {return path[currentSegment].getY();}
 	public double getIndependentVariable() {return path[currentSegment].getIndependentVariable();}
 	public boolean doneGeneratingTargets() {return doneGeneratingTargets;}
-	
-	
-	
-//	private class Segment {
-//		private final Function x;
-//		private final Function y;
-//		private double independentVariable, end;
-//		public Segment(final Function x, final Function y, final double start, final double end) {
-//			this.x = x;
-//			this.y = y;
-//			this.independentVariable = start;
-//			this.end = end;
-//		}
-//		
-//		public boolean increment(final double amount) {
-//			independentVariable += amount;
-//			return independentVariable < end;
-//		}
-//		
-//		public double getX() {return x.at(independentVariable);}
-//		public double getY() {return y.at(independentVariable);}
-//		
-//		public double getIndependentVariable() {return independentVariable;}
-//	}
-//	
-//	private interface Function {
-//		double at(final double independentVariable);
-//	}
 }

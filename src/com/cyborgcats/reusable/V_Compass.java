@@ -14,9 +14,6 @@ public class V_Compass {
 	**/
 	public void setTareAngle(final double tareAngle) {
 		this.tareAngle = tareAngle;
-		/*protectedZoneStart = validateAngle(protectedZoneStart - this.tareAngle);TODO this logic may not work if the tareAngle is outside of [0,360]
-		 *don't try to fix unless absolutely necessary as it may cause other issues (mainly useful for something like a turret with restricted motion)
-		 */
 	}
 	/**
 	 * This function returns the current tare angle, relative to the initialized 0.
@@ -28,11 +25,8 @@ public class V_Compass {
 	 * This function modifies the input to create a value between 0 and 359.999...
 	**/
 	public static double validateAngle(final double angle) {
-		if (angle < 0) {
-			return (360 - (Math.abs(angle)%360) < 360) ? 360 - (Math.abs(angle)%360) : 0;
-		}else {
-			return (angle%360 < 360) ? angle%360 : 0;
-		}
+		if (angle < 0) return (360 - (Math.abs(angle)%360) < 360) ? 360 - (Math.abs(angle)%360) : 0;
+		else return (angle%360 < 360) ? angle%360 : 0;
 	}
 	/**
 	 * This function finds the shortest path from the start angle to the end angle and returns the size of that path in degrees.

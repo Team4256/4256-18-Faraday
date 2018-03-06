@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.hal.PowerJNI;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -73,6 +74,9 @@ public class Robot extends IterativeRobot {
 		moduleA.setTareAngle(-26.0);	moduleB.setTareAngle(-40.0);	moduleC.setTareAngle(75.0);	moduleD.setTareAngle(50.0);
 		//competition robot: -68.0							  59.0						     -3.0						 56.0
 		//practice robot:	 -26.0,						 	 -40.0,							 75.0,						 50.0
+		elevatorOne.setZero(0.0);
+		elevatorTwo.setZero(0.0);
+		clamp.setZero();
 
 		V_PID.set("zed", Parameters.zedP, Parameters.zedI, Parameters.zedD);
 		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
@@ -124,17 +128,18 @@ public class Robot extends IterativeRobot {
 	public void robotPeriodic() {
 		faraday.getEntry("Gyro").setNumber(gyro.getCurrentAngle());
 		faraday.getEntry("Pressure").setNumber(pressureGauge.getAverageVoltage()*39.875 - 54.375);//TODO are these constants correct?
-		faraday.getEntry("Zeroed Elevators").setBoolean(elevatorOne.knowsZero && elevatorTwo.knowsZero);
 		faraday.getEntry("Clamp Open").setBoolean(clamp.isOpen());
 		faraday.getEntry("Climbing Mode").setBoolean(elevators.inClimbingMode());
 		faraday.getEntry("Browning Out").setBoolean(RobotController.isBrownedOut());
 		faraday.getEntry("TX2 Powered On").setBoolean(tx2PowerSensor.get());
-		//TODO put whether we have a cube or not
+		faraday.getEntry("Has Cube").setBoolean(clamp.hasCube());
+		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
+		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
-		if (odometer.newX() && odometer.newY()) {
+  		if (odometer.newX() && odometer.newY()) {
 			final double actualX = odometer.getX(),		  actualY = odometer.getY();
 			instructions.getLeash().maintainLength(actualX, actualY);
 			final double desiredX = instructions.getLeash().getX(), 	  desiredY = instructions.getLeash().getY();
@@ -219,9 +224,9 @@ public class Robot extends IterativeRobot {
 			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
 				 
 				 
-				 if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5) && !clamp.hasCube()) clamp.slurp();//CLAMP SLURP AND SPIT
-			else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) 					   clamp.spit();
-			else 																   clamp.stop();
+				 if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)) clamp.slurp();//CLAMP SLURP AND SPIT
+			else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) clamp.spit();
+			else 											   clamp.stop();
 			
 				 if (driver.getRawButton(R_Xbox.BUTTON_LB)) clamp.open();//CLAMP OPEN AND CLOSE OVERRIDE
 			else if (driver.getRawButton(R_Xbox.BUTTON_RB)) clamp.close();
@@ -237,9 +242,9 @@ public class Robot extends IterativeRobot {
 			else elevators.enableClimbMode(clamp);
 		}
 		
-			 if (gunner.getPOV(0) == R_Xbox.POV_NORTH) clamp.rotateTo(90.0);
-		else if (gunner.getPOV(0) == R_Xbox.POV_EAST)  clamp.rotateTo(45.0);
-		else if (gunner.getPOV(0) == R_Xbox.POV_SOUTH) clamp.rotateTo(0.0);
+		final double gunnerLeftX = gunner.getRawAxis(R_Xbox.AXIS_LEFT_X);
+		if (Math.abs(gunnerLeftX) > 0.5) clamp.rotateTo(45.0*(Math.signum(gunnerLeftX) + 1.0));
+		else clamp.increment(2.0*gunner.getDeadbandedAxis(R_Xbox.AXIS_LEFT_Y));
 
 		
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
@@ -264,17 +269,14 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
-		moduleA.swivelTo(0);
-		moduleB.swivelTo(0);
-		moduleC.swivelTo(0);
-		moduleD.swivelTo(0);
-		elevatorOne.setZero(0.0);
-		elevatorTwo.setZero(0.0);
-		elevators.setInches(0.0);
-		clamp.setZero();
+		moduleA.swivelTo(0.0);
+		moduleB.swivelTo(0.0);
+		moduleC.swivelTo(0.0);
+		moduleD.swivelTo(0.0);
 	}
 	
 	@Override
 	public void disabledPeriodic() {
+		elevators.setInches(0.0);//attempts to clear previous setpoint of elevators
 	}
 }
