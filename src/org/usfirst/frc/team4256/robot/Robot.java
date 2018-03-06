@@ -70,9 +70,9 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-66.0);	moduleB.setTareAngle(-43.0);	moduleC.setTareAngle(5.0);	moduleD.setTareAngle(45.0);
-		//competition robot: -68.0							 59.0						 -3.0						 56.0
-		//practice robot:	 -66.0,						 	 -43.0,							 5.0,						 45.0
+		moduleA.setTareAngle(-26.0);	moduleB.setTareAngle(-40.0);	moduleC.setTareAngle(75.0);	moduleD.setTareAngle(50.0);
+		//competition robot: -68.0							  59.0						     -3.0						 56.0
+		//practice robot:	 -26.0,						 	 -40.0,							 75.0,						 50.0
 
 		V_PID.set("zed", Parameters.zedP, Parameters.zedI, Parameters.zedD);
 		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
