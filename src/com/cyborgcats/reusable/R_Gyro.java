@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.I2C;
 
 public class R_Gyro extends AHRS {
 	private double lastMeasuredAngle = 0.0;
-	private double lastLegalDirection = 11.0;
+	private double lastLegalDirection = 1.0;
 	public V_Compass compass;
 	
 	public R_Gyro(final byte updateHz, final double protectedZoneStart, final double protectedZoneSize) {

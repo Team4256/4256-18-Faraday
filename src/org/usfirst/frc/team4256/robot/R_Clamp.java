@@ -19,6 +19,7 @@ public class R_Clamp {
 	private R_Talon rotator;
 	private AnalogInput ultrasonic;
 	private static int counter = 0;
+	private static double currentSetpoint = 0.0;
 	public boolean knowsZero = false;
 	
 	private final double intakeConstant = 0.85;
@@ -157,11 +158,16 @@ public class R_Clamp {
 		knowsZero = true;
 	}
 	
+	public void increment(final double degrees) {
+		rotateTo(currentSetpoint + degrees);
+	}
+	
 	public void rotateTo(double desiredAngle) {
 		desiredAngle = rotator.compass.legalizeAngle(desiredAngle);
 		if (desiredAngle == 0.0) rotator.selectProfileSlot(0, 0);
 		else rotator.selectProfileSlot(1, 0);
 		rotator.quickSet(desiredAngle, true);
+		currentSetpoint = desiredAngle;
 	}
 	
 	
