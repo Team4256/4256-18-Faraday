@@ -11,7 +11,7 @@ public class R_ElevatorOne {
 	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kForward;
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
-	protected static final double maximumHeight = 44.0;//inches
+	protected static final double maximumHeight = 42.5;//inches
 	protected static final double hookBaseline = 44.0;//inches
 	private R_Talon master;
 	private R_Victor followerA;

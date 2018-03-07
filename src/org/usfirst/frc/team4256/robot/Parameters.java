@@ -77,7 +77,7 @@ public abstract class Parameters {
 	public static final byte Gyrometer_updateHz = 50;
 	
 	public static final double spinP = 0.75;
-	public static final double spinI = .000015;
+	public static final double spinI = 0.000015;
 	public static final double spinD = 2.0;
 	
 	public static final double zedP = 0.1838;

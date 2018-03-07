@@ -244,7 +244,7 @@ public class Robot extends IterativeRobot {
 		
 		final double gunnerLeftX = gunner.getRawAxis(R_Xbox.AXIS_LEFT_X);
 		if (Math.abs(gunnerLeftX) > 0.5) clamp.rotateTo(45.0*(Math.signum(gunnerLeftX) + 1.0));
-		else clamp.increment(2.0*gunner.getDeadbandedAxis(R_Xbox.AXIS_LEFT_Y));
+		else clamp.increment(-2.0*gunner.getDeadbandedAxis(R_Xbox.AXIS_LEFT_Y));
 
 		
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
