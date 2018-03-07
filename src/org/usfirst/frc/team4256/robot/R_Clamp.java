@@ -7,6 +7,7 @@ import com.cyborgcats.reusable.Phoenix.R_Victor;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class R_Clamp {
 	private enum CubePosition {Absent, WithinReach, Present;}
@@ -28,7 +29,7 @@ public class R_Clamp {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
-		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false, 90.0, 270.0);
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false, 100.0, 250.0);
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
@@ -153,8 +154,7 @@ public class R_Clamp {
 	 * This function defines zero for the rotator.
 	**/
 	public void setZero() {
-		rotator.compass.setTareAngle(-90.0);//setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, R_Talon.kTimeoutMS);
-		rotator.quickSet(90.0, true);
+		rotator.setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, R_Talon.kTimeoutMS);
 		knowsZero = true;
 	}
 	
@@ -164,7 +164,7 @@ public class R_Clamp {
 	
 	public void rotateTo(double desiredAngle) {
 		desiredAngle = rotator.compass.legalizeAngle(desiredAngle);
-		if (desiredAngle == 0.0) rotator.selectProfileSlot(0, 0);
+		if (desiredAngle <= 10.0) rotator.selectProfileSlot(0, 0);
 		else rotator.selectProfileSlot(1, 0);
 		rotator.quickSet(desiredAngle, true);
 		currentSetpoint = desiredAngle;
