@@ -38,10 +38,10 @@ public class R_Clamp {
 		rotator.setInverted(true);
 		rotator.setNeutralMode(R_Talon.brake);
 		
-		rotator.config_kP(0, 0.3, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kP(0, 0.2, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kI(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kD(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kP(1, 2.5, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kP(1, 3.0, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kI(1, 0.0, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kD(1, 80.0, R_Talon.kTimeoutMS);//TODO tune
 	}

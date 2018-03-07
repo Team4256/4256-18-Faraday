@@ -71,7 +71,7 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-26.0);	moduleB.setTareAngle(-40.0);	moduleC.setTareAngle(75.0);	moduleD.setTareAngle(50.0);
+		moduleA.setTareAngle(-26.0);	moduleB.setTareAngle(-104.0);	moduleC.setTareAngle(75.0);	moduleD.setTareAngle(48.0);
 		//competition robot: -68.0							  59.0						     -3.0						 56.0
 		//practice robot:	 -26.0,						 	 -40.0,							 75.0,						 50.0
 		elevatorOne.setZero(0.0);
@@ -279,6 +279,5 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void disabledPeriodic() {
-		elevators.setInches(0.0);//attempts to clear previous setpoint of elevators
 	}
 }
