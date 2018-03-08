@@ -8,11 +8,10 @@ public class V_Instructions {
 		final boolean switchRight = gameData.charAt(0) == 'R';
 		final boolean scaleRight = gameData.charAt(1) == 'R';
 		
-		if (scaleRight) {
-			leashA = curve_origin2scaleRight();
-		}else {
-			leashA = curve_origin2scaleLeft();
-		}
+//		if (scaleRight) leashA = curve_origin2scaleRight();
+//		else leashA = curve_origin2scaleLeft();
+		if (switchRight) leashA = bezier_origin2switchRight();
+		else leashA = bezier_origin2switchLeft();
 	}
 	
 	public V_Leash getLeash() {return leashA;}
@@ -22,30 +21,18 @@ public class V_Instructions {
 		for what might be thought of as time. Though the syntax makes it look like x and y are generated
 		from themselves, it is actually the time-like incrementer that gets passed in.*/
 		
-		P_Curve a = new P_Curve(x -> -4.0*(1.0 - Math.cos(2.0*x)),
-								y -> 7.5*Math.sin(y),
-								0.0, 1.0);
-		P_Curve b = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,
-								y -> y*y + 5.311,
-								1.0, 3.8);
-		P_Curve c = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,
-								y -> 5.0*Math.sin(y - 3.8) + 19.751,
-								3.8, 5.4);
+		P_Curve a = new P_Curve(x -> -4.0*(1.0 - Math.cos(2.0*x)),		y -> 7.5*Math.sin(y),	0.0, 1.0);
+		P_Curve b = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,	y -> y*y + 5.311,	1.0, 3.8);
+		P_Curve c = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,	y -> 5.0*Math.sin(y - 3.8) + 19.751,	3.8, 5.4);
 		//Create an array of segments; represents a full path.
 		P_Curve[] path = new P_Curve[] {a, b, c};
 		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
 	}
 	
 	private static V_Leash curve_origin2scaleRight() {
-		P_Curve a = new P_Curve(x -> 4.0*(1.0 - Math.cos(2.0*x)),
-				  				y -> 7.5*Math.sin(y),
-				  				0.0, 1.0);
-		P_Curve b = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,
-				  				y -> y*y + 5.311,
-				  				1.0, 3.8);
-		P_Curve c = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,
-								y -> 5.0*Math.sin(y - 3.8) + 19.751,
-								3.8, 5.4);
+		P_Curve a = new P_Curve(x -> 4.0*(1.0 - Math.cos(2.0*x)),		y -> 7.5*Math.sin(y),	0.0, 1.0);
+		P_Curve b = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,	y -> y*y + 5.311,	1.0, 3.8);
+		P_Curve c = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,	y -> 5.0*Math.sin(y - 3.8) + 19.751,	3.8, 5.4);
 		//Create an array of segments; represents a full path.
 		P_Curve[] path = new P_Curve[] {a, b, c};
 		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
@@ -65,12 +52,28 @@ public class V_Instructions {
 	}
 	
 	private static V_Leash bezier_origin2scaleRight() {
-	    //									p0x  p0y  p1x  p1y  p2x  p2y  p3x  p3y nSteps
+		//							p0x  p0y  p1x  p1y  p2x  p2y  p3x  p3y  start
 		P_Bezier a = new P_Bezier(7.188, 13.32, 12, 120, 138, 84, 138, 138, 0.0);//inches
 		P_Bezier b = new P_Bezier(138, 138, 138, 156, 138, 192, 138, 210, 1.0);
 		P_Bezier c = new P_Bezier(138, 210, 138, 228, 114, 264, 90, 279, 2.0);
 		//Create an array of CubicBeziers; represents a full path.
 		P_Bezier[] path = new P_Bezier[] {a, b, c};
+		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.05);
+	}
+	
+	private static V_Leash bezier_origin2switchLeft() {
+		//							p0x  p0y  p1x  p1y  p2x  p2y  p3x  p3y  start
+		P_Bezier a = new P_Bezier(7.188, 13.32, 6, 120, -132, 44, -129, 168, 0.0);//inches
+		//Create an array of CubicBeziers; represents a full path.
+		P_Bezier[] path = new P_Bezier[] {a};
+		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.05);
+	}
+	
+	private static V_Leash bezier_origin2switchRight() {
+		//							p0x  p0y  p1x  p1y  p2x  p2y  p3x  p3y  start
+		P_Bezier a = new P_Bezier(7.188, 13.32, 8, 120, 132, 44, 129, 168, 0.0);//inches
+		//Create an array of CubicBeziers; represents a full path.
+		P_Bezier[] path = new P_Bezier[] {a};
 		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.05);
 	}
 }

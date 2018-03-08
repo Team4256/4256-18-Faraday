@@ -94,7 +94,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		//{Robot Input}
 		zed.getEntry("Enable Odometry").setBoolean(true);
-		odometer.setOrigin(odometer.getX() + .599, odometer.getY() + 1.11);
+		odometer.setOrigin(odometer.getX() - .599, odometer.getY() - 1.11);
 		//{Robot Output}
 		swerve.autoMode(true);
 		
@@ -155,6 +155,9 @@ public class Robot extends IterativeRobot {
 			
 			
 			double desiredOrientation = gyro.getCurrentAngle();
+			final double errorOrientation = gyro.wornPath(desiredOrientation)/180.0;
+			double spin = V_PID.get("spin", errorOrientation);
+			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
 			
 			
 			V_Events.check(instructions.getLeash().getIndependentVariable());
@@ -163,17 +166,17 @@ public class Robot extends IterativeRobot {
 			case(0):
 				desiredOrientation = 0.0;
 				clamp.close();
+				elevators.setInches(3.0);
 				break;
 			case(1): 
-				elevators.setInches(ElevatorPresets.SCALE_HIGH.height());
+				clamp.rotateTo(0.0);
+				elevators.setInches(ElevatorPresets.SWITCH.height());
 				break;
-			case(2): clamp.spit();break;
+			case(2):
+				if (errorOrientation < 10) clamp.spit();
+				break;
 			}
 			
-			
-			final double errorOrientation = gyro.wornPath(desiredOrientation)/180.0;
-			double spin = V_PID.get("spin", errorOrientation);
-			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
 			
 			
 			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
