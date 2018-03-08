@@ -250,8 +250,8 @@ public class Robot extends IterativeRobot {
 
 		
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
-			gyro.reset();
-			lockedAngle = gyro.getCurrentAngle();
+			gyro.setTareAngle(gyro.getCurrentAngle(), true);
+			lockedAngle = 0.0;
 			V_PID.clear("spin");
 		}
 		
