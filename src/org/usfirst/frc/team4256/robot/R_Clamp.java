@@ -28,20 +28,20 @@ public class R_Clamp {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
-		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, false, 110.0, 230.0);
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, true, 110.0, 230.0);//false for practice
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
 	public void init() {
 		intakeLeft.init();
 		intakeRight.init();
-		rotator.setInverted(true);
+		rotator.setInverted(false);
 		rotator.setNeutralMode(R_Talon.brake);
 		
 		rotator.config_kP(0, 0.2, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kI(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kD(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kP(1, 3.0, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kP(1, 2.5, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kI(1, 0.0, R_Talon.kTimeoutMS);//TODO tune
 		rotator.config_kD(1, 80.0, R_Talon.kTimeoutMS);//TODO tune
 	}
@@ -92,8 +92,8 @@ public class R_Clamp {
 	 * 
 	**/
 	private void setWheelSpeed(final double percent) {
-		intakeLeft.quickSet(percent);
-		intakeRight.quickSet(-percent);
+		intakeLeft.quickSet(-percent);
+		intakeRight.quickSet(percent);
 	}
 	
 	
@@ -176,6 +176,5 @@ public class R_Clamp {
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
-		rotator.completeLoopUpdate();
 	}
 }
