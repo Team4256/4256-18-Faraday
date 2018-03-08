@@ -61,6 +61,7 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		//{Robot Input}
 		gyro.reset();
+		gyro.setTareAngle(-90.0, false);//TODO test this !!!!
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED").getSubTable("Position");
@@ -71,9 +72,9 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-26.0);	moduleB.setTareAngle(-104.0);	moduleC.setTareAngle(75.0);	moduleD.setTareAngle(48.0);
+		moduleA.setTareAngle(-68.0);	moduleB.setTareAngle(-59.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
 		//competition robot: -68.0							  59.0						     -3.0						 56.0
-		//practice robot:	 -26.0,						 	 -40.0,							 75.0,						 50.0
+		//practice robot:	 -26.0,						 	 -104.0,						 75.0,						 48.0
 		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
 		clamp.setZero();
