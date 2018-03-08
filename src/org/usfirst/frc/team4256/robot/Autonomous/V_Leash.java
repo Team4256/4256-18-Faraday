@@ -5,14 +5,14 @@ public class V_Leash {
 	private boolean doneGeneratingTargets = false;
 	
 	//an array of segments represents a full path
-	private final V_Segment[] path;
+	private final Path[] path;
 	private final double desiredLength;
 	private final double growthRate;
 	/**
 	 * Leash will try to keep the distance between desired and actual coordinates as close to desiredLength as possible.
 	 * growthRate tells it how quickly to increment the time-like parameter that helps generate new X and Y values.
 	**/
-	public V_Leash(final V_Segment[] path, final double desiredLength, final double growthRate) {
+	public V_Leash(final Path[] path, final double desiredLength, final double growthRate) {
 		this.path = path;
 		this.desiredLength = desiredLength;
 		this.growthRate = growthRate;
@@ -24,9 +24,9 @@ public class V_Leash {
 	}
 	
 	private void increment(final double amount) {
-		if (!path[currentSegment].increment(amount)) {
-			if (currentSegment + 1 < path.length) currentSegment++;
-			else doneGeneratingTargets = true;
+		if (!path[currentSegment].increment(amount)) {//if current bezier has been used up
+			if (currentSegment + 1 < path.length) currentSegment++;//if we are able to move on, do so
+			else doneGeneratingTargets = true;//otherwise, say we're done
 		}
 	}
 	

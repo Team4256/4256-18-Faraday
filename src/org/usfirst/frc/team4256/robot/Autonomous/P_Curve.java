@@ -1,10 +1,10 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
-public class V_Segment {
+public class P_Curve implements Path {
 	private final Function x;
 	private final Function y;
 	private double independentVariable, end;
-	public V_Segment(final Function x, final Function y, final double start, final double end) {
+	public P_Curve(final Function x, final Function y, final double start, final double end) {
 		this.x = x;
 		this.y = y;
 		this.independentVariable = start;

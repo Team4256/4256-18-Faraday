@@ -142,7 +142,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
   		if (odometer.newX() && odometer.newY()) {
-			final double actualX = odometer.getX(),		  actualY = odometer.getY();
+			final double actualX = odometer.getX(),		  				  actualY = odometer.getY();
 			instructions.getLeash().maintainLength(actualX, actualY);
 			final double desiredX = instructions.getLeash().getX(), 	  desiredY = instructions.getLeash().getY();
 			final double errorX = desiredX - actualX, errorY = desiredY - actualY;
