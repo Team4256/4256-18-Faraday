@@ -12,11 +12,20 @@ public class V_Instructions {
 		
 //		if (scaleRight) leashA = curve_origin2scaleRight();
 //		else leashA = curve_origin2scaleLeft();
-		if (switchRight) leashA = bezier_origin2switchRight();
-		else leashA = bezier_origin2switchLeft();
+//		if (switchRight) leashA = bezier_origin2switchRight();
+//		else leashA = bezier_origin2switchLeft();
+		leashA = bezier_origin2line();
 	}
 	
 	public V_Leash getLeash() {return leashA;}
+	
+	private static V_Leash bezier_origin2line() {
+		//							p0x   p0y    p1x   p1y   p2x  p2y   p3x   p3y  start
+		P_Bezier a = new P_Bezier(7.188, 13.32, 7.188, 40, 7.188, 90, 7.188, 138, 0.0);//inches
+		//Create an array of CubicBeziers; represents a full path.
+		P_Bezier[] path = new P_Bezier[] {a};
+		return new V_Leash(path, 3.0, 0.05);
+	}
 	
 	private static V_Leash curve_origin2scaleLeft() {
 		/*Define segments of the path using lambda functions for x and y, as well as a start and end value
