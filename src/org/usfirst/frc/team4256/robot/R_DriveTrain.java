@@ -35,8 +35,8 @@ public class R_DriveTrain {
 	public void init() {
 		moduleA.init(/*reversed traction*/true);//practice: false, comp: false
 		moduleB.init(/*reversed traction*/false);//practice: true, comp: false
-		moduleC.init(/*reversed traction*/false);//practice: true, comp: false
-		moduleD.init(/*reversed traction*/false);//practice: true, comp: false
+		moduleC.init(/*reversed traction*/true);//practice: true, comp: false
+		moduleD.init(/*reversed traction*/true);//practice: true, comp: false
 	}
 	
 	

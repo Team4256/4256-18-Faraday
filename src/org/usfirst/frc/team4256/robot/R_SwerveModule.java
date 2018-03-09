@@ -43,8 +43,8 @@ public class R_SwerveModule {
 		traction.init();
 		traction.setInverted(reversedTraction);
 		traction.setNeutralMode(R_Talon.coast);
-		traction.configContinuousCurrentLimit(45, R_Talon.kTimeoutMS);
-		traction.configPeakCurrentLimit(50, R_Talon.kTimeoutMS);
+		traction.configContinuousCurrentLimit(40, R_Talon.kTimeoutMS);
+		traction.configPeakCurrentLimit(45, R_Talon.kTimeoutMS);
 		traction.configPeakCurrentDuration(250, R_Talon.kTimeoutMS);
 	}
 	

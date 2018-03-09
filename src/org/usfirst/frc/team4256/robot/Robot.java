@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(100.0);	moduleB.setTareAngle(-7.0);	moduleC.setTareAngle(-11.0);	moduleD.setTareAngle(56.0);
+		moduleA.setTareAngle(-124.0);	moduleB.setTareAngle(4.0);	moduleC.setTareAngle(82.0);	moduleD.setTareAngle(-56.0);
 		//competition robot: 78.0						 -20.0						     -3.0						 56.0
 		//practice robot:	 -26.0,						 -104.0,						 75.0,						 48.0
 		elevatorOne.setZero(0.0);
@@ -106,7 +106,7 @@ public class Robot extends IterativeRobot {
 		V_PID.clear("zed");
 		V_PID.clear("spin");
 		
-		final int startingPosition = (int)Math.round((float)faraday.getEntry("Starting Position").getNumber(1));
+		final int startingPosition = 0;//(int)faraday.getEntry("Starting Position").getNumber(1);
 		StartingPosition placement;
 		switch (startingPosition) {
 		case(0):placement = StartingPosition.LEFT;
@@ -119,8 +119,7 @@ public class Robot extends IterativeRobot {
 		if (gameData.length() > 0) {
 			faraday.getEntry("Field Data").setBoolean(true);
 			instructions = new V_Instructions(gameData, placement);
-		}
-		else {
+		}else {
 			faraday.getEntry("Field Data").setBoolean(false);
 			instructions = new V_Instructions("RRR", placement);
 		}
@@ -208,7 +207,8 @@ public class Robot extends IterativeRobot {
 					swerve.holonomic_encoderAware(0.0, 0.0, spin);
 				}
 				if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceCharter.LEFT)) ||
-					(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceCharter.RIGHT))) {
+					(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceCharter.RIGHT)) ||
+					(instructions.startingPosition.equals(StartingPosition.CENTER))) {
 					clamp.spit();
 				}
 				break;
@@ -265,8 +265,8 @@ public class Robot extends IterativeRobot {
 		
 				 if (V_Fridge.becomesTrue("Button LB", gunner.getRawButton(R_Xbox.BUTTON_LB))) elevators.increment(-11.0);//ELEVATOR INCREMENTS (gunner)
 			else if (V_Fridge.becomesTrue("Button RB", gunner.getRawButton(R_Xbox.BUTTON_RB))) elevators.increment(11.0);
-			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
-			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
+			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-1.2*gunner.getRawAxis(R_Xbox.AXIS_LT));
+			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(1.2*gunner.getRawAxis(R_Xbox.AXIS_RT));
 				 
 				 
 				 if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)) clamp.slurp();//CLAMP SLURP AND SPIT
