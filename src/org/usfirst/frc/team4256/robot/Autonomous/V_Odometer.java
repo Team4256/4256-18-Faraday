@@ -6,7 +6,8 @@ import edu.wpi.first.networktables.NetworkTable;
 public class V_Odometer {
 	private final NetworkTable zed;
 	private double tareX = 0.0, tareY = 0.0;
-	private ConsumableDouble x, y;
+	private ConsumableDouble x = new ConsumableDouble();
+	private ConsumableDouble y = new ConsumableDouble();
 	
 	public V_Odometer(final NetworkTable zed) {
 		this.zed = zed;

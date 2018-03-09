@@ -37,7 +37,7 @@ public class Robot extends IterativeRobot {
 	
 	private static V_Instructions instructions;
 	private static NetworkTableInstance nt;
-	private static NetworkTable faraday, zed;
+	private static NetworkTable faraday, zed, zed_position;
 	private static V_Odometer odometer;
 
 	//{Robot Output}
@@ -64,8 +64,9 @@ public class Robot extends IterativeRobot {
 		gyro.setTareAngle(-90.0, false);//TODO test this !!!!
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
-		zed = nt.getTable("ZED").getSubTable("Position");
-		odometer = new V_Odometer(zed);
+		zed = nt.getTable("ZED");
+		zed_position = zed.getSubTable("Position");
+		odometer = new V_Odometer(zed_position);
 		odometer.init();
 		//{Robot Output}
 		swerve.init();
@@ -103,6 +104,7 @@ public class Robot extends IterativeRobot {
 		
 		final String gameData = DriverStation.getInstance().getGameSpecificMessage();
 		if (gameData.length() > 0) instructions = new V_Instructions(gameData);
+		else instructions = new V_Instructions("RRR");
 	}
 	
 	@Override
