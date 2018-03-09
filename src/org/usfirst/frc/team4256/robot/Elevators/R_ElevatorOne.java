@@ -15,7 +15,6 @@ public class R_ElevatorOne {
 	protected static final double hookBaseline = 44.0;//inches
 	private R_Talon master;
 	private R_Victor followerA;
-	private R_Victor followerB;
 	private DoubleSolenoid shifter;
 	private int maximumEncoderValue;
 	public boolean knowsZero = false;
@@ -23,7 +22,6 @@ public class R_ElevatorOne {
 	public R_ElevatorOne(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter) {
 		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, true);//practice: true, comp: true
 		followerA = new R_Victor(followerAID, R_Victor.follower);
-		followerB = new R_Victor(followerBID, R_Victor.follower);
 		this.shifter = shifter;	
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
@@ -69,7 +67,6 @@ public class R_ElevatorOne {
 		master.config_kD(1, 10.0, R_Talon.kTimeoutMS);
 
 		followerA.init(master);
-		followerB.init(master);
 	}
 	
 	
