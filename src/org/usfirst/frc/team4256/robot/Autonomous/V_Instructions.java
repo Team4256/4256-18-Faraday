@@ -12,8 +12,10 @@ public class V_Instructions {
 		
 //		if (scaleRight) leashA = curve_origin2scaleRight();
 //		else leashA = curve_origin2scaleLeft();
+		
 //		if (switchRight) leashA = bezier_origin2switchRight();
 //		else leashA = bezier_origin2switchLeft();
+		
 		leashA = bezier_origin2line();
 	}
 	
