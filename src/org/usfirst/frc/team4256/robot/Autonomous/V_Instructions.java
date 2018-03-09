@@ -3,10 +3,12 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 public class V_Instructions {
 	
 	private V_Leash leashA;
+	public final boolean switchRight;
+	public final boolean scaleRight;
 	
 	public V_Instructions(final String gameData) {
-		final boolean switchRight = gameData.charAt(0) == 'R';
-		final boolean scaleRight = gameData.charAt(1) == 'R';
+		switchRight = gameData.charAt(0) == 'R';
+		scaleRight = gameData.charAt(1) == 'R';
 		
 //		if (scaleRight) leashA = curve_origin2scaleRight();
 //		else leashA = curve_origin2scaleLeft();

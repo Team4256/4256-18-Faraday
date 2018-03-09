@@ -105,6 +105,8 @@ public class Robot extends IterativeRobot {
 		final String gameData = DriverStation.getInstance().getGameSpecificMessage();
 		if (gameData.length() > 0) instructions = new V_Instructions(gameData);
 		else instructions = new V_Instructions("RRR");
+		
+		V_Events.init();
 	}
 	
 	@Override
@@ -132,7 +134,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotPeriodic() {
 		faraday.getEntry("Gyro").setNumber(gyro.getCurrentAngle());
-		faraday.getEntry("Pressure").setNumber(pressureGauge.getAverageVoltage()*39.875/* - 54.375*/);//TODO are these constants correct?
+		faraday.getEntry("Pressure").setNumber(pressureGauge.getAverageVoltage()*39.875);
 		faraday.getEntry("Clamp Open").setBoolean(clamp.isOpen());
 		faraday.getEntry("Climbing Mode").setBoolean(elevators.inClimbingMode());
 		faraday.getEntry("Browning Out").setBoolean(RobotController.isBrownedOut());
@@ -144,41 +146,49 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
+		//run processing only if ZED values are new
   		if (odometer.newX() && odometer.newY()) {
-			final double actualX = odometer.getX(),		  				  actualY = odometer.getY();
-			instructions.getLeash().maintainLength(actualX, actualY);
-			final double desiredX = instructions.getLeash().getX(), 	  desiredY = instructions.getLeash().getY();
-			final double errorX = desiredX - actualX, errorY = desiredY - actualY;
+  			//get most recent ZED values
+			final double actualX = odometer.getX(),
+						 actualY = odometer.getY();
 			
+			//ensure that the desired position stays a leash length away
+			instructions.getLeash().maintainLength(actualX, actualY);
+			
+			//get desired position and compute error components
+			final double desiredX = instructions.getLeash().getX(),
+						 desiredY = instructions.getLeash().getY();
+			final double errorX = desiredX - actualX,
+						 errorY = desiredY - actualY;
+			
+			//use error components to compute commands that swerve understands
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
 			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
 			double speed = V_PID.get("zed", errorMagnitude);
 			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
 			
 			
-			double desiredOrientation = gyro.getCurrentAngle();
-			final double errorOrientation = gyro.wornPath(desiredOrientation)/180.0;
-			double spin = V_PID.get("spin", errorOrientation);
-			if (Math.abs(spin) > 0.5) spin = 0.5*Math.signum(spin);
-			
 			
 			V_Events.check(instructions.getLeash().getIndependentVariable());
 			
 			switch(V_Events.counter) {
 			case(0):
-				desiredOrientation = 0.0;
+				lockedAngle = instructions.switchRight ? 0.0 : 90.0;
 				clamp.close();
 				elevators.setInches(3.0);
 				break;
 			case(1): 
+				lockedAngle = instructions.switchRight ? -90.0 : 90.0;
 				clamp.rotateTo(0.0);
 				elevators.setInches(ElevatorPresets.SWITCH.height());
 				break;
 			case(2):
-				if (errorOrientation < 10) clamp.spit();
+				clamp.spit();
 				break;
 			}
 			
+			//compute spin such that robot orients itself according to commands in events
+			final double spin = V_PID.get("spin", gyro.wornPath(lockedAngle));
 			
 			
 			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);

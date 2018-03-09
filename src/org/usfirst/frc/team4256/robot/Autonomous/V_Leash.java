@@ -24,7 +24,7 @@ public class V_Leash {
 	}
 	
 	private void increment(final double amount) {
-		if (!path[currentSegment].increment(amount)) {//if current bezier has been used up
+		if (!path[currentSegment].increment(amount)) {//if current segment has been used up
 			if (currentSegment + 1 < path.length) currentSegment++;//if we are able to move on, do so
 			else doneGeneratingTargets = true;//otherwise, say we're done
 		}
