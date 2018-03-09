@@ -31,7 +31,7 @@ public class Robot extends IterativeRobot {
 	private static final R_Xbox gunner = new R_Xbox(1);
 	private static double lockedAngle = 0;
 	//{Robot Input}
-	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0, 0);
+	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0.0, 0.0);
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.pressureGauge);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.tx2PowerSensor);
 	
@@ -73,9 +73,9 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(78.0);	moduleB.setTareAngle(55.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
-		//competition robot: -68.0							  59.0						     -3.0						 56.0
-		//practice robot:	 -26.0,						 	 -104.0,						 75.0,						 48.0
+		moduleA.setTareAngle(78.0);	moduleB.setTareAngle(-20.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
+		//competition robot: 78.0						 -20.0						     -3.0						 56.0
+		//practice robot:	 -26.0,						 -104.0,						 75.0,						 48.0
 		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
 		clamp.setZero();
