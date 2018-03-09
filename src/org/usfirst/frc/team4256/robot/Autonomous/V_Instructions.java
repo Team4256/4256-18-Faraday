@@ -50,7 +50,7 @@ public class V_Instructions {
 		P_Bezier c = new P_Bezier(-138, 204, -137, 252, -109, 272, -90, 279, 2.0);
 		//Create an array of CubicBeziers; represents a full path.
 		P_Bezier[] path = new P_Bezier[] {a, b, c};
-		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.05);
+		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
 	}
 	
 	private static V_Leash bezier_origin2scaleRight() {
@@ -60,22 +60,24 @@ public class V_Instructions {
 		P_Bezier c = new P_Bezier(138, 210, 138, 228, 114, 264, 90, 279, 2.0);
 		//Create an array of CubicBeziers; represents a full path.
 		P_Bezier[] path = new P_Bezier[] {a, b, c};
-		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.05);
+		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
 	}
 	
 	private static V_Leash bezier_origin2switchLeft() {
 		//							p0x  p0y  p1x  p1y  p2x  p2y  p3x  p3y  start
-		P_Bezier a = new P_Bezier(7.188, 13.32, 6, 120, -132, 44, -129, 168, 0.0);//inches
+		P_Bezier a = new P_Bezier(7.188, 13.32, 6, 120, -132, 44, -108, 153, 0.0);//inches
 		//Create an array of CubicBeziers; represents a full path.
 		P_Bezier[] path = new P_Bezier[] {a};
-		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.05);
+		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
 	}
 	
 	private static V_Leash bezier_origin2switchRight() {
 		//							p0x  p0y  p1x  p1y  p2x  p2y  p3x  p3y  start
-		P_Bezier a = new P_Bezier(7.188, 13.32, 8, 120, 132, 44, 129, 168, 0.0);//inches
+		P_Bezier a = new P_Bezier(7.188, 13.32, 8, 120, 132, 44, 108, 153, 0.0);//inches
 		//Create an array of CubicBeziers; represents a full path.
 		P_Bezier[] path = new P_Bezier[] {a};
-		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.05);
+		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
 	}
+	
+	
 }

@@ -183,15 +183,20 @@ public class Robot extends IterativeRobot {
 				elevators.setInches(ElevatorPresets.SWITCH.height());
 				break;
 			case(2):
+				long startTime = System.currentTimeMillis();
+				while (System.currentTimeMillis() - startTime < 500) {
+					double spin = instructions.switchRight ? -.2 : .2;
+					swerve.holonomic_encoderAware(0.0, 0.0, spin);
+				}
 				clamp.spit();
 				break;
 			}
 			
 			//compute spin such that robot orients itself according to commands in events
-			final double spin = V_PID.get("spin", gyro.wornPath(lockedAngle));
+			final double spin = instructions.switchRight ? -.1 : .1;//V_PID.get("spin", gyro.wornPath(lockedAngle));
 			
 			
-			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
+			swerve.holonomic_encoderAware(errorDirection, speed, spin);
 		}
 	}
 	
