@@ -33,8 +33,8 @@ public class R_DriveTrain {
 	 * This function prepares each swerve module individually.
 	**/
 	public void init() {
-		moduleA.init(/*reversed traction*/false);//practice: false, comp: false
-		moduleB.init(/*reversed traction*/true);//practice: true, comp: true
+		moduleA.init(/*reversed traction*/true);//practice: false, comp: false
+		moduleB.init(/*reversed traction*/false);//practice: true, comp: true
 		moduleC.init(/*reversed traction*/false);//practice: true, comp: false
 		moduleD.init(/*reversed traction*/false);//practice: true, comp: false
 	}
@@ -92,7 +92,7 @@ public class R_DriveTrain {
 		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
 		moduleD_previousAngle = moduleAngles_final[3];
 		
-		if (isThere(5.0)) {
+		if (isThere(10.0)) {
 			final double[] moduleSpeeds_final = computeModuleSpeeds(moduleComps_desired);
 			if (bad) {
 				moduleA.set(0.0);						moduleB.set(0.0);
@@ -121,7 +121,7 @@ public class R_DriveTrain {
 		moduleA.swivelTo(moduleAngles_final[0], bad);	moduleB.swivelTo(moduleAngles_final[1], bad);
 		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
 		
-		if (isThere(5.0)) {
+		if (isThere(10.0)) {
 			final double[] moduleSpeeds_final = computeModuleSpeeds(moduleComps_desired);
 			if (bad) {
 				moduleA.set(0.0);						moduleB.set(0.0);
