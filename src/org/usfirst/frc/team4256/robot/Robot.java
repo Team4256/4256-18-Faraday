@@ -99,31 +99,24 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		//{Robot Input}
 		zed.getEntry("Enable Odometry").setBoolean(true);
-		odometer.setOrigin(odometer.getX() - .599, odometer.getY() - 1.11);
 		//{Robot Output}
 		swerve.autoMode(true);
 		
 		V_PID.clear("zed");
 		V_PID.clear("spin");
 		
-		final int startingPosition = (int)Math.round((float)faraday.getEntry("Starting Position").getNumber(1));
-		StartingPosition placement;
-		switch (startingPosition) {
-		case(0):placement = StartingPosition.LEFT;
-		case(1):placement = StartingPosition.CENTER;
-		case(2):placement = StartingPosition.RIGHT;
-		default: placement = StartingPosition.CENTER;
-		}
+		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(1).floatValue());
 		
 		final String gameData = DriverStation.getInstance().getGameSpecificMessage();
 		if (gameData.length() > 0) {
 			faraday.getEntry("Field Data").setBoolean(true);
-			instructions = new V_Instructions(gameData, placement);
-		}
-		else {
+			instructions = new V_Instructions(gameData, startingPosition);
+		}else {
 			faraday.getEntry("Field Data").setBoolean(false);
-			instructions = new V_Instructions("RRR", placement);
+			instructions = new V_Instructions("RRR", startingPosition);
 		}
+		
+		odometer.setOrigin(odometer.getX() - instructions.initOdometerPosX/12.0, odometer.getY() - V_Instructions.startY);
 		
 		V_Events.init();
 	}

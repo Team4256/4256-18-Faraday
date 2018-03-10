@@ -1,6 +1,12 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
 public class V_Instructions {
+	public static final double leftStartX = -112.33, centerStartX = 7.19, rightStartX = 115.0;
+	public static final double switchX = 95.43, cubeX = 72.64, scaleX = 71.11;
+	public static final double startY = 13.32, switchY = 166.6, cubeY = 214.35, scaleY = 296.13;
+	
+	public final double initOdometerPosX;
+	
 	public enum StartingPosition {LEFT, CENTER, RIGHT};
 	public enum FieldPieceCharter {LEFT, RIGHT};
 	
@@ -10,73 +16,129 @@ public class V_Instructions {
 	
 	private V_Leash leash;
 	
-	public V_Instructions(final String gameData, final StartingPosition startingPosition) {
-		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceCharter.LEFT : FieldPieceCharter.RIGHT;
-		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceCharter.LEFT : FieldPieceCharter.RIGHT;
-		this.startingPosition = startingPosition;
+	public V_Instructions(final String gameData, final int startingPosition) {
+		//{organize initialization data}
+		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceCharter.LEFT : FieldPieceCharter.RIGHT;//SWITCH
+		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceCharter.LEFT : FieldPieceCharter.RIGHT;//SCALE
+		switch (startingPosition) {//ROBOT
+		case(0):this.startingPosition = StartingPosition.LEFT;break;
+		case(1):this.startingPosition = StartingPosition.CENTER;break;
+		case(2):this.startingPosition = StartingPosition.RIGHT;break;
+		default: this.startingPosition = StartingPosition.CENTER;break;
+		}
 		
-		switch (this.startingPosition) {
-		case LEFT:
-			/*When starting on the left with the clamp facing right, there are four possible one-cube actions.
-			  1) If the left side of the switch is assigned to us, drive forward and place cube there (no rotation).
-			  2) If the left side of the scale is assigned to us, drive forward and place cube there (no rotation).
-			  3) If everything assigned to us is on the right, just drive forward.//TODO could we get all the way around?
-			  4) If the left side of the switch AND scale are assigned to us, drive forward and place cube in switch (according to Sam)*/
+		switch (this.startingPosition) {//TODO for each starting pos, have one set of events for paths of 3 and one for paths of 2
+		case LEFT:initOdometerPosX = leftStartX;
+		
+			if (switchTarget.equals(FieldPieceCharter.LEFT) && scaleTarget.equals(FieldPieceCharter.LEFT)) {
+				//{easy switch then easy scale}
+				final P_Bezier a = new P_Bezier(leftStartX, startY, -120, 108, -119, 167, -switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier b = new P_Bezier(-switchX, switchY, -117, 204, -88, 222, -cubeX, cubeY, 1.0);//get to new cube
+				final P_Bezier c = new P_Bezier(-cubeX, cubeY, -72.64, 224, -71.11, 286, -scaleX, scaleY, 2.0);//get to easy scale
+				
+				final P_Bezier[] path = new P_Bezier[] {a, b, c};
+				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				
+			}else if (switchTarget.equals(FieldPieceCharter.LEFT)) {
+				//{easy switch then hard scale}
+				final P_Bezier a = new P_Bezier(leftStartX, startY, -120, 108, -119, 167, -switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier b = new P_Bezier(-switchX, switchY, -117, 204, -88, 222, -cubeX, cubeY, 1.0);//get to new cube
+				final P_Bezier c = new P_Bezier(-cubeX, cubeY, -40, 278, 63, 228, scaleX, scaleY, 2.0);//get to hard scale
+				
+				final P_Bezier[] path = new P_Bezier[] {a, b, c};
+				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				
+			}else if (scaleTarget.equals(FieldPieceCharter.LEFT)) {
+				//{easy scale then hard switch}
+				final P_Bezier a = new P_Bezier(leftStartX, startY, -119, 206, -92, 238, -scaleX, scaleY, 0.0);//get to easy scale
+				final P_Bezier b = new P_Bezier(-scaleX, scaleY, -5, 255, 79, 267, /*cubeX*/61.5, cubeY, 1.0);//get to new cube/hard switch
+				
+				final P_Bezier[] path = new P_Bezier[] {a, b};
+				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				
+			}else {
+				//(hard switch then hard scale)TODO
+			}
 			
-			if (switchTarget.equals(FieldPieceCharter.LEFT)) leash = bezier_sides2switchNearest();
-			else if (switchTarget.equals(FieldPieceCharter.RIGHT)) leash = bezier_sides2switchNearest();//TODO should go farther to get to scale
-			else leash = bezier_sides2switchNearest();//still drive forward, but don't do any spitting, etc.
+			break;
 			
-		case CENTER:
+		case CENTER:initOdometerPosX = centerStartX;
+		
+			//easy switch then ____ scale
+			//TODO this should be a 2 cube auto
 			if (switchTarget.equals(FieldPieceCharter.RIGHT)) leash = bezier_center2switchRight();
 			else leash = bezier_center2switchLeft();
-//			if (scaleRight) leashA = curve_origin2scaleRight();
-//			else leash = curve_origin2scaleLeft();
-		
-		case RIGHT:
-			/*When starting on the right with the clamp facing right, there are four possible one-cube actions.
-			  1) If the right side of the switch is assigned to us, drive forward and place cube there (180 rotation).
-			  2) If the right side of the scale is assigned to us, drive forward and place cube there (180 rotation).
-			  3) If everything assigned to us is on the left, just drive forward.//TODO could we get all the way around?
-			  4) If the right side of the switch AND scale are assigned to us, drive forward and place cube in switch (180 rotation)*/
 			
-			if (switchTarget.equals(FieldPieceCharter.RIGHT)) leash = bezier_sides2switchNearest();
-			else if (switchTarget.equals(FieldPieceCharter.LEFT)) leash = bezier_sides2switchNearest();//TODO should go farther to get to scale
-			else leash = bezier_sides2switchNearest();//still drive forward, but don't do any spitting, etc.
+			break;
+		
+		case RIGHT:initOdometerPosX = rightStartX;
+		
+			if (switchTarget.equals(FieldPieceCharter.RIGHT) && scaleTarget.equals(FieldPieceCharter.RIGHT)) {
+				//{easy switch then easy scale}
+				final P_Bezier a = new P_Bezier(rightStartX, startY, 93, 57, 132, 158, switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier b = new P_Bezier(switchX, switchY, 111, 195, 101, 220, cubeX, cubeY, 1.0);//get to new cube
+				final P_Bezier c = new P_Bezier(cubeX, cubeY, 72.64, 224, 71.11, 286, scaleX, scaleY, 2.0);//get to easy scale
+				
+				final P_Bezier[] path = new P_Bezier[] {a, b, c};
+				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				
+			}else if (switchTarget.equals(FieldPieceCharter.RIGHT)) {
+				//{easy switch then hard scale}
+				final P_Bezier a = new P_Bezier(rightStartX, startY, 93, 57, 132, 158, switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier b = new P_Bezier(switchX, switchY, 111, 195, 101, 220, cubeX, cubeY, 1.0);//get to new cube
+				final P_Bezier c = new P_Bezier(cubeX, cubeY, 40, 278, -63, 228, -scaleX, scaleY, 2.0);//get to hard scale
+				
+				final P_Bezier[] path = new P_Bezier[] {a, b, c};
+				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				
+			}else if (scaleTarget.equals(FieldPieceCharter.RIGHT)) {
+				//{easy scale then hard switch}
+				final P_Bezier a = new P_Bezier(rightStartX, startY, 124, 222, 77, 248, scaleX, scaleY, 0.0);//get to easy scale
+				final P_Bezier b = new P_Bezier(scaleX, scaleY, 20, 259, -74, 260, /*-cubeX*/-61.5, cubeY, 1.0);//get to new cube/hard switch
+				
+				final P_Bezier[] path = new P_Bezier[] {a, b};
+				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+			}else {
+				//(hard switch then hard scale)TODO
+			}
+			
+			break;
+			
+		default:initOdometerPosX = centerStartX;break;
 		}
 	}
 	
 	public V_Leash getLeash() {return leash;}
 	
-	private static V_Leash bezier_sides2switchNearest() {
-		//							p0x   p0y    p1x   p1y   p2x  p2y   p3x   p3y  start
-		P_Bezier a = new P_Bezier(7.188, 13.32, 7.188, 40, 7.188, 90, 7.188, 138, 0.0);//inches
-		//Create an array of CubicBeziers; represents a full path.
-		P_Bezier[] path = new P_Bezier[] {a};
-		return new V_Leash(path, 3.0, 0.05);
-	}
+//	private static V_Leash bezier_sides2switchNearest() {
+//		//							p0x   p0y    p1x   p1y   p2x  p2y   p3x   p3y  start
+//		P_Bezier a = new P_Bezier(7.188, 13.32, 7.188, 40, 7.188, 90, 7.188, 138, 0.0);//inches
+//		//Create an array of CubicBeziers; represents a full path.
+//		P_Bezier[] path = new P_Bezier[] {a};
+//		return new V_Leash(path, 3.0, 0.05);
+//	}
 	
-	private static V_Leash curve_center2scaleLeft() {
-		/*Define segments of the path using lambda functions for x and y, as well as a start and end value
-		for what might be thought of as time. Though the syntax makes it look like x and y are generated
-		from themselves, it is actually the time-like incrementer that gets passed in.*/
-		
-		P_Curve a = new P_Curve(x -> -4.0*(1.0 - Math.cos(2.0*x)),		y -> 7.5*Math.sin(y),	0.0, 1.0);
-		P_Curve b = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,	y -> y*y + 5.311,	1.0, 3.8);
-		P_Curve c = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,	y -> 5.0*Math.sin(y - 3.8) + 19.751,	3.8, 5.4);
-		//Create an array of segments; represents a full path.
-		P_Curve[] path = new P_Curve[] {a, b, c};
-		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
-	}
+//	private static V_Leash curve_center2scaleLeft() {
+//		/*Define segments of the path using lambda functions for x and y, as well as a start and end value
+//		for what might be thought of as time. Though the syntax makes it look like x and y are generated
+//		from themselves, it is actually the time-like incrementer that gets passed in.*/
+//		
+//		P_Curve a = new P_Curve(x -> -4.0*(1.0 - Math.cos(2.0*x)),		y -> 7.5*Math.sin(y),	0.0, 1.0);
+//		P_Curve b = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,	y -> y*y + 5.311,	1.0, 3.8);
+//		P_Curve c = new P_Curve(x -> -2.0*(1.0 - Math.cos(x)) - 4.746,	y -> 5.0*Math.sin(y - 3.8) + 19.751,	3.8, 5.4);
+//		//Create an array of segments; represents a full path.
+//		P_Curve[] path = new P_Curve[] {a, b, c};
+//		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+//	}
 	
-	private static V_Leash curve_center2scaleRight() {
-		P_Curve a = new P_Curve(x -> 4.0*(1.0 - Math.cos(2.0*x)),		y -> 7.5*Math.sin(y),	0.0, 1.0);
-		P_Curve b = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,	y -> y*y + 5.311,	1.0, 3.8);
-		P_Curve c = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,	y -> 5.0*Math.sin(y - 3.8) + 19.751,	3.8, 5.4);
-		//Create an array of segments; represents a full path.
-		P_Curve[] path = new P_Curve[] {a, b, c};
-		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
-	}
+//	private static V_Leash curve_center2scaleRight() {
+//		P_Curve a = new P_Curve(x -> 4.0*(1.0 - Math.cos(2.0*x)),		y -> 7.5*Math.sin(y),	0.0, 1.0);
+//		P_Curve b = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,	y -> y*y + 5.311,	1.0, 3.8);
+//		P_Curve c = new P_Curve(x -> 2.0*(1.0 - Math.cos(x)) + 4.746,	y -> 5.0*Math.sin(y - 3.8) + 19.751,	3.8, 5.4);
+//		//Create an array of segments; represents a full path.
+//		P_Curve[] path = new P_Curve[] {a, b, c};
+//		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+//	}
 	
 	private static V_Leash bezier_center2scaleLeft() {
 		/*Define cubic beziers for the path. Each one starts at (p0x, p0y) and ends at (p3x, p3y).
