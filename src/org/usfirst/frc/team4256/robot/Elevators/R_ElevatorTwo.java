@@ -31,7 +31,7 @@ public class R_ElevatorTwo {
 
 		master.config_kP(0, 0.17, R_Talon.kTimeoutMS);
 		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
-		master.config_kD(0, 2.0, R_Talon.kTimeoutMS);
+		master.config_kD(0, 1.7, R_Talon.kTimeoutMS);
 	}
 	
 	
