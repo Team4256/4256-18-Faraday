@@ -33,10 +33,10 @@ public class R_DriveTrain {
 	 * This function prepares each swerve module individually.
 	**/
 	public void init() {
-		moduleA.init(/*reversed traction*/true);//practice: false, comp: false
-		moduleB.init(/*reversed traction*/false);//practice: true, comp: false
-		moduleC.init(/*reversed traction*/true);//practice: true, comp: false
-		moduleD.init(/*reversed traction*/true);//practice: true, comp: false
+		moduleA.init(/*reversed traction*/false);//practice: false, comp: false
+		moduleB.init(/*reversed traction*/true);//practice: true, comp: true
+		moduleC.init(/*reversed traction*/false);//practice: true, comp: false
+		moduleD.init(/*reversed traction*/false);//practice: true, comp: false
 	}
 	
 	
@@ -101,6 +101,9 @@ public class R_DriveTrain {
 				moduleA.set(moduleSpeeds_final[0]);		moduleB.set(moduleSpeeds_final[1]);
 				moduleC.set(moduleSpeeds_final[2]);		moduleD.set(moduleSpeeds_final[3]);
 			}
+		}else {
+			moduleA.set(0.0);						moduleB.set(0.0);
+			moduleC.set(0.0);						moduleD.set(0.0);
 		}
 		
 		drivetrain_previousSpin = speedSpin;

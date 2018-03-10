@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(78.0);	moduleB.setTareAngle(-20.0);	moduleC.setTareAngle(-3.0);	moduleD.setTareAngle(56.0);
+		moduleA.setTareAngle(56.0);	moduleB.setTareAngle(-67.0);	moduleC.setTareAngle(19.0);	moduleD.setTareAngle(124.0);
 		//competition robot: 78.0						 -20.0						     -3.0						 56.0
 		//practice robot:	 -26.0,						 -104.0,						 75.0,						 48.0
 		elevatorOne.setZero(0.0);
@@ -154,6 +154,18 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Has Cube").setBoolean(clamp.hasCube());
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
+//		double a = moduleA.rotation.getCurrentError(true);
+//		double b = moduleB.rotation.getCurrentError(true);
+//		double c = moduleC.rotation.getCurrentError(true);
+//		double d = moduleD.rotation.getCurrentError(true);
+//		SmartDashboard.putNumber("mod A error", a);
+//		SmartDashboard.putNumber("mod B error", b);
+//		SmartDashboard.putNumber("mod C error", c);
+//		SmartDashboard.putNumber("mod D error", d);
+//		SmartDashboard.putBoolean("mod A there", a <= 5);
+//		SmartDashboard.putBoolean("mod B there", b <= 5);
+//		SmartDashboard.putBoolean("mod C there", c <= 5);
+//		SmartDashboard.putBoolean("mod D there", d <= 5);
 	}
 	
 	@Override

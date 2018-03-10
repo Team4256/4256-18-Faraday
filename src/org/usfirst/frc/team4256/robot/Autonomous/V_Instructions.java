@@ -58,6 +58,7 @@ public class V_Instructions {
 				
 			}else {
 				//(hard switch then hard scale)TODO
+				leash = bezier_sides2switchNearest();
 			}
 			
 			break;
@@ -100,6 +101,7 @@ public class V_Instructions {
 				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
 			}else {
 				//(hard switch then hard scale)TODO
+				leash = bezier_sides2switchNearest();
 			}
 			
 			break;
