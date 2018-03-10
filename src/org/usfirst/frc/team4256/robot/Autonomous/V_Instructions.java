@@ -48,6 +48,36 @@ public class V_Instructions {
 	
 	public V_Leash getLeash() {return leash;}
 	
+	private static V_Leash bezier_sideRight2scaleRight() {
+//		                           p0x     p0y   p1x   p1y  p2x  p2y    p3x     p3y   start
+		P_Bezier a = new P_Bezier(67.188, 13.32, 91.8, 126, 108, 252, 129.336, 327.78, 0.0);
+		P_Bezier[] path = new P_Bezier[] {a};
+		return new V_Leash(path, 3.0, 0.1);
+	}
+	
+	private static V_Leash bezier_sideRight2scaleLeft() {
+//                                 p0x     p0y   p1x  p1y  p2x  p2y    p3x    p3y    start
+		P_Bezier a = new P_Bezier(67.188, 13.32, 84, 93.6, 99, 187.2, 67.188, 228.36, 0.0);
+		P_Bezier b = new P_Bezier(67.188, 228.36, -75.36, 228.36, -121.8, 272.88, -129.336, 327.78, 1.0);
+		P_Bezier[] path = new P_Bezier[] {a, b};
+		return new V_Leash(path, 3.0, 0.1);
+	}
+	
+	private static V_Leash bezier_sideLeft2scaleRight() {
+//                                  p0x     p0y     p1x   p1y    p2x   p2y     p3x      p3y  start
+		P_Bezier a = new P_Bezier(-91.812, 13.32, -117.6, 120, -124.8, 252, -129.336, 327.78, 0.0);
+		P_Bezier[] path = new P_Bezier[] {a};
+		return new V_Leash(path, 3.0, 0.1);
+	}
+	
+	private static V_Leash bezier_sideLeft2scaleLeft() {
+//                                  p0x     p0y    p1x   p1y   p2x   p2y     p3x     p3y   start
+		P_Bezier a = new P_Bezier(-91.812, 13.32, -108, 82.8, -120, 164.4, -91.812, 228.36, 0.0);
+		P_Bezier b = new P_Bezier(-91.812, 228.36, 72, 228.36, 117.6, 265.2, 129.336, 327.78, 1.0);
+		P_Bezier[] path = new P_Bezier[] {a, b};
+		return new V_Leash(path, 3.0, 0.1);
+	}
+	
 	private static V_Leash bezier_sides2switchNearest() {
 		//							p0x   p0y    p1x   p1y   p2x  p2y   p3x   p3y  start
 		P_Bezier a = new P_Bezier(7.188, 13.32, 7.188, 40, 7.188, 90, 7.188, 138, 0.0);//inches
