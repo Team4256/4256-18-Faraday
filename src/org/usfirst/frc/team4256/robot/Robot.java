@@ -12,7 +12,7 @@ import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Events;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Odometer;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions;
-import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.FieldPieceCharter;
+import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.FieldPieceConfig;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.StartingPosition;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -39,10 +39,13 @@ public class Robot extends IterativeRobot {
 	
 	private static V_Instructions instructions;
 	private static NetworkTableInstance nt;
-	private static NetworkTable faraday, zed, zed_position;
+	private static NetworkTable faraday, zed;
 	private static V_Odometer odometer;
 	
-	private static long start;
+	//{Game Input}
+	private static String gameData_old = "";
+	private static String gameData_new = "";
+	private static boolean haveGameData = false;
 
 	//{Robot Output}
 	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
@@ -63,23 +66,25 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
+		//{Human Input}
+		faraday.getEntry("Starting Position").setNumber(1);
 		//{Robot Input}
 		gyro.reset();
-		//gyro.setTareAngle(-90.0, false);
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED");
-		zed_position = zed.getSubTable("Position");
-		odometer = new V_Odometer(zed_position);
+		odometer = new V_Odometer(zed);
 		odometer.init();
+		//{Game Input}
+		gameData_old = DriverStation.getInstance().getGameSpecificMessage();
 		//{Robot Output}
 		swerve.init();
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-64.0);	moduleB.setTareAngle(80.0);	moduleC.setTareAngle(-10.0);	moduleD.setTareAngle(25.0);
-		//competition robot: 78.0						 -20.0						     -3.0						 56.0
-		//practice robot:	 -26.0,						 -104.0,						 75.0,						 48.0
+		moduleA.setTareAngle(-64.0);moduleB.setTareAngle(80.0);moduleC.setTareAngle(-10.0);moduleD.setTareAngle(25.0);
+		//competition robot: -64.0, 80.0, -10.0, 25.0
+		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
 		clamp.setZero();
@@ -93,50 +98,34 @@ public class Robot extends IterativeRobot {
 			catch (InterruptedException e) {Thread.currentThread().interrupt();}
 			tx2PowerControl.set(false);
 		}
-		
-		faraday.getEntry("Starting Position").setNumber(1);
 	}
 
 	@Override
 	public void autonomousInit() {
+		//{Human Input}
+		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(1).floatValue());
+		
+		//{Game Input}
+		final long start = System.currentTimeMillis();
+		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
+		instructions = haveGameData ? new V_Instructions(gameData_new, startingPosition) : new V_Instructions(null, startingPosition);
+		V_Events.init();
+		
 		//{Robot Input}
-		zed.getEntry("Enable Odometry").setBoolean(true);
+		gyro.setTareAngle(-90.0, false);//TODO only do this in certain cases
+		odometer.setOrigin(odometer.getX() - instructions.initOdometerPosX/12.0, odometer.getY() - V_Instructions.startY/12.0);
+		
 		//{Robot Output}
 		swerve.autoMode(true);
 		
 		V_PID.clear("zed");
 		V_PID.clear("spin");
-		
-		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(1).floatValue());
-		
-		String gameData = DriverStation.getInstance().getGameSpecificMessage();
-		
-		
-		start = System.currentTimeMillis();
-		
-		while (System.currentTimeMillis() - start < 500) {
-			gameData = DriverStation.getInstance().getGameSpecificMessage();
-		}
-		
-		if (gameData.length() == 0) {
-			faraday.getEntry("Field Data").setBoolean(false);
-			instructions = new V_Instructions("RRR", startingPosition);
-		}else {
-			faraday.getEntry("Field Data").setBoolean(true);
-			instructions = new V_Instructions(gameData, startingPosition);
-		}
-		
-		odometer.setOrigin(odometer.getX() - instructions.initOdometerPosX/12.0, odometer.getY() - V_Instructions.startY/12.0);
-		
-		V_Events.init();
-		
-		
 	}
 	
 	@Override
 	public void teleopInit() {
 		//{Robot Input}
-		zed.getEntry("Enable Odometry").setBoolean(false);
+		odometer.disable();
 		lockedAngle = gyro.getCurrentAngle();
 		//{Robot Output}
 		swerve.autoMode(false);
@@ -166,84 +155,85 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Has Cube").setBoolean(clamp.hasCube());
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
+		faraday.getEntry("Received Field").setBoolean(haveGameData);
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
-		if (System.currentTimeMillis() - start < 2000) {
-			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
-			clamp.close();
-			elevators.setInches(3.0);
-		}else if (System.currentTimeMillis() - start < 5000) {
-			swerve.holonomic_encoderAware(0.0, 0.5, 0.0);
-			elevators.setInches(ElevatorPresets.SWITCH.height());
-		}else {
-			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
-			if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceCharter.LEFT)) ||
-				(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceCharter.RIGHT))) {
-				clamp.spit();
-			}
-		}
-		swerve.completeLoopUpdate();
-		//run processing only if ZED values are new
-//  		if (odometer.newX() && odometer.newY()) {
-//  			//get most recent ZED values
-//			final double actualX = odometer.getX(),
-//						 actualY = odometer.getY();
-//			
-//			//ensure that the desired position stays a leash length away
-//			instructions.getLeash().maintainLength(actualX, actualY);
-//			
-//			//get desired position and compute error components
-//			final double desiredX = instructions.getLeash().getX(),
-//						 desiredY = instructions.getLeash().getY();
-//			final double errorX = desiredX - actualX,
-//						 errorY = desiredY - actualY;
-//			
-//			//use error components to compute commands that swerve understands
-//			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
-//			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
-//			double speed = V_PID.get("zed", errorMagnitude);
-//			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
-//			
-//			
-//			
-//			V_Events.check(instructions.getLeash().getIndependentVariable());
-//			
-//			switch(V_Events.counter) {
-//			case(0):
-////				lockedAngle = instructions.switchRight ? 0.0 : 90.0;
-//				clamp.close();
-//				elevators.setInches(3.0);
-//				break;
-//			case(1): 
-////				lockedAngle = instructions.switchRight ? -90.0 : 90.0;
-//				clamp.rotateTo(0.0);
-//				elevators.setInches(ElevatorPresets.SWITCH.height());
-//				break;
-//			case(2):
-//				final long startTime = System.currentTimeMillis();
-//				while (System.currentTimeMillis() - startTime < 500) {
-//					final double spin = instructions.switchTarget.equals(FieldPieceCharter.RIGHT) ? -0.2 : 0.0;
-//					swerve.holonomic_encoderAware(0.0, 0.0, spin);
-//				}
-//				if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceCharter.LEFT)) ||
-//					(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceCharter.RIGHT))) {
-//					clamp.spit();
-//				}
-//				break;
+//		if (System.currentTimeMillis() - start < 2000) {
+//			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
+//			clamp.close();
+//			elevators.setInches(3.0);
+//		}else if (System.currentTimeMillis() - start < 5000) {
+//			swerve.holonomic_encoderAware(0.0, 0.5, 0.0);
+//			elevators.setInches(ElevatorPresets.SWITCH.height());
+//		}else {
+//			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
+//			if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceConfig.LEFT)) ||
+//				(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceConfig.RIGHT))) {
+//				clamp.spit();
 //			}
-//			
-//			//compute spin such that robot orients itself according to commands in events
-//			final double spin = instructions.switchTarget.equals(FieldPieceCharter.RIGHT) ? -0.1 : 0.0;//V_PID.get("spin", gyro.wornPath(lockedAngle));
-//			
-//			
-//			swerve.holonomic_encoderAware(errorDirection, speed, spin);
 //		}
+//		swerve.completeLoopUpdate();
+		//run processing only if ZED values are new
+  		if (odometer.newX() && odometer.newY()) {
+  			//get most recent ZED values
+			final double actualX = odometer.getX(),
+						 actualY = odometer.getY();
+			
+			//ensure that the desired position stays a leash length away
+			instructions.getLeash().maintainLength(actualX, actualY);
+			
+			//get desired position and compute error components
+			final double desiredX = instructions.getLeash().getX(),
+						 desiredY = instructions.getLeash().getY();
+			final double errorX = desiredX - actualX,
+						 errorY = desiredY - actualY;
+			
+			//use error components to compute commands that swerve understands
+			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
+			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
+			double speed = V_PID.get("zed", errorMagnitude);
+			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
+			
+			
+			
+			V_Events.check(instructions.getLeash().getIndependentVariable());
+			
+			switch(V_Events.counter) {
+			case(0):
+//				lockedAngle = instructions.switchRight ? 0.0 : 90.0;
+				clamp.close();
+				elevators.setInches(3.0);
+				break;
+			case(1): 
+//				lockedAngle = instructions.switchRight ? -90.0 : 90.0;
+				clamp.rotateTo(0.0);
+				elevators.setInches(ElevatorPresets.SWITCH.height());
+				break;
+			case(2):
+				final long startTime = System.currentTimeMillis();
+				while (System.currentTimeMillis() - startTime < 500) {
+					final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.2 : 0.0;
+					swerve.holonomic_encoderAware(0.0, 0.0, spin);
+				}
+				if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceConfig.LEFT)) ||
+					(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceConfig.RIGHT))) {
+					clamp.spit();
+				}
+				break;
+			}
+			
+			//compute spin such that robot orients itself according to commands in events
+			final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.1 : 0.0;//V_PID.get("spin", gyro.wornPath(lockedAngle));
+			
+			
+			swerve.holonomic_encoderAware(errorDirection, speed, spin);
+		}
 	}
 	
 	@Override
-	public void teleopPeriodic() {
+	public void teleopPeriodic() {//TODO elevator override for climber (back and start)
 		//{speed multipliers}
 		final boolean turbo = driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT);
 		final boolean snail = driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT);
@@ -342,5 +332,11 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void disabledPeriodic() {
+		pollGameData();
+	}
+	
+	public static void pollGameData() {
+		gameData_new = DriverStation.getInstance().getGameSpecificMessage();
+		if ((gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
 	}
 }

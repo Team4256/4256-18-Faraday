@@ -4,18 +4,19 @@ import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 
 public class V_Odometer {
-	private final NetworkTable zed;
+	private final NetworkTable zed, position;
 	private double tareX = 0.0, tareY = 0.0;
 	private ConsumableDouble x = new ConsumableDouble();
 	private ConsumableDouble y = new ConsumableDouble();
 	
 	public V_Odometer(final NetworkTable zed) {
 		this.zed = zed;
+		this.position = zed.getSubTable("Position");
 	}
 	
 	public void init() {
-		zed.addEntryListener("X", (zed, key, entry, value, flags) -> {this.onUpdatedX(value.getDouble());}, EntryListenerFlags.kUpdate);
-		zed.addEntryListener("Y", (zed, key, entry, value, flags) -> {this.onUpdatedY(value.getDouble());}, EntryListenerFlags.kUpdate);
+		position.addEntryListener("X", (position, key, entry, value, flags) -> {this.onUpdatedX(value.getDouble());}, EntryListenerFlags.kUpdate);
+		position.addEntryListener("Y", (position, key, entry, value, flags) -> {this.onUpdatedY(value.getDouble());}, EntryListenerFlags.kUpdate);
 	}
 	
 	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
@@ -36,4 +37,6 @@ public class V_Odometer {
 		public double get() {isNew = false;		return value;}
 		public boolean isNew() {return isNew;}
 	}
+	
+	public void disable() {zed.getEntry("Enable Odometry").setBoolean(false);}
 }
