@@ -66,8 +66,6 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
-		//{Human Input}
-		faraday.getEntry("Starting Position").setNumber(1);
 		//{Robot Input}
 		gyro.reset();
 		nt = NetworkTableInstance.getDefault();
@@ -75,6 +73,8 @@ public class Robot extends IterativeRobot {
 		zed = nt.getTable("ZED");
 		odometer = new V_Odometer(zed);
 		odometer.init();
+		//{Human Input}
+		faraday.getEntry("Starting Position").setNumber(1);
 		//{Game Input}
 		gameData_old = DriverStation.getInstance().getGameSpecificMessage();
 		//{Robot Output}
@@ -82,7 +82,7 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-64.0);moduleB.setTareAngle(80.0);moduleC.setTareAngle(-10.0);moduleD.setTareAngle(25.0);
+		moduleA.setTareAngle(-40.0);moduleB.setTareAngle(75.0);moduleC.setTareAngle(-8.0);moduleD.setTareAngle(-17.0);
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		elevatorOne.setZero(0.0);
@@ -200,35 +200,35 @@ public class Robot extends IterativeRobot {
 			
 			V_Events.check(instructions.getLeash().getIndependentVariable());
 			
-			switch(V_Events.counter) {
-			case(0):
-//				lockedAngle = instructions.switchRight ? 0.0 : 90.0;
-				clamp.close();
-				elevators.setInches(3.0);
-				break;
-			case(1): 
-//				lockedAngle = instructions.switchRight ? -90.0 : 90.0;
-				clamp.rotateTo(0.0);
-				elevators.setInches(ElevatorPresets.SWITCH.height());
-				break;
-			case(2):
-				final long startTime = System.currentTimeMillis();
-				while (System.currentTimeMillis() - startTime < 500) {
-					final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.2 : 0.0;
-					swerve.holonomic_encoderAware(0.0, 0.0, spin);
-				}
-				if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceConfig.LEFT)) ||
-					(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceConfig.RIGHT))) {
-					clamp.spit();
-				}
-				break;
-			}
+//			switch(V_Events.counter) {
+//			case(0):
+////				lockedAngle = instructions.switchRight ? 0.0 : 90.0;
+//				clamp.close();
+//				elevators.setInches(3.0);
+//				break;
+//			case(1): 
+////				lockedAngle = instructions.switchRight ? -90.0 : 90.0;
+//				clamp.rotateTo(0.0);
+//				elevators.setInches(ElevatorPresets.SWITCH.height());
+//				break;
+//			case(2):
+//				final long startTime = System.currentTimeMillis();
+//				while (System.currentTimeMillis() - startTime < 500) {
+//					final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.2 : 0.0;
+//					swerve.holonomic_encoderAware(0.0, 0.0, spin);
+//				}
+//				if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceConfig.LEFT)) ||
+//					(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceConfig.RIGHT))) {
+//					clamp.spit();
+//				}
+//				break;
+//			}
 			
 			//compute spin such that robot orients itself according to commands in events
 			final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.1 : 0.0;//V_PID.get("spin", gyro.wornPath(lockedAngle));
 			
 			
-			swerve.holonomic_encoderAware(errorDirection, speed, spin);
+			swerve.holonomic_encoderAware(errorDirection, speed, 0.0/*spin*/);
 		}
 	}
 	
@@ -337,6 +337,6 @@ public class Robot extends IterativeRobot {
 	
 	public static void pollGameData() {
 		gameData_new = DriverStation.getInstance().getGameSpecificMessage();
-		if ((gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
+		if ((gameData_new != null) && (gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
 	}
 }

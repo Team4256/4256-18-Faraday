@@ -12,6 +12,7 @@ public class V_Odometer {
 	public V_Odometer(final NetworkTable zed) {
 		this.zed = zed;
 		this.position = zed.getSubTable("Position");
+		zed.getEntry("Enable Odometry").setBoolean(true);
 	}
 	
 	public void init() {

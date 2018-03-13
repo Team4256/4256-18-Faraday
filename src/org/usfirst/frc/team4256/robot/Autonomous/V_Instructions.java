@@ -2,7 +2,7 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 
 public class V_Instructions {
 	public static final double leftStartX = -112.33, centerStartX = 7.19, rightStartX = 115.0;
-	public static final double switchX = 95.43, cubeX = 72.64, scaleX = 71.11;
+	public static final double switchX = 95.43, cubeX = 72.64, scaleX = 83.11;
 	public static final double startY = 13.32, switchY = 166.6, cubeY = 214.35, scaleY = 296.13;
 	
 	public final double initOdometerPosX;
