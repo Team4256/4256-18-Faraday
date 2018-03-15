@@ -38,12 +38,12 @@ public class R_Clamp {
 		rotator.setInverted(false);
 		rotator.setNeutralMode(R_Talon.brake);
 		
-		rotator.config_kP(0, 0.2, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kI(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kD(0, 0.0, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kP(1, 2.5, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kI(1, 0.0, R_Talon.kTimeoutMS);//TODO tune
-		rotator.config_kD(1, 80.0, R_Talon.kTimeoutMS);//TODO tune
+		rotator.config_kP(0, 0.2, R_Talon.kTimeoutMS);
+		rotator.config_kI(0, 0.0, R_Talon.kTimeoutMS);
+		rotator.config_kD(0, 0.0, R_Talon.kTimeoutMS);
+		rotator.config_kP(1, 2.5, R_Talon.kTimeoutMS);
+		rotator.config_kI(1, 0.0, R_Talon.kTimeoutMS);
+		rotator.config_kD(1, 80.0, R_Talon.kTimeoutMS);
 	}
 	
 	
@@ -51,14 +51,10 @@ public class R_Clamp {
 	 * This function attempts to "slurp" nearby cubes into the clamp.
 	**/
 	public void slurp() {
-		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
-		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
-		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
-		if (cubePosition.equals(CubePosition.WithinReach) && cubeLikelyPresent()) cubePosition = CubePosition.Present;
 		//{do stuff based on the enum}
 		switch (cubePosition) {
 		case Absent://open and begin intaking
-			open();
+			open();//TODO theoretically will open, but if ultrasonic sensor doesn't update instantaneously then it will close again right away
 			setWheelSpeed(-intakeConstant);
 			break;
 		case WithinReach://hug cube
@@ -68,6 +64,10 @@ public class R_Clamp {
 			stop();
 			break;
 		}
+		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
+		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
+		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
+		if (cubePosition.equals(CubePosition.WithinReach) && cubeLikelyPresent()) cubePosition = CubePosition.Present;
 	}
 	
 	

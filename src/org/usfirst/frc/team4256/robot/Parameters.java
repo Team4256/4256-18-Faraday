@@ -4,10 +4,16 @@
 //right stick, x axis: raw spin
 //left stick, press: turbo mode
 //right stick, press: snail mode
-//LB: slurp (intake in)
-//LT: increment elevator down
-//RB: spit (intake out)
-//RT: increment elevator up
+//RT: slurp (intake in)
+//LT: spit
+//RB: manually close clamp
+//LB: manually open clamp
+
+//GUNNER
+//RT: elevator up
+//LT: elevator down
+//RB: increment elevator up
+//LB: increment elevator down
 //B: elevator low scale preset
 //A: elevator floor preset
 //X: elevator switch preset
