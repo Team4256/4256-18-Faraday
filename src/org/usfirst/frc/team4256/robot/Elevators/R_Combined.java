@@ -2,29 +2,29 @@ package org.usfirst.frc.team4256.robot.Elevators;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
 
-public class R_Elevators {
+public class R_Combined {
 	private static final double initialClimbingHeight = 81.0;//inches
-	private R_ElevatorOne elevatorOne;
-	private R_ElevatorTwo elevatorTwo;
+	private E_One one;
+	private E_Two two;
 	private double currentSetpoint = 0.0;//should always be the distance from 0 to clamp, not 0 to hook
 	private boolean climbing = false;
 
-	public R_Elevators (R_ElevatorOne elevatorOne, R_ElevatorTwo elevatorTwo) {
-		this.elevatorOne = elevatorOne;
-		this.elevatorTwo = elevatorTwo;
+	public R_Combined(E_One one, E_Two two) {
+		this.one = one;
+		this.two = two;
 	}
 	
 	/**
 	 * This function prepares each elevator individually.
 	**/
 	public void init() {//TODO set voltage ramp rates or use current limiting??
-		elevatorOne.init();
-		elevatorTwo.init();
+		one.init();
+		two.init();
 	}
 	
 	
 //	public double getInches() {//TODO
-//	if (climbing) return currentSetpoint + R_ElevatorOne.hookHeight;
+//	if (climbing) return currentSetpoint + E_One.hookHeight;
 //	else return currentSetpoint;
 //}
 	
@@ -35,14 +35,14 @@ public class R_Elevators {
 	 * Outside climbing mode, minimum is 0 and maximum is (El1.maxHeight + El2.maxHeight).
 	**/
 	private double validateInches(final double inches) {
-		final double minimumHeight = climbing ? R_ElevatorOne.hookBaseline : 0.1;//ideally 0, but .1 helps avoid encoder noise around 0
-		final double maximumHeight = climbing ? R_ElevatorOne.hookBaseline + R_ElevatorOne.maximumHeight : R_ElevatorOne.maximumHeight + R_ElevatorTwo.maximumHeight;
+		final double minimumHeight = climbing ? E_One.hookBaseline : 0.1;//ideally 0, but .1 helps avoid encoder noise around 0
+		final double maximumHeight = climbing ? E_One.hookBaseline + E_One.maximumHeight : E_One.maximumHeight + E_Two.maximumHeight;
 		return Math.min(Math.max(inches, minimumHeight), maximumHeight);//clips values outside of [minimumHeight, maximumHeight]
 	}
 	
 	
 	public void increment(final double inches) {
-		if (climbing) setInches(currentSetpoint + inches + R_ElevatorOne.hookBaseline - elevatorTwo.getInches());
+		if (climbing) setInches(currentSetpoint + inches + E_One.hookBaseline - two.getInches());
 		else setInches(currentSetpoint + inches);
 	}
 	
@@ -66,20 +66,20 @@ public class R_Elevators {
 	private void setClampHeight(double desiredInches) {
 		desiredInches = validateInches(desiredInches);
 		
-		final double currentElOnePosition = elevatorOne.getInches();
+		final double currentElOnePosition = one.getInches();
 		final boolean desiredAboveCurrentElOne = desiredInches > currentElOnePosition;
 		if (desiredAboveCurrentElOne) {
-			elevatorOne.setTorque(false);//when moving up, go really fast
-			if (desiredInches <= currentElOnePosition + R_ElevatorTwo.maximumHeight) {
-				elevatorTwo.setInches(desiredInches - elevatorOne.getInches());
+			one.setTorque(false);//when moving up, go really fast
+			if (desiredInches <= currentElOnePosition + E_Two.maximumHeight) {
+				two.setInches(desiredInches - one.getInches());
 			}else {
-				elevatorTwo.setInches(R_ElevatorTwo.maximumHeight);
-				if (elevatorTwo.isThere(5.0)) elevatorOne.setInches(desiredInches - elevatorTwo.getInches());
+				two.setInches(E_Two.maximumHeight);
+				if (two.isThere(5.0)) one.setInches(desiredInches - two.getInches());
 			}
 		}else {
-			elevatorOne.setTorque(true);//when coming down, slow down a bit
-			elevatorTwo.setInches(0.0);
-			if (elevatorTwo.isThere(5.0)) elevatorOne.setInches(desiredInches);
+			one.setTorque(true);//when coming down, slow down a bit
+			two.setInches(0.0);
+			if (two.isThere(5.0)) one.setInches(desiredInches);
 		}
 		currentSetpoint = desiredInches;
 	}
@@ -91,17 +91,17 @@ public class R_Elevators {
 	**/
 	private void setHookHeight(double desiredInches) {
 		desiredInches = validateInches(desiredInches);
-		final double elevatorOneDesiredInches = desiredInches - R_ElevatorOne.hookBaseline;
-		elevatorOne.setInches(elevatorOneDesiredInches);
-		currentSetpoint = elevatorOneDesiredInches + elevatorTwo.getInches();//getInches should result in approx. R_ElevatorTwo.climbingHeight, bc that's what enableClimbMode made it
+		final double elevatorOneDesiredInches = desiredInches - E_One.hookBaseline;
+		one.setInches(elevatorOneDesiredInches);
+		currentSetpoint = elevatorOneDesiredInches + two.getInches();//getInches should result in approx. E_Two.climbingHeight, bc that's what enableClimbMode made it
 	}
 	
 	
 	public void enableClimbMode(final R_Clamp clamp) {
-		elevatorTwo.setInches(R_ElevatorTwo.climbingHeight);
+		two.setInches(E_Two.climbingHeight);
 		clamp.close();
 		clamp.rotateTo(90.0);
-		elevatorOne.setTorque(true);
+		one.setTorque(true);
 		climbing = true;
 		setInches(initialClimbingHeight);
 	}
@@ -118,8 +118,8 @@ public class R_Elevators {
 	
 	
 	public void completeLoopUpdate() {
-		elevatorOne.completeLoopUpdate();
-		elevatorTwo.completeLoopUpdate();
+		one.completeLoopUpdate();
+		two.completeLoopUpdate();
 	}
 
 }
