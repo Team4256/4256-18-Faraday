@@ -9,10 +9,11 @@ import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
+import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
+import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
+import org.usfirst.frc.team4256.robot.Autonomous.Autonomous;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Events;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Odometer;
-import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions;
-import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.FieldPieceConfig;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -36,7 +37,7 @@ public class Robot extends IterativeRobot {
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.pressureGauge);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.tx2PowerSensor);
 	
-	private static V_Instructions instructions;
+	private static Autonomous autonomous;
 	private static NetworkTableInstance nt;
 	private static NetworkTable faraday, zed;
 	private static V_Odometer odometer;
@@ -56,7 +57,7 @@ public class Robot extends IterativeRobot {
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
 	private static final E_One elevatorOne = new E_One(Parameters.ElevatorOne_master, Parameters.ElevatorOne_followerA, Parameters.ElevatorOne_followerB, elevatorOneShifter);
 	private static final E_Two elevatorTwo = new E_Two(Parameters.ElevatorTwo_master);
-	private static final R_Combined elevators = new R_Combined(elevatorOne, elevatorTwo);
+	private static final R_Combined elevator = new R_Combined(elevatorOne, elevatorTwo);
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
 	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
@@ -78,7 +79,7 @@ public class Robot extends IterativeRobot {
 		gameData_old = DriverStation.getInstance().getGameSpecificMessage();
 		//{Robot Output}
 		swerve.init();
-		elevators.init();
+		elevator.init();
 		clamp.init();
 		
 		moduleA.setTareAngle(-40.0);moduleB.setTareAngle(75.0);moduleC.setTareAngle(-8.0);moduleD.setTareAngle(-17.0);
@@ -107,12 +108,12 @@ public class Robot extends IterativeRobot {
 		//{Game Input}
 		final long start = System.currentTimeMillis();
 		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
-		instructions = haveGameData ? new V_Instructions(gameData_new, startingPosition) : new V_Instructions(startingPosition);
+		autonomous = haveGameData ? new A_OneSwitchOneScale(startingPosition, gameData_new, odometer) : new A_PassLine(startingPosition, odometer);//TODO will need a switch with many cases
 		V_Events.init();
 		
 		//{Robot Input}
 		gyro.setTareAngle(-90.0, false);//TODO only do this in certain cases
-		odometer.setOrigin(odometer.getX() - instructions.initOdometerPosX/12.0, odometer.getY() - V_Instructions.startY/12.0);
+		odometer.setOrigin(odometer.getX() - autonomous.initOdometerPosX()/12.0, odometer.getY() - Autonomous.startY/12.0);
 		
 		//{Robot Output}
 		swerve.autoMode(true);
@@ -148,7 +149,7 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Gyro").setNumber(gyro.getCurrentAngle());
 		faraday.getEntry("Pressure").setNumber(pressureGauge.getAverageVoltage()*39.875);
 		faraday.getEntry("Clamp Open").setBoolean(clamp.isOpen());
-		faraday.getEntry("Climbing Mode").setBoolean(elevators.inClimbingMode());
+		faraday.getEntry("Climbing Mode").setBoolean(elevator.inClimbingMode());
 		faraday.getEntry("Browning Out").setBoolean(RobotController.isBrownedOut());
 		faraday.getEntry("TX2 Powered On").setBoolean(tx2PowerSensor.get());
 		faraday.getEntry("Has Cube").setBoolean(clamp.hasCube());
@@ -159,45 +160,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-//		if (System.currentTimeMillis() - start < 2000) {
-//			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
-//			clamp.close();
-//			elevators.setInches(3.0);
-//		}else if (System.currentTimeMillis() - start < 5000) {
-//			swerve.holonomic_encoderAware(0.0, 0.5, 0.0);
-//			elevators.setInches(ElevatorPresets.SWITCH.height());
-//		}else {
-//			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
-//			if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceConfig.LEFT)) ||
-//				(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceConfig.RIGHT))) {
-//				clamp.spit();
-//			}
-//		}
-//		swerve.completeLoopUpdate();
-		//run processing only if ZED values are new
-  		if (odometer.newX() && odometer.newY()) {
-  			//get most recent ZED values
-			final double actualX = odometer.getX(),
-						 actualY = odometer.getY();
-			
-			//ensure that the desired position stays a leash length away
-			instructions.getLeash().maintainLength(actualX, actualY);
-			
-			//get desired position and compute error components
-			final double desiredX = instructions.getLeash().getX(),
-						 desiredY = instructions.getLeash().getY();
-			final double errorX = desiredX - actualX,
-						 errorY = desiredY - actualY;
-			
-			//use error components to compute commands that swerve understands
-			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
-			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
-			double speed = V_PID.get("zed", errorMagnitude);
-			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
-			
-			
-			
-			V_Events.check(instructions.getLeash().getIndependentVariable());
+		autonomous.run(swerve, clamp, elevator);
+//			V_Events.check(instructions.getLeash().getIndependentVariable());
 			
 //			switch(V_Events.counter) {
 //			case(0):
@@ -222,13 +186,10 @@ public class Robot extends IterativeRobot {
 //				}
 //				break;
 //			}
-			
-			//compute spin such that robot orients itself according to commands in events
-			final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.1 : 0.0;//V_PID.get("spin", gyro.wornPath(lockedAngle));
-			
-			
-			swerve.holonomic_encoderAware(errorDirection, speed, 0.0/*spin*/);
-		}
+//			
+//			compute spin such that robot orients itself according to commands in events
+//			final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.1 : 0.0;//V_PID.get("spin", gyro.wornPath(lockedAngle));
+//		}
 	}
 	
 	@Override
@@ -266,16 +227,16 @@ public class Robot extends IterativeRobot {
 		swerve.holonomic_encoderAware(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
-		if (!elevators.inClimbingMode()) {
-				 if (gunner.getRawButton(R_Xbox.BUTTON_A)) {elevators.setInches(ElevatorPresets.FLOOR.height());}//ELEVATOR PRESETS
-			else if (gunner.getRawButton(R_Xbox.BUTTON_X)) {elevators.setInches(ElevatorPresets.SWITCH.height());}
-			else if (gunner.getRawButton(R_Xbox.BUTTON_B)) {elevators.setInches(ElevatorPresets.SCALE_LOW.height());}
-			else if (gunner.getRawButton(R_Xbox.BUTTON_Y)) {elevators.setInches(ElevatorPresets.SCALE_HIGH.height());}
+		if (!elevator.inClimbingMode()) {
+				 if (gunner.getRawButton(R_Xbox.BUTTON_A)) {elevator.setInches(ElevatorPresets.FLOOR.height());}//ELEVATOR PRESETS
+			else if (gunner.getRawButton(R_Xbox.BUTTON_X)) {elevator.setInches(ElevatorPresets.SWITCH.height());}
+			else if (gunner.getRawButton(R_Xbox.BUTTON_B)) {elevator.setInches(ElevatorPresets.SCALE_LOW.height());}
+			else if (gunner.getRawButton(R_Xbox.BUTTON_Y)) {elevator.setInches(ElevatorPresets.SCALE_HIGH.height());}
 		
-				 if (V_Fridge.becomesTrue("Button LB", gunner.getRawButton(R_Xbox.BUTTON_LB))) elevators.increment(-11.0);//ELEVATOR INCREMENTS (gunner)
-			else if (V_Fridge.becomesTrue("Button RB", gunner.getRawButton(R_Xbox.BUTTON_RB))) elevators.increment(11.0);
-			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
-			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
+				 if (V_Fridge.becomesTrue("Button LB", gunner.getRawButton(R_Xbox.BUTTON_LB))) elevator.increment(-11.0);//ELEVATOR INCREMENTS (gunner)
+			else if (V_Fridge.becomesTrue("Button RB", gunner.getRawButton(R_Xbox.BUTTON_RB))) elevator.increment(11.0);
+			else if (gunner.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevator.increment(-0.7*gunner.getRawAxis(R_Xbox.AXIS_LT));
+			else if (gunner.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevator.increment(0.7*gunner.getRawAxis(R_Xbox.AXIS_RT));
 				 
 				 
 				 if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)) clamp.slurp();//CLAMP SLURP AND SPIT
@@ -286,14 +247,14 @@ public class Robot extends IterativeRobot {
 			else if (driver.getRawButton(R_Xbox.BUTTON_RB)) clamp.close();
 		
 		}else {
-				 if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevators.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));//ELEVATOR INCREMENTS (driver)
-			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevators.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
+				 if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevator.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));//ELEVATOR INCREMENTS (driver)
+			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevator.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}
 
 		
-		if (elevators.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
-			if (elevators.inClimbingMode()) elevators.disableClimbMode(clamp);
-			else elevators.enableClimbMode(clamp);
+		if (elevator.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
+			if (elevator.inClimbingMode()) elevator.disableClimbMode(clamp);
+			else elevator.enableClimbMode(clamp);
 		}
 		
 		final double gunnerLeftX = gunner.getRawAxis(R_Xbox.AXIS_LEFT_X);
@@ -317,7 +278,7 @@ public class Robot extends IterativeRobot {
 		
 		//{completing motor controller updates}
 		swerve.completeLoopUpdate();
-		elevators.completeLoopUpdate();
+		elevator.completeLoopUpdate();
 		clamp.completeLoopUpdate();
 	}
 	
