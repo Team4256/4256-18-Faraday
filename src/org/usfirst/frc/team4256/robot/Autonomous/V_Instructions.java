@@ -17,6 +17,7 @@ public class V_Instructions {
 	private V_Leash leash;
 	
 	public V_Instructions(final int startingPosition) {
+		//{organize initialization data}
 		switchTarget = null;
 		scaleTarget = null;
 		switch (startingPosition) {//ROBOT
