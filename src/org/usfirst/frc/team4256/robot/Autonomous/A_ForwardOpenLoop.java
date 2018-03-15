@@ -38,7 +38,7 @@ public class A_ForwardOpenLoop implements Autonomous{
 			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
 			if ((startingPosition.equals(StartingPosition.LEFT) && switchTarget.equals(FieldPieceConfig.LEFT)) ||
 				(startingPosition.equals(StartingPosition.RIGHT) && switchTarget.equals(FieldPieceConfig.RIGHT))) {
-				clamp.spit();
+				clamp.spit(R_Clamp.intakeConstant);
 			}
 		}
 	}

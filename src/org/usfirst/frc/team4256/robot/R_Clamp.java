@@ -22,7 +22,7 @@ public class R_Clamp {
 	private static double currentSetpoint = 0.0;
 	public boolean knowsZero = false;
 	
-	private final double intakeConstant = 0.85;
+	public static final double intakeConstant = 0.85;
 	
 	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int rotatorID, final int ultrasonicPort) {
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
@@ -111,6 +111,7 @@ public class R_Clamp {
 	**/
 	public void close() {
 		clamp.set(CloseState);
+		cubePosition = CubePosition.Present;
 	}
 	
 	
