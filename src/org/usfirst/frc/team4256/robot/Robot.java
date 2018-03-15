@@ -81,7 +81,7 @@ public class Robot extends IterativeRobot {
 		elevators.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-40.0);moduleB.setTareAngle(75.0);moduleC.setTareAngle(-8.0);moduleD.setTareAngle(-17.0);
+		moduleA.setTareAngle(-115.0);moduleB.setTareAngle(145.0);moduleC.setTareAngle(55.0);moduleD.setTareAngle(-17.0);
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		elevatorOne.setZero(0.0);
@@ -279,7 +279,7 @@ public class Robot extends IterativeRobot {
 				 
 				 
 				 if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.5)) clamp.slurp();//CLAMP SLURP AND SPIT
-			else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.5)) clamp.spit();
+			else if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.2)) clamp.spit();
 			else 											   clamp.stop();
 			
 				 if (driver.getRawButton(R_Xbox.BUTTON_LB)) clamp.open();//CLAMP OPEN AND CLOSE OVERRIDE
