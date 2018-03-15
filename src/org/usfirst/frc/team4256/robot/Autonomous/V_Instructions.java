@@ -2,7 +2,7 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 
 import org.usfirst.frc.team4256.robot.R_DriveTrain;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.FieldPieceConfig;
-import org.usfirst.frc.team4256.robot.Elevators.R_Elevators;
+import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
 import org.usfirst.frc.team4256.robot.R_Clamp;
 
@@ -213,7 +213,7 @@ public class V_Instructions {
 	}
 	
 	private final long start = System.currentTimeMillis();
-	public void forwardSimple(final R_DriveTrain swerve, final R_Clamp clamp, final R_Elevators elevators) {
+	public void forwardSimple(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevators) {
 		if (System.currentTimeMillis() - start < 2000) {
 			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
 			clamp.close();
