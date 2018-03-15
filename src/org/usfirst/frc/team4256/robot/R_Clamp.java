@@ -74,8 +74,8 @@ public class R_Clamp {
 	/**
 	 * This function attempts to "spit" cubes out of the clamp.
 	**/
-	public void spit() {
-		setWheelSpeed(intakeConstant);
+	public void spit(final double strength) {
+		setWheelSpeed(strength);
 		cubePosition = CubePosition.Absent;
 	}
 	
