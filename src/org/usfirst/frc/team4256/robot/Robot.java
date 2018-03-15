@@ -13,7 +13,6 @@ import org.usfirst.frc.team4256.robot.Autonomous.V_Events;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Odometer;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.FieldPieceConfig;
-import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.StartingPosition;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -108,7 +107,7 @@ public class Robot extends IterativeRobot {
 		//{Game Input}
 		final long start = System.currentTimeMillis();
 		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
-		instructions = haveGameData ? new V_Instructions(gameData_new, startingPosition) : new V_Instructions(null, startingPosition);
+		instructions = haveGameData ? new V_Instructions(gameData_new, startingPosition) : new V_Instructions(startingPosition);
 		V_Events.init();
 		
 		//{Robot Input}
