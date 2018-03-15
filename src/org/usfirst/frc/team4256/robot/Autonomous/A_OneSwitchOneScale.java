@@ -28,11 +28,15 @@ public class A_OneSwitchOneScale implements Autonomous{
 		
 		this.odometer = odometer;
 		
-		switch (this.startingPosition) {//TODO for each starting pos, have one set of events for paths of 3 and one for paths of 2
-		case LEFT:  useLeash_left();  break;
-		case CENTER:useLeash_center();break;
-		case RIGHT: useLeash_right(); break;
-		default:    useLeash_center();break;
+		switch (this.startingPosition) {
+		case LEFT:  useLeash_left();
+					useEvents_left();  break;
+		case CENTER:useLeash_center();
+					useEvents_center();break;
+		case RIGHT: useLeash_right();
+					useEvents_right(); break;
+		default:    useLeash_center();
+					useEvents_center();break;
 		}
 	}
 	
@@ -60,6 +64,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 			
 			swerve.holonomic_encoderAware(errorDirection, speed, 0.0/*spin*/);
   		}
+  		//-----------------------------------------------------------------------------
+  		V_Events.check(leash.getIndependentVariable());
+  		
 	}
 	
 	public double initOdometerPosX() {return initOdometerPosX;}
@@ -95,9 +102,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 			
 		}else {
 			//{hard switch then hard scale}
-			final P_Bezier a = new P_Bezier(leftStartX, startY, -112, 140, -166, 254, 22, 241, 0.0);//get to new cube/easy switch
-			final P_Bezier b = new P_Bezier(22, 241, 41, 237, 55, 235, cubeX, cubeY, 1.0);
-			final P_Bezier c = new P_Bezier(cubeX, cubeY, 82, 240, 73, 264, scaleX, scaleY, 2.0);
+			final P_Bezier a = new P_Bezier(leftStartX, startY, -112, 140, -166, 254, 22, 241, 0.0);
+			final P_Bezier b = new P_Bezier(22, 241, 41, 237, 55, 235, cubeX, cubeY, 1.0);//get to new cube/hard switch
+			final P_Bezier c = new P_Bezier(cubeX, cubeY, 82, 240, 73, 264, scaleX, scaleY, 2.0);//get to hard scale
 			
 			final P_Bezier[] path = new P_Bezier[] {a, b, c};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
@@ -175,12 +182,63 @@ public class A_OneSwitchOneScale implements Autonomous{
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			//{hard switch then hard scale}
-			final P_Bezier a = new P_Bezier(rightStartX, startY, 112, 140, 166, 254, -22, 241, 0.0);//get to new cube/easy switch
-			final P_Bezier b = new P_Bezier(-22, 241, -41, 237, -55, 235, -cubeX, cubeY, 1.0);
-			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -82, 240, -73, 264, -scaleX, scaleY, 2.0);
+			final P_Bezier a = new P_Bezier(rightStartX, startY, 112, 140, 166, 254, -22, 241, 0.0);
+			final P_Bezier b = new P_Bezier(-22, 241, -41, 237, -55, 235, -cubeX, cubeY, 1.0);//get to new cube/hard switch
+			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -82, 240, -73, 264, -scaleX, scaleY, 2.0);//get to hard scale
 			
 			final P_Bezier[] path = new P_Bezier[] {a, b, c};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
+		}
+	}
+
+
+
+
+
+
+
+	private void useEvents_left() {
+		if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
+			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
+			
+			
+		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
+			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
+			
+			
+		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
+			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
+			
+			
+		}else {
+			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
+			
+			
+		}
+	}
+	
+	private void useEvents_center() {
+		// at 1.0, reaches switch; at 2.0, reaches new cube; at 3.0, reaches scale
+		
+	}
+
+	private void useEvents_right() {
+		if (switchTarget.equals(FieldPieceConfig.RIGHT) && scaleTarget.equals(FieldPieceConfig.RIGHT)) {
+			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
+			
+			
+		}else if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
+			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
+			
+			
+		}else if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
+			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
+			
+			
+		}else {
+			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
+			
+			
 		}
 	}
 }

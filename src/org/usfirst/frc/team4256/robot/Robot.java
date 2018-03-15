@@ -161,6 +161,9 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		autonomous.run(swerve, clamp, elevator);
+		V_Events a = new V_Events((swerve, clamp, elevator) -> swerve.autoMode(false));
+		V_Events.Event sfbjn = (swerve, clamp, elevator) -> swerve.autoMode(false);
+
 //			V_Events.check(instructions.getLeash().getIndependentVariable());
 			
 //			switch(V_Events.counter) {
