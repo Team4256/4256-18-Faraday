@@ -1,9 +1,15 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
+import org.usfirst.frc.team4256.robot.R_DriveTrain;
+import org.usfirst.frc.team4256.robot.Autonomous.V_Instructions.FieldPieceConfig;
+import org.usfirst.frc.team4256.robot.Elevators.R_Elevators;
+import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
+import org.usfirst.frc.team4256.robot.R_Clamp;
+
 public class V_Instructions {
 	public static final double leftStartX = -112.33, centerStartX = 7.19, rightStartX = 115.0;
 	public static final double switchX = 95.43, cubeX = 72.64, scaleX = 83.11;
-	public static final double startY = 13.32, switchY = 166.6, cubeY = 214.35, scaleY = 296.13;
+	public static final double startY = 13.32, switchY = 166.6, cubeY = 210.0, scaleY = 296.13;
 	
 	public final double initOdometerPosX;
 	
@@ -31,7 +37,7 @@ public class V_Instructions {
 		case LEFT:initOdometerPosX = leftStartX;
 			final P_Bezier l = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to nearest switch
 			P_Bezier[] pl = new P_Bezier[] {l};
-			leash = new V_Leash(pl, /*leash length*/3.0, /*growth rate*/0.1);
+			leash = new V_Leash(pl, /*leash length*/1.5, /*growth rate*/0.1);
 			break;
 		case CENTER:initOdometerPosX = centerStartX;
 			leash = bezier_center2switchLeft();//get to left switch, might as well be random side though
@@ -39,7 +45,7 @@ public class V_Instructions {
 		case RIGHT:initOdometerPosX = rightStartX;
 			final P_Bezier r = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to nearest switch
 			P_Bezier[] pr = new P_Bezier[] {r};
-			leash = new V_Leash(pr, /*leash length*/3.0, /*growth rate*/0.1);
+			leash = new V_Leash(pr, /*leash length*/1.5, /*growth rate*/0.1);
 			break;
 		default:initOdometerPosX = centerStartX;break;
 		}
@@ -61,38 +67,38 @@ public class V_Instructions {
 		case LEFT:initOdometerPosX = leftStartX;
 		
 			if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
-				//{easy switch then easy scale}//-------------------------------------------------------------------------------------DONE
+				//{easy switch then easy scale}
 				final P_Bezier a = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
 				final P_Bezier b = new P_Bezier(-switchX, switchY, -115, 202, -87, 222, -cubeX, cubeY, 1.0);//get to new cube
 				final P_Bezier c = new P_Bezier(-cubeX, cubeY, -72.64, 224, -71.11, 286, -scaleX, scaleY, 2.0);//get to easy scale
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b, c};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 				
 			}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
 				//{easy switch then hard scale}
 				final P_Bezier a = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
 				final P_Bezier b = new P_Bezier(-switchX, switchY, -115, 202, -87, 222, -cubeX, cubeY, 1.0);//get to new cube
-				final P_Bezier c = new P_Bezier(-cubeX, cubeY, -40, 278, 63, 228, scaleX, scaleY, 2.0);//get to hard scale
+				final P_Bezier c = new P_Bezier(-cubeX, cubeY, -36, 279, 94, 180, scaleX, scaleY, 2.0);//get to hard scale
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b, c};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 				
 			}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
-				//{easy scale then hard switch}//-------------------------------------------------------------------------------------DONE
+				//{easy scale then hard switch}
 				final P_Bezier a = new P_Bezier(leftStartX, startY, -119, 206, -92, 238, -scaleX, scaleY, 0.0);//get to easy scale
-				final P_Bezier b = new P_Bezier(-scaleX, scaleY, -52, 193, 42, 277, /*cubeX*/64.0, cubeY, 1.0);//get to new cube/hard switch
+				final P_Bezier b = new P_Bezier(-scaleX, scaleY, -84, 193, 42, 277, /*cubeX*/57.0, cubeY, 1.0);//get to new cube/hard switch
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 				
 			}else {
 				//{hard switch then hard scale}
-				final P_Bezier a = new P_Bezier(leftStartX, startY, -112, 92, -122, 96, -119, 166, 0.0);//get to random place
-				final P_Bezier b = new P_Bezier(-119, 166, -117, 297, 141, 126, scaleX, scaleY, 1.0);//pass by hard switch, end at hard scale
+				final P_Bezier a = new P_Bezier(leftStartX, startY, -112, 92, -149, 295, /*-cubeX*/-57, cubeY, 0.0);//get to new cube/easy switch
+				final P_Bezier b = new P_Bezier(/*-cubeX*/-57, cubeY, -21, 275, 88, 194, scaleX, scaleY, 1.0);//pass by hard switch, end at hard scale
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 			
 			break;
@@ -108,37 +114,37 @@ public class V_Instructions {
 		case RIGHT:initOdometerPosX = rightStartX;
 		
 			if (switchTarget.equals(FieldPieceConfig.RIGHT) && scaleTarget.equals(FieldPieceConfig.RIGHT)) {
-				//{easy switch then easy scale}//-----------------------------------------------------------------------------------DONE
+				//{easy switch then easy scale}
 				final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
 				final P_Bezier b = new P_Bezier(switchX, switchY, 111, 195, 101, 220, cubeX, cubeY, 1.0);//get to new cube
 				final P_Bezier c = new P_Bezier(cubeX, cubeY, 72.64, 224, 71.11, 286, scaleX, scaleY, 2.0);//get to easy scale
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b, c};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 				
 			}else if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
 				//{easy switch then hard scale}
 				final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
 				final P_Bezier b = new P_Bezier(switchX, switchY, 111, 195, 101, 220, cubeX, cubeY, 1.0);//get to new cube
-				final P_Bezier c = new P_Bezier(cubeX, cubeY, 40, 278, -63, 228, -scaleX, scaleY, 2.0);//get to hard scale
+				final P_Bezier c = new P_Bezier(cubeX, cubeY, 36, 279, -94, 180, -scaleX, scaleY, 2.0);//get to hard scale
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b, c};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 				
 			}else if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
-				//{easy scale then hard switch}//-----------------------------------------------------------------------------------DONE
+				//{easy scale then hard switch}
 				final P_Bezier a = new P_Bezier(rightStartX, startY, 124, 222, 77, 248, scaleX, scaleY, 0.0);//get to easy scale
-				final P_Bezier b = new P_Bezier(scaleX, scaleY, 52, 193, -42, 277, /*-cubeX*/-64.0, cubeY, 1.0);//get to new cube/hard switch
+				final P_Bezier b = new P_Bezier(scaleX, scaleY, 84, 193, -42, 277, /*-cubeX*/-64.0, cubeY, 1.0);//get to new cube/hard switch
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}else {
 				//{hard switch then hard scale}
-				final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 76, 113, 90, 119, 166, 0.0);//get to random place
-				final P_Bezier b = new P_Bezier(119, 166, 117, 297, -124, 126, -scaleX, scaleY, 1.0);//pass by hard switch, end at hard scale
+				final P_Bezier a = new P_Bezier(rightStartX, startY, 112, 92, 149, 295, /*cubeX*/57, cubeY, 0.0);//get to new cube/easy switch
+				final P_Bezier b = new P_Bezier(/*cubeX*/57, cubeY, 21, 275, -88, 194, -scaleX, scaleY, 1.0);//pass by hard switch, end at hard scale
 				
 				final P_Bezier[] path = new P_Bezier[] {a, b};
-				leash = new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 			
 			break;
@@ -204,5 +210,24 @@ public class V_Instructions {
 		//Create an array of CubicBeziers; represents a full path.
 		P_Bezier[] path = new P_Bezier[] {a};
 		return new V_Leash(path, /*leash length*/3.0, /*growth rate*/0.1);
+	}
+	
+	private final long start = System.currentTimeMillis();
+	public void forwardSimple(final R_DriveTrain swerve, final R_Clamp clamp, final R_Elevators elevators) {
+		if (System.currentTimeMillis() - start < 2000) {
+			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
+			clamp.close();
+			elevators.setInches(3.0);
+		}else if (System.currentTimeMillis() - start < 5000) {
+			swerve.holonomic_encoderAware(0.0, 0.5, 0.0);
+			elevators.setInches(ElevatorPresets.SWITCH.height());
+		}else {
+			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
+			if ((startingPosition.equals(StartingPosition.LEFT) && switchTarget.equals(FieldPieceConfig.LEFT)) ||
+				(startingPosition.equals(StartingPosition.RIGHT) && switchTarget.equals(FieldPieceConfig.RIGHT))) {
+				clamp.spit();
+			}
+		}
+		swerve.completeLoopUpdate();
 	}
 }
