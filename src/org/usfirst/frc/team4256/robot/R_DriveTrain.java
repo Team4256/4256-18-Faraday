@@ -15,7 +15,7 @@ public class R_DriveTrain {
 	private double moduleD_previousAngle = 0.0;
 	private double drivetrain_previousSpin = 0.0;
 
-	private R_Gyro gyro;
+	public R_Gyro gyro;
 	private R_SwerveModule moduleA;
 	private R_SwerveModule moduleB;
 	private R_SwerveModule moduleC;

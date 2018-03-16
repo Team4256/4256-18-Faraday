@@ -12,7 +12,6 @@ import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
 import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
 import org.usfirst.frc.team4256.robot.Autonomous.Autonomous;
-import org.usfirst.frc.team4256.robot.Autonomous.V_Events;
 import org.usfirst.frc.team4256.robot.Autonomous.V_Odometer;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -109,7 +108,6 @@ public class Robot extends IterativeRobot {
 		final long start = System.currentTimeMillis();
 		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
 		autonomous = haveGameData ? new A_OneSwitchOneScale(startingPosition, gameData_new, odometer) : new A_PassLine(startingPosition, odometer);//TODO will need a switch with many cases
-		V_Events.init();
 		
 		//{Robot Input}
 		gyro.setTareAngle(-90.0, false);//TODO only do this in certain cases
@@ -161,35 +159,6 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		autonomous.run(swerve, clamp, elevator);
-//			V_Events.check(instructions.getLeash().getIndependentVariable());
-			
-//			switch(V_Events.counter) {
-//			case(0):
-////				lockedAngle = instructions.switchRight ? 0.0 : 90.0;
-//				clamp.close();
-//				elevators.setInches(3.0);
-//				break;
-//			case(1): 
-////				lockedAngle = instructions.switchRight ? -90.0 : 90.0;
-//				clamp.rotateTo(0.0);
-//				elevators.setInches(ElevatorPresets.SWITCH.height());
-//				break;
-//			case(2):
-//				final long startTime = System.currentTimeMillis();
-//				while (System.currentTimeMillis() - startTime < 500) {
-//					final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.2 : 0.0;
-//					swerve.holonomic_encoderAware(0.0, 0.0, spin);
-//				}
-//				if ((instructions.startingPosition.equals(StartingPosition.LEFT) && instructions.switchTarget.equals(FieldPieceConfig.LEFT)) ||
-//					(instructions.startingPosition.equals(StartingPosition.RIGHT) && instructions.switchTarget.equals(FieldPieceConfig.RIGHT))) {
-//					clamp.spit();
-//				}
-//				break;
-//			}
-//			
-//			compute spin such that robot orients itself according to commands in events
-//			final double spin = instructions.switchTarget.equals(FieldPieceConfig.RIGHT) ? -0.1 : 0.0;//V_PID.get("spin", gyro.wornPath(lockedAngle));
-//		}
 	}
 	
 	@Override
