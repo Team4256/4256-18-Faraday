@@ -92,7 +92,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			//{easy switch then hard scale}
 			final P_Bezier a = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
 			final P_Bezier b = new P_Bezier(-switchX, switchY, -115, 202, -91, 228, -cubeX, cubeY, 1.0);//get to new cube
-			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -30, 279, 94, 180, scaleX, scaleY, 2.0);//get to hard scale
+			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -30, 289, 94, 190, scaleX, scaleY, 2.0);//get to hard scale
 
 			final P_Bezier[] path = new P_Bezier[] {a, b, c};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
@@ -107,8 +107,8 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		}else {
 			//{hard switch then hard scale}
-			final P_Bezier a = new P_Bezier(leftStartX, startY, -112, 140, -166, 254, 22, 241, 0.0);
-			final P_Bezier b = new P_Bezier(22, 241, 41, 237, 55, 235, cubeX, cubeY, 1.0);//get to new cube/hard switch
+			final P_Bezier a = new P_Bezier(leftStartX, startY, -112, 140, -166, 268, 22, 255, 0.0);
+			final P_Bezier b = new P_Bezier(22, 255, 41, 251, 55, 235, cubeX, cubeY, 1.0);//get to new cube/hard switch
 			final P_Bezier c = new P_Bezier(cubeX, cubeY, 82, 240, 73, 264, scaleX, scaleY, 2.0);//get to hard scale
 
 			final P_Bezier[] path = new P_Bezier[] {a, b, c};
@@ -173,7 +173,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			//{easy switch then hard scale}
 			final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
 			final P_Bezier b = new P_Bezier(switchX, switchY, 115, 202, 91, 228, cubeX, cubeY, 1.0);//get to new cube
-			final P_Bezier c = new P_Bezier(cubeX, cubeY, 30, 279, -94, 180, -scaleX, scaleY, 2.0);//get to hard scale//TODO this and its left hand partner run into a bunch of cubes
+			final P_Bezier c = new P_Bezier(cubeX, cubeY, 30, 289, -94, 190, -scaleX, scaleY, 2.0);//get to hard scale
 
 			final P_Bezier[] path = new P_Bezier[] {a, b, c};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
@@ -187,8 +187,8 @@ public class A_OneSwitchOneScale implements Autonomous{
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			//{hard switch then hard scale}
-			final P_Bezier a = new P_Bezier(rightStartX, startY, 112, 140, 166, 254, -22, 241, 0.0);
-			final P_Bezier b = new P_Bezier(-22, 241, -41, 237, -55, 235, -cubeX, cubeY, 1.0);//get to new cube/hard switch
+			final P_Bezier a = new P_Bezier(rightStartX, startY, 112, 140, 166, 268, -22, 255, 0.0);
+			final P_Bezier b = new P_Bezier(-22, 255, -41, 251, -55, 235, -cubeX, cubeY, 1.0);//get to new cube/hard switch
 			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -82, 240, -73, 264, -scaleX, scaleY, 2.0);//get to hard scale
 
 			final P_Bezier[] path = new P_Bezier[] {a, b, c};
@@ -335,9 +335,21 @@ public class A_OneSwitchOneScale implements Autonomous{
 													 									 	 return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 			 										 										 return 0.0;};
+			 										 										 
+			final V_Events.Command k = (c, e, g) -> {c.open();
+																							 e.setInches(Parameters.ElevatorPresets.FLOOR.height());
+																							 final double error = g.wornPath(180.0);
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
+																							 return spin;};
+			final V_Events.Command l = (c, e, g) -> {c.slurp();
+																							 if(c.hasCube()) e.setInches(Parameters.ElevatorPresets.SWITCH.height());
+																							 return 0.0;};
+																							 
+			final V_Events.Command m = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
+																							 return 0.0;};
 
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until scale
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j, k, l, m};//TODO only takes care of stuff up until scale
+			final double[] triggers = new double[] {0.3, 0.5, 0.9, 1.3, 1.7, 1.9};
 			events = new V_Events(commands, triggers);
 
 		}else {
