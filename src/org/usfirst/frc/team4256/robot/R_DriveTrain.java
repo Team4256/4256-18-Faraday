@@ -21,6 +21,8 @@ public class R_DriveTrain {
 	private R_SwerveModule moduleC;
 	private R_SwerveModule moduleD;
 	
+	private long stuckTime = System.currentTimeMillis();
+	
 	public R_DriveTrain(final R_Gyro gyro, final R_SwerveModule moduleA, final R_SwerveModule moduleB, final R_SwerveModule moduleC, final R_SwerveModule moduleD) {
 		this.gyro = gyro;
 		this.moduleA = moduleA;
@@ -87,7 +89,11 @@ public class R_DriveTrain {
 			moduleAngles_final = computeModuleAngles(moduleComps_desired);
 		}
 		
+		if (Math.abs(speed - speed_actual) < 0.4) stuckTime = System.currentTimeMillis();
+		
 		boolean bad = speed == 0.0 && speedSpin == 0.0;
+		if (System.currentTimeMillis() - stuckTime > 500) bad = true;
+		
 		moduleA.swivelTo(moduleAngles_final[0], bad);	moduleB.swivelTo(moduleAngles_final[1], bad);
 		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
 		moduleD_previousAngle = moduleAngles_final[3];
