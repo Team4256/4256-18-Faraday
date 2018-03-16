@@ -1,12 +1,12 @@
 package org.usfirst.frc.team4256.robot.Elevators;
 
-public interface Elevator {
-	public void init();
-	public void setInches(final double inches);
-	public double getInches();
-	public void increment(final double inches, final boolean startingAtPreviousSetpoint);
-	public boolean isThere(final double threshold);
-	public void overrideSoftLimits(final boolean enable);
-	public void setZero(final double offsetInchesFromCurrent);
-	public void completeLoopUpdate();
+public abstract class Elevator {
+	public abstract void init();
+	public abstract void setInches(final double inches);
+	public abstract double getInches();
+	public abstract void increment(final double inches, final boolean startingAtPreviousSetpoint);
+	public abstract boolean isThere(final double threshold);
+	public abstract void overrideSoftLimits(final boolean enable);
+	public abstract void setZero(final double offsetInchesFromCurrent);
+	public abstract void completeLoopUpdate();
 }
