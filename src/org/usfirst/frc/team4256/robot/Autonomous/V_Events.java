@@ -33,7 +33,8 @@ public class V_Events {
 	}
 	
 	public double execute(final R_Clamp clamp, final R_Combined elevator, final R_Gyro gyro) {
-		return commands[step].execute(clamp, elevator, gyro);//calls methods on clamp and elevator, then returns spin for swerve
+		if (step > -1) return commands[step].execute(clamp, elevator, gyro);//calls methods on clamp and elevator, then returns spin for swerve
+		else return 0.0;
 	}
 	
 	public interface Command {

@@ -263,8 +263,21 @@ public class A_OneSwitchOneScale implements Autonomous{
 	}
 
 	private void useEvents_center() {
-		// at 1.0, reaches switch; at 2.0, reaches new cube; at 3.0, reaches scale
+		// at 1.0, reaches switch; at 2.0, reaches new cube; at 3.0, reaches scale//TODO this was just copy pasted
+					final V_Events.Command h = (c, e, g) -> {c.close();
+																									 e.setInches(3.0);
+																									 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
+															 									 	 return spin;};
+					final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
+															 										 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
+																									 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
+															 									 	 return spin;};
+					final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
+															 										 return 0.0;};
 
+					final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
+					final double[] triggers = new double[] {0.3, 0.5, 1.0};
+					events = new V_Events(commands, triggers);
 	}
 
 	private void useEvents_right() {
@@ -272,11 +285,11 @@ public class A_OneSwitchOneScale implements Autonomous{
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
 			final V_Events.Command h = (c, e, g) -> {c.close();
 																							 e.setInches(3.0);
-																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
+																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.2 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 													 										 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
+																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.2 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 													 										 return 0.0;};
@@ -289,11 +302,11 @@ public class A_OneSwitchOneScale implements Autonomous{
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
 			final V_Events.Command h = (c, e, g) -> {c.close();
 													 										 e.setInches(3.0);
-																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
+																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.2 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 												     									 	 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
+																							 final double spin = g.getCurrentAngle() < 270.0 ? 0.2 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 													 										 return 0.0;};
@@ -306,11 +319,11 @@ public class A_OneSwitchOneScale implements Autonomous{
 			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
 			final V_Events.Command h = (c, e, g) -> {c.close();
 													 										 e.setInches(3.0);
-													 									 	 final double spin = g.getCurrentAngle() > 0.0 ? -0.1 : 0.0;
+													 									 	 final double spin = g.getCurrentAngle() > 0.0 ? -0.2 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 													 										 e.setInches(Parameters.ElevatorPresets.SCALE_HIGH.height());
-													 									 	 final double spin = g.getCurrentAngle() > 0.0 ? -0.1 : 0.0;
+													 									 	 final double spin = g.getCurrentAngle() > 0.0 ? -0.2 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 			 										 										 return 0.0;};
@@ -323,11 +336,11 @@ public class A_OneSwitchOneScale implements Autonomous{
 			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
 			final V_Events.Command h = (c, e, g) -> {c.close();
 																							 e.setInches(3.0);
-																						   final double spin = g.getCurrentAngle() < 180.0 ? 0.1 : 0.0;
+																						   final double spin = g.getCurrentAngle() < 180.0 ? 0.2 : 0.0;
 																						   return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 																							 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																						   final double spin = g.getCurrentAngle() < 180.0 ? 0.1 : 0.0;
+																						   final double spin = g.getCurrentAngle() < 180.0 ? 0.2 : 0.0;
 																						   return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 																							 return 0.0;};
