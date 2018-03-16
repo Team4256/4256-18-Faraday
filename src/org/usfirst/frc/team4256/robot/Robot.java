@@ -9,6 +9,7 @@ import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
+import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
 import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
 import org.usfirst.frc.team4256.robot.Autonomous.Autonomous;
@@ -74,6 +75,7 @@ public class Robot extends IterativeRobot {
 		odometer.init();
 		//{Human Input}
 		faraday.getEntry("Starting Position").setNumber(1);
+		faraday.getEntry("Simple Auto").setBoolean(false);
 		//{Game Input}
 		gameData_old = DriverStation.getInstance().getGameSpecificMessage();
 		//{Robot Output}
@@ -103,14 +105,25 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		//{Human Input}
 		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(1).floatValue());
+		final boolean simpleAuto = faraday.getEntry("Simple Auto").getBoolean(false);
 		
 		//{Game Input}
 		final long start = System.currentTimeMillis();
 		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
-		autonomous = haveGameData ? new A_OneSwitchOneScale(startingPosition, gameData_new, odometer) : new A_PassLine(startingPosition, odometer);//TODO will need a switch with many cases
+		if(!simpleAuto) {
+			if (haveGameData) {
+				autonomous = new A_OneSwitchOneScale(startingPosition, gameData_new, odometer);
+				gyro.setTareAngle(-90.0, false);
+			}else {
+				autonomous = new A_PassLine(startingPosition, odometer);
+				gyro.setTareAngle(-90.0, false);
+			}
+		}else {
+			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
+			gyro.setTareAngle(0.0, false);
+		}
 		
 		//{Robot Input}
-		gyro.setTareAngle(-90.0, false);//TODO only do this in certain cases
 		odometer.setOrigin(odometer.getX() - autonomous.initOdometerPosX()/12.0, odometer.getY() - Autonomous.startY/12.0);
 		
 		//{Robot Output}
