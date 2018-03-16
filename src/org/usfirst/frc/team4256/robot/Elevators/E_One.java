@@ -6,7 +6,7 @@ import com.cyborgcats.reusable.Phoenix.R_Victor;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-public class E_One implements Elevator {
+public class E_One extends Elevator {
 	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kReverse;//should be kForward
 	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kReverse;
 	private static final double gearRatio = 1.0;
@@ -53,6 +53,7 @@ public class E_One implements Elevator {
 	/**
 	 * This function prepares each motor individually by enabling soft limits, setting PID values, and commanding followers.
 	**/
+	@Override
 	public void init() {
 		master.init();
 		
@@ -93,7 +94,6 @@ public class E_One implements Elevator {
 		return master.getCurrentRevs();
 	}
 	
-	
 	private double validateInches(final double inches) {
 		if (inches > maximumHeight) {
 			return maximumHeight;
@@ -108,6 +108,7 @@ public class E_One implements Elevator {
 	/**
 	 * This function sends the elevator to a certain height after clipping the input.
 	**/
+	@Override
 	public void setInches(final double inches) {
 		setRevs(inchesToRevs(validateInches(inches)));
 	}
@@ -116,6 +117,7 @@ public class E_One implements Elevator {
 	/**
 	 * 
 	**/
+	@Override
 	public double getInches() {
 		return revsToInches(getRevs());
 	}
@@ -124,6 +126,7 @@ public class E_One implements Elevator {
 	/**
 	 * 
 	**/
+	@Override
 	public void increment(final double inches, final boolean startingAtPreviousSetpoint) {
 		double newSetpoint = getInches() + inches;
 		if (startingAtPreviousSetpoint) newSetpoint += master.getCurrentError(false);
@@ -134,6 +137,7 @@ public class E_One implements Elevator {
 	/**
 	 * Threshold should be specified in inches. If the elevator is within that many inches of its target, this function returns true.
 	**/
+	@Override
 	public boolean isThere(final double threshold) {
 		return Math.abs(revsToInches(master.getCurrentError(false))) <= threshold;
 	}
@@ -142,11 +146,12 @@ public class E_One implements Elevator {
 	/**
 	 * A shortcut to call overrideSoftLimits on all the Talons in the elevator.
 	**/
+	@Override
 	public void overrideSoftLimits(final boolean enable) {
 		master.overrideSoftLimitsEnable(enable);
 	}
 	
-	
+	@Override
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition((int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
 		enableSoftLimits();
@@ -157,6 +162,7 @@ public class E_One implements Elevator {
 	/**
 	 * A shortcut to call completeLoopUpdate on all the Talons in the elevator.
 	**/
+	@Override
 	public void completeLoopUpdate() {
 		master.completeLoopUpdate();
 	}

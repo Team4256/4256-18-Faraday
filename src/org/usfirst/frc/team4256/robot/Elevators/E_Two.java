@@ -3,7 +3,7 @@ package org.usfirst.frc.team4256.robot.Elevators;
 import com.cyborgcats.reusable.Phoenix.R_Encoder;
 import com.cyborgcats.reusable.Phoenix.R_Talon;
 
-public class E_Two implements Elevator {
+public class E_Two extends Elevator {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
 	protected static final double maximumHeight = 40.5;//inches
@@ -21,6 +21,7 @@ public class E_Two implements Elevator {
 	/**
 	 * This function prepares the motor by enabling soft limits and setting PID values.
 	**/
+	@Override
 	public void init() {
 		master.init();
 		master.configAllowableClosedloopError(0, (int)master.convert.from.REVS.afterGears(inchesToRevs(0.5)), R_Talon.kTimeoutMS);//TODO
@@ -73,6 +74,7 @@ public class E_Two implements Elevator {
 	/**
 	 * This function sends the elevator to a certain height after clipping the input.
 	**/
+	@Override
 	public void setInches(final double inches) {
 		setRevs(inchesToRevs(validateInches(inches)));
 	}
@@ -81,6 +83,7 @@ public class E_Two implements Elevator {
 	/**
 	 * 
 	**/
+	@Override
 	public double getInches() {
 		return revsToInches(getRevs());
 	}
@@ -89,6 +92,7 @@ public class E_Two implements Elevator {
 	/**
 	 * 
 	**/
+	@Override
 	public void increment(final double inches, final boolean startingAtPreviousSetpoint) {
 		double newSetpoint = getInches() + inches;
 		if (startingAtPreviousSetpoint) newSetpoint += master.getCurrentError(false);
@@ -99,6 +103,7 @@ public class E_Two implements Elevator {
 	/**
 	 * Threshold should be specified in inches. If the elevator is within that many inches of its target, this function returns true.
 	**/
+	@Override
 	public boolean isThere(final double threshold) {
 		return Math.abs(revsToInches(master.getCurrentError(false))) <= threshold;
 	}
@@ -107,11 +112,12 @@ public class E_Two implements Elevator {
 	/**
 	 * A shortcut to call overrideSoftLimits on all the Talons in the elevator.
 	**/
+	@Override
 	public void overrideSoftLimits(final boolean enable) {
 		master.overrideSoftLimitsEnable(enable);
 	}
 	
-	
+	@Override
 	public void setZero(final double offsetInchesFromCurrent) {
 		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
 		knowsZero = true;
@@ -121,6 +127,7 @@ public class E_Two implements Elevator {
 	/**
 	 * A shortcut to call completeLoopUpdate on all the Talons in the elevator.
 	**/
+	@Override
 	public void completeLoopUpdate() {
 		master.completeLoopUpdate();
 	}
