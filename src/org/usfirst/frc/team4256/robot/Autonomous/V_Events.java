@@ -5,6 +5,8 @@ import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import com.cyborgcats.reusable.R_Gyro;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class V_Events {
 	private final Command[] commands;//list of actions
 	private final double[] triggers;//list of values where independentVariable triggers an action
@@ -28,11 +30,12 @@ public class V_Events {
 		if (!doneRunning && independentVariable >= triggers[step + 1]) {
 			//move on when the independent variable is greater than the trigger value
 			step++;
-			if (step + 2 >= triggers.length) doneRunning = true;
+			if (step + 2 > triggers.length) doneRunning = true;
 		}
 	}
 	
 	public double execute(final R_Clamp clamp, final R_Combined elevator, final R_Gyro gyro) {
+		SmartDashboard.putNumber("step", step);
 		if (step > -1) return commands[step].execute(clamp, elevator, gyro);//calls methods on clamp and elevator, then returns spin for swerve
 		else return 0.0;
 	}
