@@ -7,8 +7,6 @@ import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import com.cyborgcats.reusable.V_PID;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class A_OneSwitchOneScale implements Autonomous{
 	public final FieldPieceConfig switchTarget;
 	public final FieldPieceConfig scaleTarget;
@@ -46,7 +44,6 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 	public void run(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		events.check(leash.getIndependentVariable());
-		SmartDashboard.putNumber("Ind Var", leash.getIndependentVariable());
   		final double spin = events.execute(clamp, elevator, swerve.gyro);
 
 		//run path processing only if ZED values are new
@@ -244,20 +241,20 @@ public class A_OneSwitchOneScale implements Autonomous{
 			 										 										 return 0.0;};
 
 			 										 										 
-			final V_Events.Command k = (c, e, g) -> {c.open();
-																							 e.setInches(Parameters.ElevatorPresets.FLOOR.height());
-																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-																							 return spin;};
-			final V_Events.Command l = (c, e, g) -> {c.slurp();
-																							 if(c.hasCube()) e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																							 return 0.0;};
+//			final V_Events.Command k = (c, e, g) -> {c.open();//TODO 
+//																							 e.setInches(Parameters.ElevatorPresets.FLOOR.height());
+//																							 final double error = g.wornPath(180.0);
+//																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
+//																							 return spin;};
+//			final V_Events.Command l = (c, e, g) -> {c.slurp();
+//																							 if(c.hasCube()) e.setInches(Parameters.ElevatorPresets.SWITCH.height());
+//																							 return 0.0;};
+//																							 
+//			final V_Events.Command m = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
+//																							 return 0.0;};
 																							 
-			final V_Events.Command m = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-																							 return 0.0;};
-																							 
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j, k, l, m};
-			final double[] triggers = new double[] {0.3, 0.5, 0.9, 1.2, 1.7, 1.9};
+			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j/*, k, l, m*/};
+			final double[] triggers = new double[] {0.3, 0.5, 0.9/*, 1.2, 1.7, 1.9*/};
 			events = new V_Events(commands, triggers);
 
 		}else {
