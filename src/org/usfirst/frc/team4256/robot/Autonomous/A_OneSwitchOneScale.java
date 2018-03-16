@@ -173,7 +173,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			//{easy switch then hard scale}
 			final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
 			final P_Bezier b = new P_Bezier(switchX, switchY, 115, 202, 91, 228, cubeX, cubeY, 1.0);//get to new cube
-			final P_Bezier c = new P_Bezier(cubeX, cubeY, 30, 279, -94, 180, -scaleX, scaleY, 2.0);//get to hard scale
+			final P_Bezier c = new P_Bezier(cubeX, cubeY, 30, 279, -94, 180, -scaleX, scaleY, 2.0);//get to hard scale//TODO this and its left hand partner run into a bunch of cubes
 
 			final P_Bezier[] path = new P_Bezier[] {a, b, c};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
@@ -197,7 +197,6 @@ public class A_OneSwitchOneScale implements Autonomous{
 	}
 
 	//-------------------------------------------------------------------------------------------------------------------------------------
-	//TODO use signum of getWornPath rather than less than or greater than
 	private void useEvents_left() {
 		if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
@@ -289,12 +288,12 @@ public class A_OneSwitchOneScale implements Autonomous{
 			final V_Events.Command h = (c, e, g) -> {c.close();
 																							 e.setInches(3.0);
 																							 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 													 										 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
 													 										 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 													 										 return 0.0;};
@@ -308,12 +307,12 @@ public class A_OneSwitchOneScale implements Autonomous{
 			final V_Events.Command h = (c, e, g) -> {c.close();
 													 										 e.setInches(3.0);
 													 										 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 												     									 	 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
 												     									 	 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 													 										 return 0.0;};
@@ -327,12 +326,12 @@ public class A_OneSwitchOneScale implements Autonomous{
 			final V_Events.Command h = (c, e, g) -> {c.close();
 													 										 e.setInches(3.0);
 													 										 final double error = g.wornPath(0.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;;
 													 									 	 return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 													 										 e.setInches(Parameters.ElevatorPresets.SCALE_HIGH.height());
 													 										 final double error = g.wornPath(0.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 													 									 	 return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 			 										 										 return 0.0;};
@@ -346,12 +345,12 @@ public class A_OneSwitchOneScale implements Autonomous{
 			final V_Events.Command h = (c, e, g) -> {c.close();
 																							 e.setInches(3.0);
 																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 																						   return spin;};
 			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
 																							 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
 																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.2 : 0.0;
+																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 																						   return spin;};
 			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
 																							 return 0.0;};

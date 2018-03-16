@@ -81,7 +81,7 @@ public class Robot extends IterativeRobot {
 		elevator.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-140.0);moduleB.setTareAngle(121.0);moduleC.setTareAngle(55.0);moduleD.setTareAngle(-17.0);
+		moduleA.setTareAngle(-55.0);moduleB.setTareAngle(-71.0);moduleC.setTareAngle(-18.0);moduleD.setTareAngle(-87.0);
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		elevatorOne.setZero(0.0);
