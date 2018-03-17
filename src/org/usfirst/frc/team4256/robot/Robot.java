@@ -8,6 +8,11 @@ import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
 
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
@@ -63,6 +68,8 @@ public class Robot extends IterativeRobot {
 	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(Parameters.tx2PowerControl);
+
+	private static Logger logger = Logger.getLogger("Robot");
 	
 	@Override
 	public void robotInit() {
@@ -82,8 +89,14 @@ public class Robot extends IterativeRobot {
 		swerve.init();
 		elevator.init();
 		clamp.init();
+
+		try {
+			logger.addHandler(new FileHandler("/U/log.txt"));
+			logger.setLevel(Level.FINE);
+		} catch (SecurityException | IOException e1) { }
 		
 		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(-8.0);moduleC.setTareAngle(-10.0);moduleD.setTareAngle(78.0);
+		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		elevatorOne.setZero(0.0);
