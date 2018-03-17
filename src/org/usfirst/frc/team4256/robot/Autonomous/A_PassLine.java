@@ -32,7 +32,7 @@ public class A_PassLine implements Autonomous{
 		}
 	}
 	
-	public void run(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevator) {//TODO probably have a pause thing too
+	public void run(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		//run processing only if ZED values are new
   		if (odometer.newX() && odometer.newY()) {
   			//get most recent ZED values

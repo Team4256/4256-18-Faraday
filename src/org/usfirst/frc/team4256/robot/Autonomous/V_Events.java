@@ -38,6 +38,46 @@ public class V_Events {
 	}
 	
 	public interface Command {
-		double execute(final R_Clamp clamp, final R_Combined elevator, final R_Gyro gyro);//should call methods on clamp and elevator, then return spin for swerve
+		//should call methods on clamp and elevator, then return spin for swerve
+		double execute(final R_Clamp clamp, final R_Combined elevator, final R_Gyro gyro);
+	}
+	
+	
+	
+	/*
+	 * Instructions is a 2D array of ints. It can have any number of rows, and should have 3 columns.
+	 * The first column determines clamp state (0 is slurp, 1 is spit, 2 is open).
+	 * The second column determines elevator height (in inches).
+	 * The third column represents the desired robot orientation (angle in degrees).
+	 * 
+	 * An array of executable commands is returned.
+	*/
+	public static Command[] getFromArray(final int[][] instructions) {
+		Command[] commands = new Command[instructions.length];
+		
+		for (int i = 0; i < instructions.length; i++) {
+			final int[] instruction = instructions[i];
+			
+			commands[i] = (c, e, g) -> {//c is for clamp, e is for elevator, g is for gyro
+				final int clampState = instruction[0],
+						  elevatorHeight = instruction[1],
+						  desiredAngle = instruction[2];
+			
+				switch(clampState) {
+				case 0: c.slurp();break;
+				case 1: c.spit(0.5);break;
+				case 2: c.open();break;
+				case 3: c.rotateTo(0.0);break;
+				default: break;
+				}
+			
+				e.setInches((double)elevatorHeight);
+			
+				final double error = g.wornPath((double)desiredAngle);
+				return Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;			
+			};
+		}
+		
+		return commands;
 	}
 }

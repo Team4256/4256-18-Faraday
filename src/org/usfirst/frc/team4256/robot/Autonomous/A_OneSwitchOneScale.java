@@ -73,6 +73,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 	public double initOdometerPosX() {return initOdometerPosX;}
 
+	//------------------------------------------------------------------------------------------
 	private void useLeash_left() {
 		initOdometerPosX = leftStartX;
 
@@ -112,7 +113,63 @@ public class A_OneSwitchOneScale implements Autonomous{
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}
 	}
+	
+	private void useEvents_left() {
+		if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
+			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
+			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
+				{0, 3, 0},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 0},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 0}
+			};
+			
+			
+			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
+		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
+			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
+			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
+				{0, 3, 0},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 0},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 0}
+			};
+			
+
+			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
+
+		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
+			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
+			final int[][] instructions = new int[][] {
+				{0, 3, 0},
+				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0},
+				{1, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0},
+				{2, Parameters.ElevatorPresets.FLOOR.height(), 180},
+				{0, Parameters.ElevatorPresets.SWITCH.height(), 180},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+				
+			};
+			
+
+			final double[] triggers = new double[] {0.3, 0.5, 0.9, 1.2, 1.7, 1.9};
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
+
+		}else {
+			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
+			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
+				{0, 3, 180},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 180},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+			};
+
+			
+			final double[] triggers = new double[] {0.3, 0.6, 1.9};
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
+		}
+	}
+	//------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------------------
 	private void useLeash_center() {
 		initOdometerPosX = centerStartX;
 
@@ -154,6 +211,20 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}
 	}
 
+	private void useEvents_center() {
+		// at 1.0, reaches switch; at 2.0, reaches new cube; at 3.0, reaches scale//TODO this was just copy pasted
+		final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
+			{0, 3, 0},
+			{3, Parameters.ElevatorPresets.SWITCH.height(), 0},
+			{1, Parameters.ElevatorPresets.SWITCH.height(), 0}
+		};
+		
+		
+		final double[] triggers = new double[] {0.3, 0.5, 0.9};
+		events = new V_Events(V_Events.getFromArray(instructions), triggers);
+	}
+	//------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------------------
 	private void useLeash_right() {
 		initOdometerPosX = rightStartX;
 
@@ -193,197 +264,58 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}
 	}
 
-	//-------------------------------------------------------------------------------------------------------------------------------------
-	private void useEvents_left() {
-		if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
-			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
-			final V_Events.Command h = (c, e, g) -> {c.close();
-																							 e.setInches(3.0);
-													 									 	 return 0.0;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-													 										 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-													 									 	 return 0.0;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-													 										 return 0.0;};
-
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
-			events = new V_Events(commands, triggers);
-
-		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
-			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
-			final V_Events.Command h = (c, e, g) -> {c.close();
-													 										 e.setInches(3.0);
-													 									 	 return 0.0;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-												     									     e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-													 									 	 return 0.0;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-													 										 return 0.0;};
-
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
-			events = new V_Events(commands, triggers);
-
-		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
-			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
-			final V_Events.Command h = (c, e, g) -> {c.close();
-													 										 e.setInches(3.0);
-													 										 final double error = g.wornPath(0.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-													 									 	 return spin;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-													 										 e.setInches(Parameters.ElevatorPresets.SCALE_HIGH.height());
-													 										 final double error = g.wornPath(0.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-													 									 	 return spin;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(0.5);
-			 										 										 return 0.0;};
-
-			 										 										 
-			final V_Events.Command k = (c, e, g) -> {c.open();//TODO 
-																							 e.setInches(Parameters.ElevatorPresets.FLOOR.height());
-																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-																							 return spin;};
-			final V_Events.Command l = (c, e, g) -> {c.slurp();
-																							 if(c.hasCube()) e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																							 return 0.0;};
-																							 
-//			final V_Events.Command m = (c, e, g) -> {c.spit(0.5);
-//																							 return 0.0;};
-																							 
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j, k, l/*, m*/};
-			final double[] triggers = new double[] {0.3, 0.5, 0.9, 1.2, 1.7/*, 1.9*/};
-			events = new V_Events(commands, triggers);
-
-		}else {
-			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
-			final V_Events.Command h = (c, e, g) -> {c.close();
-																							 e.setInches(3.0);
-																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-																							 return spin;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-																							 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-																							 return spin;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-																							 return 0.0;};
-
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
-			final double[] triggers = new double[] {0.3, 0.6, 1.9};
-			events = new V_Events(commands, triggers);
-		}
-	}
-
-	private void useEvents_center() {
-		// at 1.0, reaches switch; at 2.0, reaches new cube; at 3.0, reaches scale//TODO this was just copy pasted
-					final V_Events.Command h = (c, e, g) -> {c.close();
-																									 e.setInches(3.0);
-																									 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
-															 									 	 return spin;};
-					final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-															 										 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																									 final double spin = g.getCurrentAngle() < 270.0 ? 0.1 : 0.0;
-															 									 	 return spin;};
-					final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-															 										 return 0.0;};
-
-					final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
-					final double[] triggers = new double[] {0.3, 0.5, 1.0};
-					events = new V_Events(commands, triggers);
-	}
-
 	private void useEvents_right() {
 		if (switchTarget.equals(FieldPieceConfig.RIGHT) && scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
-			final V_Events.Command h = (c, e, g) -> {c.close();
-																							 e.setInches(3.0);
-																							 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-													 									 	 return spin;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-													 										 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-													 										 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-													 									 	 return spin;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-													 										 return 0.0;};
-
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
+			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
+				{0, 3, 270},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 270},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 270}
+			};
+			
+			
 			final double[] triggers = new double[] {0.3, 0.5, 0.9};
-			events = new V_Events(commands, triggers);
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
-			final V_Events.Command h = (c, e, g) -> {c.close();
-													 										 e.setInches(3.0);
-													 										 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-													 									 	 return spin;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-												     									 	 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-												     									 	 final double error = g.wornPath(270.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-													 									 	 return spin;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-													 										 return 0.0;};
-
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
+			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
+				{0, 3, 270},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 270},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 270}
+			};
+			
+			
 			final double[] triggers = new double[] {0.3, 0.5, 0.9};
-			events = new V_Events(commands, triggers);
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
-			final V_Events.Command h = (c, e, g) -> {c.close();
-													 										 e.setInches(3.0);
-													 										 final double error = g.wornPath(0.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;;
-													 									 	 return spin;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-													 										 e.setInches(Parameters.ElevatorPresets.SCALE_HIGH.height());
-													 										 final double error = g.wornPath(0.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-													 									 	 return spin;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-			 										 										 return 0.0;};
-			 										 										 
-			final V_Events.Command k = (c, e, g) -> {c.open();
-																							 e.setInches(Parameters.ElevatorPresets.FLOOR.height());
-																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-																							 return spin;};
-			final V_Events.Command l = (c, e, g) -> {c.slurp();
-																							 if(c.hasCube()) e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																							 return 0.0;};
-																							 
-			final V_Events.Command m = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-																							 return 0.0;};
-
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j, k, l, m};
-			final double[] triggers = new double[] {0.3, 0.5, 0.9, 1.3, 1.7, 1.9};
-			events = new V_Events(commands, triggers);
+			final int[][] instructions = new int[][] {
+				{0, 3, 0},
+				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 0},
+				{2, Parameters.ElevatorPresets.FLOOR.height(), 180},
+				{0, Parameters.ElevatorPresets.SWITCH.height(), 180},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+			};
+			
+			
+			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else {
 			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
-			final V_Events.Command h = (c, e, g) -> {c.close();
-																							 e.setInches(3.0);
-																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-																						   return spin;};
-			final V_Events.Command i = (c, e, g) -> {c.rotateTo(0.0);
-																							 e.setInches(Parameters.ElevatorPresets.SWITCH.height());
-																							 final double error = g.wornPath(180.0);
-																							 final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
-																						   return spin;};
-			final V_Events.Command j = (c, e, g) -> {c.spit(R_Clamp.intakeConstant);
-																							 return 0.0;};
-
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j};//TODO only takes care of stuff up until switch
+			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
+				{0, 3, 180},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 180},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+			};
+			
+			
 			final double[] triggers = new double[] {0.3, 0.6, 1.9};
-			events = new V_Events(commands, triggers);
+			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 		}
 	}
-}
+	//------------------------------------------------------------------------------------------
+	}
