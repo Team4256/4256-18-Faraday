@@ -90,10 +90,7 @@ public class Robot extends IterativeRobot {
 		elevator.init();
 		clamp.init();
 
-		try {
-			logger.addHandler(new FileHandler("/U/log.txt"));
-			logger.setLevel(Level.FINE);
-		} catch (SecurityException | IOException e1) { }
+		setupLogging();
 		
 		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(-8.0);moduleC.setTareAngle(-10.0);moduleD.setTareAngle(78.0);
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
@@ -288,6 +285,41 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledPeriodic() {
 		pollGameData();
+	}
+	
+	public void setupLogging() {
+		String logFileName = "/U/";
+		DriverStation ds = DriverStation.getInstance();
+		String eventName = ds.getEventName();
+		String matchNumber = Integer.toString(ds.getMatchNumber());
+		String replayNumber = Integer.toString(ds.getReplayNumber());
+		
+		switch (ds.getMatchType()) {
+			case Practice: logFileName += "Practice_";
+			case Qualification: logFileName += "Qualification_";
+			case Elimination: logFileName += "Elimination_";
+			default: logFileName += "_";
+		}
+		
+		if (ds.getMatchType() == DriverStation.MatchType.None)
+		{
+			logFileName += "Practice.log";
+			eventName = "None";
+			matchNumber = "0";
+			replayNumber = "0";
+		}
+		else
+		{
+			logFileName += eventName + "_" + matchNumber + "_" + replayNumber + ".log"; 
+		}
+		
+		try {
+			logger.addHandler(new FileHandler(logFileName));
+			logger.setLevel(Level.FINE);
+			logger.log(Level.CONFIG, "Event:" + eventName);
+			logger.log(Level.CONFIG,  "Match:" + matchNumber);
+			logger.log(Level.CONFIG,  "Replay:" + replayNumber);
+		} catch (SecurityException | IOException e1) { }
 	}
 	
 	public static void pollGameData() {
