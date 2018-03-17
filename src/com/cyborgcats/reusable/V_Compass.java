@@ -1,4 +1,4 @@
-package com.cyborgcats.reusable;//COMPLETE(ish) 2016
+package com.cyborgcats.reusable;//COMPLETE 2016
 
 public class V_Compass {
 	private double tareAngle = 0;

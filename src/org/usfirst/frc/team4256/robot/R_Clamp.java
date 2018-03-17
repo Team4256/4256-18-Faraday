@@ -8,7 +8,7 @@ import com.cyborgcats.reusable.Phoenix.R_Victor;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-public class R_Clamp {
+public class R_Clamp {//TODO make a private subclass for the rotator and a private subclass for intaking and combine them; then double check auto-slurp
 	private enum CubePosition {Absent, WithinReach, Present;}
 	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;
@@ -102,7 +102,6 @@ public class R_Clamp {
 	**/
 	public void open() {
 		clamp.set(OpenState);
-		cubePosition = CubePosition.Absent;
 	}
 	
 	
