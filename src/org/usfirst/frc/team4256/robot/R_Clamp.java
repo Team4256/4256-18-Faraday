@@ -75,7 +75,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	 * This function attempts to "spit" cubes out of the clamp.
 	**/
 	public void spit(final double strength) {
-		setWheelSpeed(strength);
+		setWheelSpeed(Math.abs(strength));
 		cubePosition = CubePosition.Absent;
 	}
 	
