@@ -74,7 +74,7 @@ public class Robot extends IterativeRobot {
 		odometer = new V_Odometer(zed);
 		odometer.init();
 		//{Human Input}
-		faraday.getEntry("Starting Position").setNumber(1);
+		faraday.getEntry("Starting Position").setNumber(0);
 		faraday.getEntry("Simple Auto").setBoolean(false);
 		//{Game Input}
 		gameData_old = DriverStation.getInstance().getGameSpecificMessage();
@@ -83,7 +83,7 @@ public class Robot extends IterativeRobot {
 		elevator.init();
 		clamp.init();
 		
-		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(-8.0);moduleC.setTareAngle(-10.0);moduleD.setTareAngle(78.0);
+		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(2.0);moduleC.setTareAngle(52.0);moduleD.setTareAngle(78.0);
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		elevatorOne.setZero(0.0);
@@ -104,7 +104,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		//{Human Input}
-		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(1).floatValue());
+		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(0).floatValue());
 		final boolean simpleAuto = faraday.getEntry("Simple Auto").getBoolean(false);
 		
 		//{Game Input}
