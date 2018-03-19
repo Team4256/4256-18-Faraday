@@ -7,13 +7,13 @@ import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
+import com.cyborgcats.reusable.Autonomous.V_Odometer;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
 import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
 import org.usfirst.frc.team4256.robot.Autonomous.Autonomous;
-import org.usfirst.frc.team4256.robot.Autonomous.V_Odometer;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;

@@ -5,6 +5,9 @@ import org.usfirst.frc.team4256.robot.R_DriveTrain;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import com.cyborgcats.reusable.V_PID;
+import com.cyborgcats.reusable.Autonomous.P_Bezier;
+import com.cyborgcats.reusable.Autonomous.V_Leash;
+import com.cyborgcats.reusable.Autonomous.V_Odometer;
 
 public class A_PassLine implements Autonomous{
 	public final StartingPosition startingPosition;
