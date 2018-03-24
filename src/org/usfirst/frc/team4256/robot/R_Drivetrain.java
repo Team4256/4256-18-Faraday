@@ -3,7 +3,7 @@ package org.usfirst.frc.team4256.robot;
 import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.V_Compass;
 
-public class R_DriveTrain {
+public class R_Drivetrain {
 	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
 	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
 	private static final double pivotToFront = Math.hypot(pivotToFrontX, pivotToFrontY);
@@ -22,7 +22,7 @@ public class R_DriveTrain {
 	private R_SwerveModule moduleD;
 	
 	
-	public R_DriveTrain(final R_Gyro gyro, final R_SwerveModule moduleA, final R_SwerveModule moduleB, final R_SwerveModule moduleC, final R_SwerveModule moduleD) {
+	public R_Drivetrain(final R_Gyro gyro, final R_SwerveModule moduleA, final R_SwerveModule moduleB, final R_SwerveModule moduleC, final R_SwerveModule moduleD) {
 		this.gyro = gyro;
 		this.moduleA = moduleA;
 		this.moduleB = moduleB;
@@ -67,7 +67,7 @@ public class R_DriveTrain {
 		final double[] moduleComps_desired = computeModuleComponents(speedX_desired, speedY_desired, speedSpin);
 		
 		final double[] speeds_actual = speedsFromModuleD();
-		double speed_actual = Math.sqrt(speeds_actual[0]*speeds_actual[0] + speeds_actual[1]*speeds_actual[1]);
+		double speed_actual = Math.hypot(speeds_actual[0], speeds_actual[1]);
 		speed_actual = Math.floor(speed_actual*10.0)/10.0;
 		
 		final double[] moduleAngles_final;
@@ -90,9 +90,11 @@ public class R_DriveTrain {
 		
 		boolean bad = speed == 0.0 && speedSpin == 0.0;
 		
-		moduleA.swivelTo(moduleAngles_final[0], bad);	moduleB.swivelTo(moduleAngles_final[1], bad);
-		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
-		moduleD_previousAngle = moduleAngles_final[3];
+		if (!bad) {
+			moduleA.swivelTo(moduleAngles_final[0]);	moduleB.swivelTo(moduleAngles_final[1]);
+			moduleC.swivelTo(moduleAngles_final[2]);	moduleD.swivelTo(moduleAngles_final[3]);
+			moduleD_previousAngle = moduleAngles_final[3];
+		}
 		
 		if (isThere(10.0)) {
 			final double[] moduleSpeeds_final = computeModuleSpeeds(moduleComps_desired);
@@ -120,8 +122,11 @@ public class R_DriveTrain {
 		
 		final double[] moduleAngles_final = computeModuleAngles(moduleComps_desired);
 		boolean bad = speed == 0.0 && speedSpin == 0.0;
-		moduleA.swivelTo(moduleAngles_final[0], bad);	moduleB.swivelTo(moduleAngles_final[1], bad);
-		moduleC.swivelTo(moduleAngles_final[2], bad);	moduleD.swivelTo(moduleAngles_final[3], bad);
+		
+		if (!bad) {
+			moduleA.swivelTo(moduleAngles_final[0]);	moduleB.swivelTo(moduleAngles_final[1]);
+			moduleC.swivelTo(moduleAngles_final[2]);	moduleD.swivelTo(moduleAngles_final[3]);
+		}
 		
 		if (isThere(10.0)) {
 			final double[] moduleSpeeds_final = computeModuleSpeeds(moduleComps_desired);

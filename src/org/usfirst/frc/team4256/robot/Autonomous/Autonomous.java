@@ -1,11 +1,11 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.R_DriveTrain;
+import org.usfirst.frc.team4256.robot.R_Drivetrain;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 public interface Autonomous {
-	public void run(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevator);
+	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator);
 	public double initOdometerPosX();
 	
 	public static final double leftStartX = -112.33, centerStartX = 7.19, rightStartX = 115.0;

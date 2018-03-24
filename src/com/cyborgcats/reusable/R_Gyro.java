@@ -30,7 +30,7 @@ public class R_Gyro extends AHRS {
 	 * Positive means clockwise and negative means counter-clockwise.
 	 * If the current angle is inside the protected zone, the path goes through the previously breached border.
 	**/
-	public double wornPath(final double target) {//TODO check over
+	public double wornPath(final double target) {
 		final double current = getCurrentAngle();
 		double path = compass.legalPath(current, target);
 		//this code is only necessary if protectedZoneSize is nonzero

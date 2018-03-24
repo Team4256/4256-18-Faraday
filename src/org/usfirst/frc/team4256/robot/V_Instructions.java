@@ -15,7 +15,7 @@ public abstract class V_Instructions {
 	 * The array is saved inside the V_Instructions class for use by its other members.
 	 * It then runs through the specified step in the array, commanding swerve to move accordingly.
 	**/
-	public static void follow(final double[][] instructions, final int autoStep, final R_DriveTrain swerve, final R_Gyro gyro) {
+	public static void follow(final double[][] instructions, final int autoStep, final R_Drivetrain swerve, final R_Gyro gyro) {
 		if (autoStep != previousStep) {
 			stepStart = System.currentTimeMillis();
 			if (canMoveOn) {

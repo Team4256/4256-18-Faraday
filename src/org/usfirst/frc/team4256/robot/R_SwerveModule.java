@@ -8,7 +8,7 @@ public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
 	public static final double tractionGearRatio = 40.0/3.0;
 	public static final double tractionWheelCircumference = 2.625*Math.PI;//inches
-	private double decapitated = 1;
+	private double decapitated = 1.0;
 	private R_Talon rotation;
 	private R_Talon traction;
 	private boolean hasTractionSensor;
@@ -41,6 +41,7 @@ public class R_SwerveModule {
 		rotation.config_kD(0, 1.8, R_Talon.kTimeoutMS);
 		
 		traction.init();
+		
 		traction.setInverted(reversedTraction);
 		traction.setNeutralMode(R_Talon.coast);
 		traction.configContinuousCurrentLimit(40, R_Talon.kTimeoutMS);
@@ -53,6 +54,10 @@ public class R_SwerveModule {
 		else traction.configOpenloopRamp(1.0, R_Talon.kTimeoutMS);
 	}
 	
+	
+	/**
+	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.
+	**/
 	public void setTareAngle(final double tareAngle) {
 		setTareAngle(tareAngle, false);
 	}
@@ -72,16 +77,7 @@ public class R_SwerveModule {
 	 * Use wheel_chassisAngle to specify the wheel's orientation relative to the robot in degrees.
 	**/
 	public void swivelTo(final double wheel_chassisAngle) {
-		swivelTo(wheel_chassisAngle, false);
-	}
-	
-	
-	/**
-	 * Use wheel_chassisAngle to specify the wheel's orientation relative to the robot in degrees.
-	 * If ignore is true, nothing will happen, which is useful for coasting based on variables outside this class's scope.
-	**/
-	public void swivelTo(final double wheel_chassisAngle, final boolean ignore) {
-		if (!ignore) {rotation.quickSet(decapitateAngle(wheel_chassisAngle), true);}//if this doesn't run, complete loop update will eventually set it to be the last angle
+		rotation.quickSet(decapitateAngle(wheel_chassisAngle), true);
 	}
 	
 	

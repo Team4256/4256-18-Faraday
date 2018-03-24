@@ -2,7 +2,7 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 
 import org.usfirst.frc.team4256.robot.Parameters;
 import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.R_DriveTrain;
+import org.usfirst.frc.team4256.robot.R_Drivetrain;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import com.cyborgcats.reusable.V_PID;
@@ -46,7 +46,7 @@ public class A_Fight2481 implements Autonomous{
 		}
 	}
 
-	public void run(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevator) {
+	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		events.check(leash.getIndependentVariable());
   		final double spin = events.execute(clamp, elevator, swerve.gyro);
 

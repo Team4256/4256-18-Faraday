@@ -3,7 +3,7 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
 import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.R_DriveTrain;
+import org.usfirst.frc.team4256.robot.R_Drivetrain;
 
 public class A_ForwardOpenLoop implements Autonomous{
 	public final FieldPieceConfig switchTarget;
@@ -25,7 +25,7 @@ public class A_ForwardOpenLoop implements Autonomous{
 		}
 	}
 		
-	public void run(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevator) {
+	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		startTimer();//if necessary
 		if (System.currentTimeMillis() - start < 2000) {
 			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
