@@ -21,7 +21,9 @@
 
 package org.usfirst.frc.team4256.robot;
 
-public abstract class Parameters {
+public final class Parameters {
+	private Parameters() {}
+	
 	//ELECTRONICS
 	public static final int Swerve_rotatorA = 11;//CAN, Talon SRX, front left, PDP 4
 	public static final int Swerve_rotatorB = 12;//CAN, Talon SRX, front right, PDP 5

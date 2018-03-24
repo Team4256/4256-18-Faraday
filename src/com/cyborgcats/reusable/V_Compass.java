@@ -58,16 +58,16 @@ public class V_Compass {
 	 * This function returns a valid and legal version of the input.
 	**/
 	public double legalize(double angle) {
-		double fromStartingEdge = path(protectedZoneStart, angle);
-		final double protectedZoneEnd = protectedZoneStart + protectedZoneSize;
-		final double toEndingEdge = path(angle, protectedZoneEnd);
-		
-		if (fromStartingEdge < 0) {
-			fromStartingEdge += 360;
-			fromStartingEdge *= Math.signum(toEndingEdge);
-		}
-		if ((fromStartingEdge > 0) && (fromStartingEdge < protectedZoneSize)) {
-			angle = fromStartingEdge <= Math.abs(toEndingEdge) ? protectedZoneStart : protectedZoneEnd;
+		if (protectedZoneSize != 0) {
+			final double protectedZoneEnd = protectedZoneStart + protectedZoneSize;
+				  double fromStartingEdge = path(protectedZoneStart, angle);
+			final double toEndingEdge = path(angle, protectedZoneEnd);
+			
+			if (fromStartingEdge < 0) {
+				fromStartingEdge += 360;
+				fromStartingEdge *= Math.signum(toEndingEdge);
+			}
+			if ((fromStartingEdge > 0) && (fromStartingEdge < protectedZoneSize)) angle = fromStartingEdge <= Math.abs(toEndingEdge) ? protectedZoneStart : protectedZoneEnd;
 		}
 		return validate(angle);
 	}
@@ -89,7 +89,7 @@ public class V_Compass {
 	**/
 	public double legalPath(final double start, final double end) {
 		final double start_legal = legalize(start);
-		final double path_escape = start == start_legal ? 0.0 : borderPath(start);
+		final double path_escape = validate(start) == start_legal ? 0.0 : borderPath(start);
 		double path_main = path(start_legal, legalize(end));
 		
 		if (protectedZoneSize != 0) {

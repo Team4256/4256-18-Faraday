@@ -33,7 +33,7 @@ public class Robot extends IterativeRobot {
 	private static final R_Xbox gunner = new R_Xbox(1);
 	private static double lockedAngle = 0;
 	//{Robot Input}
-	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0.0, 0.0);
+	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz);
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.pressureGauge);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.tx2PowerSensor);
 	

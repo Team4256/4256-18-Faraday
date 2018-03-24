@@ -23,7 +23,7 @@ public class R_Talon extends TalonSRX {
 	public V_Compass compass;
 	public Convert convert;
 	
-	//This constructor is intended for use with an encoder on a motor with limited motion.
+	//This constructor is intended for use with an encoder on a motor with limited rotary motion. To limit linear motion, use built-in Talon commands.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
@@ -34,6 +34,8 @@ public class R_Talon extends TalonSRX {
 			}
 		}else {
 			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
+			configSelectedFeedbackSensor(encoder.type(), 1, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
+			configSelectedFeedbackSensor(encoder.type(), 2, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
@@ -48,7 +50,7 @@ public class R_Talon extends TalonSRX {
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
-		compass = new V_Compass(0, 0);
+		compass = new V_Compass(0.0, 0.0);
 	}
 	
 	
@@ -84,7 +86,7 @@ public class R_Talon extends TalonSRX {
 	
 	/**
 	 * This function returns the current position in revolutions.
-	 * TODO this currently ignores tareAngle, which might be functional but isn't logical
+	 * talon.setSelectedSensorPosition() commands will be taken into account, and compass.getTareAngle() is ignored.
 	**/
 	public double getCurrentRevs() {
 		return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
@@ -93,10 +95,11 @@ public class R_Talon extends TalonSRX {
 	
 	/**
 	 * This function returns the current position in degrees. If wraparound is true, the output will be between 0 and 359.999...
-	 * TODO this currently ignores tareAngle, which might be functional but isn't logical
+	 * Both the compass.getTareAngle() and any talon.setSelectedSensorPosition() commands will be taken into account. DON'T USE BOTH!
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
-		return wraparound ? V_Compass.validate(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		final double raw = convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validate(raw - compass.getTareAngle()) : raw - compass.getTareAngle();
 	}
 	
 	
@@ -110,17 +113,13 @@ public class R_Talon extends TalonSRX {
 	 * Positive means clockwise and negative means counter-clockwise.
 	 * If the current angle is inside the protected zone, the path goes through the previously breached border.
 	**/
-	public double wornPath(double endAngle) {//ANGLE
-		endAngle = compass.legalize(endAngle + compass.getTareAngle());
-		double startAngle = getCurrentAngle(true);
-		double currentPathVector = V_Compass.path(startAngle, endAngle);
-		boolean legal = compass.legalize(startAngle) == startAngle;
-		if (legal) {
-			currentPathVector = compass.legalPath(startAngle, endAngle);
-			lastLegalDirection = Math.signum(currentPathVector);
-		}else if (!legal && Math.signum(currentPathVector) != -lastLegalDirection) {
-			currentPathVector = 360*Math.signum(-currentPathVector) + currentPathVector;
-		}return currentPathVector;
+	public double wornPath(double target) {//ANGLE
+		final double current = getCurrentAngle(true);
+		double path = compass.legalPath(current, target);
+		if (current == compass.legalize(current)) lastLegalDirection = Math.signum(path);
+		else if (Math.signum(path) != -lastLegalDirection) path -= Math.copySign(360, path);
+		
+		return path;
 	}
 	
 	
