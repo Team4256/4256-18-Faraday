@@ -46,7 +46,7 @@ public class R_DriveTrain {
 		if (rawSpeed > moduleD_maxSpeed) {moduleD_maxSpeed = rawSpeed;}
 		rawSpeed /= moduleD_maxSpeed;
 		
-		double tan = 1.0/Math.tan(Math.toRadians(V_Compass.validateAngle(moduleD_previousAngle)));
+		double tan = 1.0/Math.tan(Math.toRadians(V_Compass.validate(moduleD_previousAngle)));
 		if (Double.isNaN(tan)) {tan = 0.0;}
 		
 		final double rawX = rawSpeed/Math.sqrt(1.0 + tan*tan);

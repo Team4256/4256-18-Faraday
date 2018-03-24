@@ -96,7 +96,7 @@ public class R_Talon extends TalonSRX {
 	 * TODO this currently ignores tareAngle, which might be functional but isn't logical
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
-		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validate(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
 	}
 	
 	
@@ -111,10 +111,10 @@ public class R_Talon extends TalonSRX {
 	 * If the current angle is inside the protected zone, the path goes through the previously breached border.
 	**/
 	public double wornPath(double endAngle) {//ANGLE
-		endAngle = compass.legalizeAngle(endAngle + compass.getTareAngle());
+		endAngle = compass.legalize(endAngle + compass.getTareAngle());
 		double startAngle = getCurrentAngle(true);
 		double currentPathVector = V_Compass.path(startAngle, endAngle);
-		boolean legal = compass.legalizeAngle(startAngle) == startAngle;
+		boolean legal = compass.legalize(startAngle) == startAngle;
 		if (legal) {
 			currentPathVector = compass.legalPath(startAngle, endAngle);
 			lastLegalDirection = Math.signum(currentPathVector);

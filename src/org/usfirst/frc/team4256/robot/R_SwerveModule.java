@@ -131,7 +131,7 @@ public class R_SwerveModule {
 	**/
 	public double decapitateAngle(final double endAngle) {
 		decapitated = Math.abs(rotation.wornPath(endAngle)) > 90 ? -1 : 1;
-		return decapitated == -1 ? V_Compass.validateAngle(endAngle + 180) : V_Compass.validateAngle(endAngle);
+		return decapitated == -1 ? V_Compass.validate(endAngle + 180) : V_Compass.validate(endAngle);
 	}
 
 	
@@ -163,7 +163,7 @@ public class R_SwerveModule {
 	 * It requires an angle and input from the gyro.
 	**/
 	public static double convertToField(final double wheel_robotAngle, final double chassis_fieldAngle) {
-		return V_Compass.validateAngle(wheel_robotAngle + chassis_fieldAngle);
+		return V_Compass.validate(wheel_robotAngle + chassis_fieldAngle);
 	}
 	
 	
@@ -172,6 +172,6 @@ public class R_SwerveModule {
 	 * It requires an angle and input from the gyro.
 	**/
 	public static double convertToRobot(final double wheel_fieldAngle, final double chassis_fieldAngle) {
-		return V_Compass.validateAngle(wheel_fieldAngle - chassis_fieldAngle);
+		return V_Compass.validate(wheel_fieldAngle - chassis_fieldAngle);
 	}
 }
