@@ -2,11 +2,11 @@ package com.cyborgcats.reusable;//COMPLETE 2016
 
 public class V_Compass {
 	private double tareAngle = 0;
-	private double protectedZoneStart;//Angles increase as the numbers on a clock increase. This value should be the first protected angle encountered by a minute hand which starts at 12:00.
-	private double protectedZoneSize;//This value should be the number of degrees the minute hand must travel before reaching the end of the protected section.
+	private final double protectedZoneStart;//Angles increase as the numbers on a clock increase. This value should be the first protected angle encountered by a minute hand which starts at 12:00.
+	private final double protectedZoneSize;//This value should be the number of degrees the minute hand must travel before reaching the end of the protected section.
 	
 	public V_Compass(final double protectedZoneStart, final double protectedZoneSize) {
-		this.protectedZoneStart = protectedZoneStart;
+		this.protectedZoneStart = validateAngle(protectedZoneStart);
 		this.protectedZoneSize = Math.abs(protectedZoneSize)%360;
 	}
 	/**
@@ -33,40 +33,46 @@ public class V_Compass {
 	 * Positive means clockwise and negative means counter-clockwise.
 	**/
 	public static double path(double startAngle, double endAngle) {
-		startAngle = validateAngle(startAngle);
-		endAngle = validateAngle(endAngle);
-		double pathVector = endAngle - startAngle;
-		if (Math.abs(pathVector) > 180) {
-			pathVector = Math.abs(pathVector) - 360;
-		}if (endAngle - startAngle < -180) {
-			pathVector = -pathVector;
-		}return pathVector;
+//		startAngle = validateAngle(startAngle);
+//		endAngle = validateAngle(endAngle);
+//		double pathVector = endAngle - startAngle;
+//		if (Math.abs(pathVector) > 180) {
+//			pathVector = Math.abs(pathVector) - 360;
+//		}if (endAngle - startAngle < -180) {
+//			pathVector = -pathVector;
+//		}return pathVector;
+		return Math.IEEEremainder(endAngle - startAngle, 360.0);
 	}
 	/**
 	 * This function returns a valid and legal version of the input.
 	**/
 	public double legalizeAngle(double angle) {
-		angle = validateAngle(angle);
-		protectedZoneStart = validateAngle(protectedZoneStart);
-		double protectedZoneEnd = validateAngle(protectedZoneStart + protectedZoneSize);
-		if (path(protectedZoneStart, angle) >= 0 && path(protectedZoneStart, angle) <= protectedZoneSize) {
-			angle = Math.abs(path(protectedZoneStart, angle)) <= Math.abs(path(angle, protectedZoneEnd)) ? protectedZoneStart : protectedZoneEnd;
-		}return angle;
+		double fromStartingEdge = path(protectedZoneStart, angle);
+		final double protectedZoneEnd = protectedZoneStart + protectedZoneSize;
+		final double toEndingEdge = path(angle, protectedZoneEnd);
+		
+		if (fromStartingEdge < 0) {
+			fromStartingEdge += 360;
+			fromStartingEdge *= Math.signum(toEndingEdge);
+		}
+		if ((fromStartingEdge > 0) && (fromStartingEdge < protectedZoneSize)) {
+			angle = fromStartingEdge <= Math.abs(toEndingEdge) ? protectedZoneStart : protectedZoneEnd;
+		}
+		return validateAngle(angle);
 	}
 	/**
 	 * This function returns the path to the border that is nearest to the specified angle.
 	**/
 	private double borderPath(final double startAngle) {
-		double borderPath = path(startAngle, protectedZoneStart);
-		if (Math.abs(borderPath) > Math.abs(path(startAngle, protectedZoneStart + protectedZoneSize))) {
-			borderPath = path(startAngle, protectedZoneStart + protectedZoneSize);
-		}return borderPath;
+		final double toStartingEdge = path(startAngle, protectedZoneStart);
+		final double toEndingEdge = path(startAngle, protectedZoneStart + protectedZoneSize);
+		return Math.abs(toStartingEdge) <= Math.abs(toEndingEdge) ? toStartingEdge : toEndingEdge;
 	}
 	/**
 	 * This function finds the shortest legal path from the start angle to the end angle and returns the size of that path in degrees.
 	 * Positive means clockwise and negative means counter-clockwise.
 	**/
-	public double legalPath(double startAngle, double endAngle) {
+	public double legalPath(double startAngle, double endAngle) {//TODO check over
 		startAngle = legalizeAngle(startAngle);
 		endAngle = legalizeAngle(endAngle);
 		double legalPathVector = path(startAngle, endAngle);
@@ -82,6 +88,6 @@ public class V_Compass {
 	 * This function finds the angle between the Y axis and any Cartesian coordinate.
 	**/
 	public static double convertToAngle(final double x, final double y) {
-		return x == 0 && y == 0 ? 0 : validateAngle(Math.toDegrees(-1*(Math.atan2(-y, x) - Math.PI/2)));
+		return Math.toDegrees(Math.atan2(x, -y));
 	}
 }
