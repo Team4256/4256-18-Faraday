@@ -63,7 +63,7 @@ public abstract class Parameters {
 	
 	
 	//VALUES
-	public static enum ElevatorPresets {//TODO get accurate numbers
+	public static enum ElevatorPresets {
 		FLOOR(0),
 		SWITCH(30),
 		SCALE_LOW(60),

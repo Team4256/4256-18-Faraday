@@ -53,21 +53,18 @@ public class R_SwerveModule {
 		else traction.configOpenloopRamp(1.0, R_Talon.kTimeoutMS);
 	}
 	
+	public void setTareAngle(final double tareAngle) {
+		setTareAngle(tareAngle, false);
+	}
+	
 	
 	/**
 	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.
-	 * Useful when correcting for loose mechanical tolerances.
+	 * If relativeReference is true, tareAngle will be incremented rather than set.
 	**/
-	public void setTareAngle(final double tareAngle) {
+	public void setTareAngle(double tareAngle, final boolean relativeReference) {
+		if (relativeReference) {tareAngle += rotation.compass.getTareAngle();}
 		rotation.compass.setTareAngle(tareAngle);
-	}
-	
-	/**
-	 * This offsets the tare angle by the specified amount. Positive means clockwise and negative means counter-clockwise.
-	 * Useful when correcting for loose mechanical tolerances.
-	**/
-	public void incrementTareAngle(final double incrementAngle) {
-		setTareAngle(rotation.compass.getTareAngle() + incrementAngle);
 	}
 	
 	

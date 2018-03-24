@@ -3,7 +3,9 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 import java.util.HashMap;
 import java.util.Map;
 
-public class V_Fridge {//fridges and freezers control the state of matter (solid, liquid) as this class helps with boolean states
+public final class V_Fridge {//this class helps with boolean states
+	private V_Fridge() {}
+	
 	private static final Map<String, Boolean> previousStates = new HashMap<String, Boolean>();
 	public static final Map<String, Boolean> toggleStates = new HashMap<String, Boolean>();
 	public static final Map<String, Long> toggledTimes = new HashMap<String, Long>();

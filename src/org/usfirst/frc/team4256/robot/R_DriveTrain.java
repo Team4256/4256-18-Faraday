@@ -6,10 +6,10 @@ import com.cyborgcats.reusable.V_Compass;
 public class R_DriveTrain {
 	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
 	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
-	private static final double pivotToFront = Math.sqrt(pivotToFrontX*pivotToFrontX + pivotToFrontY*pivotToFrontY);
+	private static final double pivotToFront = Math.hypot(pivotToFrontX, pivotToFrontY);
 	private static final double pivotToAftX = 8.90;//inches, pivot point to aft wheel tip, x
 	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
-	private static final double pivotToAft = Math.sqrt(pivotToAftX*pivotToAftX + pivotToAftY*pivotToAftY);
+	private static final double pivotToAft = Math.hypot(pivotToAftX, pivotToAftY*pivotToAftY);
 	
 	private double moduleD_maxSpeed = 70.0;//always put max slightly higher than max observed; TODO test on comp robot
 	private double moduleD_previousAngle = 0.0;
@@ -161,10 +161,10 @@ public class R_DriveTrain {
 	
 	
 	private double[] computeModuleSpeeds(final double[] moduleComponents) {
-		final double speedA = Math.sqrt(moduleComponents[0]*moduleComponents[0] + moduleComponents[1]*moduleComponents[1]),
-					 speedB = Math.sqrt(moduleComponents[2]*moduleComponents[2] + moduleComponents[3]*moduleComponents[3]),
-					 speedC = Math.sqrt(moduleComponents[4]*moduleComponents[4] + moduleComponents[5]*moduleComponents[5]),
-					 speedD = Math.sqrt(moduleComponents[6]*moduleComponents[6] + moduleComponents[7]*moduleComponents[7]);
+		final double speedA = Math.hypot(moduleComponents[0], moduleComponents[1]),
+					 speedB = Math.hypot(moduleComponents[2], moduleComponents[3]),
+					 speedC = Math.hypot(moduleComponents[4], moduleComponents[5]),
+					 speedD = Math.hypot(moduleComponents[6], moduleComponents[7]);
 		double max = Math.max(speedA, Math.max(speedB, Math.max(speedC, speedD)));
 		if (max < 1.0) {max = 1.0;}
 		return new double[] {speedA/max, speedB/max, speedC/max, speedD/max};
