@@ -2,6 +2,10 @@ package com.cyborgcats.reusable.Phoenix;
 
 import com.cyborgcats.reusable.V_Compass;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -22,6 +26,7 @@ public class R_Talon extends TalonSRX {
 	private double lastLegalDirection = 1.0;
 	public V_Compass compass;
 	public Convert convert;
+	private Logger logger;
 	
 	//This constructor is intended for use with an encoder on a motor with limited rotary motion. To limit linear motion, use built-in Talon commands.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
@@ -41,6 +46,7 @@ public class R_Talon extends TalonSRX {
 		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 		convert = new Convert(encoder.countsPerRev(), gearRatio);
+		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
@@ -51,6 +57,7 @@ public class R_Talon extends TalonSRX {
 		super(deviceID);
 		this.controlMode = controlMode;
 		compass = new V_Compass(0.0, 0.0);
+		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	
 	
@@ -185,6 +192,7 @@ public class R_Talon extends TalonSRX {
 	private double setPercent(final double percentage) throws IllegalAccessException {
 		if (controlMode == percent) {
 			super.set(controlMode, percentage);
+			logger.log(Level.FINE, Double.toString(percentage));
 		}else {
 			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given percentage in " + controlMode.name() + " mode.");
 		}return percentage;
@@ -195,6 +203,7 @@ public class R_Talon extends TalonSRX {
 		if (controlMode == position) {
 			final double encoderCounts = convert.from.DEGREES.afterGears(getCurrentAngle(false) + wornPath(degrees));
 			super.set(controlMode, encoderCounts);
+			logger.log(Level.FINE, Double.toString(degrees));
 			return encoderCounts;
 		}else {
 			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given degrees in " + controlMode.name() + " mode.");
@@ -206,6 +215,7 @@ public class R_Talon extends TalonSRX {
 		if (controlMode == position) {
 			final double encoderCounts = convert.from.REVS.afterGears(revs);
 			super.set(controlMode, encoderCounts);
+			logger.log(Level.FINE, Double.toString(revs));
 			return encoderCounts;
 		}else {
 			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given revs in " + controlMode.name() + " mode.");
@@ -257,5 +267,9 @@ public class R_Talon extends TalonSRX {
 		case Velocity:return convert.to.RPM.afterGears(getClosedLoopError(0));
 		default:return 0.0;
 		}
+	}
+
+	public void setParentLogger(Logger logger) {
+		this.logger = logger;
 	}
 }

@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4256.robot;
 
+import java.util.logging.Logger;
+
 import com.cyborgcats.reusable.V_Compass;
 import com.cyborgcats.reusable.Phoenix.R_Encoder;
 import com.cyborgcats.reusable.Phoenix.R_Talon;
@@ -153,6 +155,11 @@ public class R_SwerveModule {
 		return tractionDeltaPathLength;
 	}
 	
+
+	public void setParentLogger(Logger logger) {
+		rotation.setParentLogger(logger);
+		traction.setParentLogger(logger);
+	}
 	
 	/**
 	 * This function translates angles from the robot's perspective to the field's orientation.

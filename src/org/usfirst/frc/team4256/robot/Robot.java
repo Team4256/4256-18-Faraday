@@ -9,6 +9,11 @@ import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
 import com.cyborgcats.reusable.Autonomous.V_Odometer;
 
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
@@ -63,6 +68,8 @@ public class Robot extends IterativeRobot {
 	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(Parameters.tx2PowerControl);
+
+	private static Logger logger = Logger.getLogger("Robot");
 	
 	@Override
 	public void robotInit() {
@@ -82,8 +89,11 @@ public class Robot extends IterativeRobot {
 		swerve.init();
 		elevator.init();
 		clamp.init();
+
+		setupLogging();
 		
 		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(2.0);moduleC.setTareAngle(26.0);moduleD.setTareAngle(78.0);
+		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		elevatorOne.setZero(0.0);
@@ -275,6 +285,41 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledPeriodic() {
 		pollGameData();
+	}
+	
+	public void setupLogging() {
+		String logFileName = "/U/";
+		DriverStation ds = DriverStation.getInstance();
+		String eventName = ds.getEventName();
+		String matchNumber = Integer.toString(ds.getMatchNumber());
+		String replayNumber = Integer.toString(ds.getReplayNumber());
+		
+		switch (ds.getMatchType()) {
+			case Practice: logFileName += "Practice_";
+			case Qualification: logFileName += "Qualification_";
+			case Elimination: logFileName += "Elimination_";
+			default: logFileName += "_";
+		}
+		
+		if (ds.getMatchType() == DriverStation.MatchType.None)
+		{
+			logFileName += "Practice.log";
+			eventName = "None";
+			matchNumber = "0";
+			replayNumber = "0";
+		}
+		else
+		{
+			logFileName += eventName + "_" + matchNumber + "_" + replayNumber + ".log"; 
+		}
+		
+		try {
+			logger.addHandler(new FileHandler(logFileName));
+			logger.setLevel(Level.FINE);
+			logger.log(Level.CONFIG, "Event:" + eventName);
+			logger.log(Level.CONFIG,  "Match:" + matchNumber);
+			logger.log(Level.CONFIG,  "Replay:" + replayNumber);
+		} catch (SecurityException | IOException e1) { }
 	}
 	
 	public static void pollGameData() {
