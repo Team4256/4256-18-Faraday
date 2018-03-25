@@ -28,14 +28,14 @@ public class A_ForwardOpenLoop implements Autonomous{
 	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		startTimer();//if necessary
 		if (System.currentTimeMillis() - start < 2000) {
-			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
+			swerve.holonomic(0.0, 0.0, 0.0);
 			clamp.close();
 			elevator.setInches(3.0);
 		}else if (System.currentTimeMillis() - start < 5000) {
-			swerve.holonomic_encoderAware(0.0, 0.5, 0.0);
+			swerve.holonomic(0.0, 0.5, 0.0);
 			elevator.setInches(ElevatorPresets.SWITCH.height());
 		}else {
-			swerve.holonomic_encoderAware(0.0, 0.0, 0.0);
+			swerve.holonomic(0.0, 0.0, 0.0);
 			if ((startingPosition.equals(StartingPosition.LEFT) && switchTarget.equals(FieldPieceConfig.LEFT)) ||
 				(startingPosition.equals(StartingPosition.RIGHT) && switchTarget.equals(FieldPieceConfig.RIGHT))) {
 				clamp.spit(R_Clamp.intakeConstant);

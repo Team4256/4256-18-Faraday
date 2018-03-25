@@ -57,7 +57,7 @@ public class A_PassLine implements Autonomous{
 			double speed = V_PID.get("zed", errorMagnitude);
 			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
 			
-			swerve.holonomic_encoderAware(errorDirection, speed, 0.0/*spin*/);
+			swerve.holonomic(errorDirection, speed, 0.0/*spin*/);
   		}
 	}
 	

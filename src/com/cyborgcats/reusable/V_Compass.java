@@ -113,6 +113,18 @@ public class V_Compass {
 	}
 	
 	
+	public static double stdd(final double[] angles) {
+		double sin = 0.0,	cos = 0.0;
+		for (double angle : angles) {sin += Math.sin(Math.toRadians(angle));cos += Math.cos(Math.toRadians(angle));}
+		
+		sin /= angles.length;
+		cos /= angles.length;
+		final double stdd = Math.sqrt(-Math.log(sin*sin + cos*cos));
+		
+		return Math.toDegrees(stdd);
+	}
+	
+	
 	/**
 	 * This function finds the angle between the Y axis and any Cartesian coordinate.
 	**/

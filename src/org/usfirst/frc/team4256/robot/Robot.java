@@ -206,7 +206,7 @@ public class Robot extends IterativeRobot {
 			V_PID.clear("spin");
 		}
 		
-		swerve.holonomic_encoderAware(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
+		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
 		if (!elevator.inClimbingMode()) {

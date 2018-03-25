@@ -27,7 +27,7 @@ public abstract class V_Instructions {
 		if (System.currentTimeMillis() - stepStart < currentInstructions[0]) {
 			double spinError = gyro.wornPath(currentInstructions[3]);
 			if (Math.abs(spinError) < 3) {spinError = 0;}
-			swerve.holonomic_encoderAware(currentInstructions[1], currentInstructions[2], V_PID.get("spin", spinError));
+			swerve.holonomic(currentInstructions[1], currentInstructions[2], V_PID.get("spin", spinError));
 		}
 	}
 	/**
