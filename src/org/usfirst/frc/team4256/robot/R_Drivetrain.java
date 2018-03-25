@@ -43,25 +43,6 @@ public class R_Drivetrain {
 	}
 	
 	
-	private double[] speedsFromModuleD() {
-		double rawSpeed = Math.abs(moduleD.tractionSpeed());
-		if (rawSpeed > moduleD_maxSpeed) {moduleD_maxSpeed = rawSpeed;}
-		rawSpeed /= moduleD_maxSpeed;
-		
-		double tan = 1.0/Math.tan(Math.toRadians(V_Compass.validate(moduleD_previousAngle)));
-		if (Double.isNaN(tan)) {tan = 0.0;}
-		
-		final double rawX = rawSpeed/Math.sqrt(1.0 + tan*tan);
-		final double rawY = rawX*tan;
-		final double drivetrainX = rawX - Math.abs(previousSpin)*pivotToAftY/pivotToAft;
-		final double drivetrainY = rawY - Math.abs(previousSpin)*pivotToAftX/pivotToAft;
-		
-		return new double[] {drivetrainX, drivetrainY};
-	}
-	
-
-	
-	
 	public void holonomic(final double direction, double speed, final double spin) {
 		//{PREPARE VARIABLES}
 		speed = Math.abs(speed);
@@ -82,8 +63,7 @@ public class R_Drivetrain {
 			final double[] angles_desired = computeAngles(comps_desired);
 			final double stdd_desired = V_Compass.stdd(angles_desired);
 			
-			final double[] comps_actual = computeComponents(speeds_actual[0], speeds_actual[1], spin);
-			final double[] angles_actual = computeAngles(comps_actual);
+			final double[] angles_actual = computeAngles(computeComponents(speeds_actual[0], speeds_actual[1], spin));
 			final double stdd_actual = V_Compass.stdd(angles_actual);
 			
 			angles_final = stdd_desired > stdd_actual ? angles_actual : angles_desired;
@@ -130,6 +110,33 @@ public class R_Drivetrain {
 	}
 	
 	
+	private double[] speedsFromModuleD() {
+		double rawSpeed = Math.abs(moduleD.tractionSpeed());
+		if (rawSpeed > moduleD_maxSpeed) {moduleD_maxSpeed = rawSpeed;}
+		rawSpeed /= moduleD_maxSpeed;
+		
+		double tan = 1.0/Math.tan(Math.toRadians(V_Compass.validate(moduleD_previousAngle)));
+		if (Double.isNaN(tan)) {tan = 0.0;}
+		
+		final double rawX = rawSpeed/Math.sqrt(1.0 + tan*tan);
+		final double rawY = rawX*tan;
+		final double drivetrainX = rawX - Math.abs(previousSpin)*pivotToAftY/pivotToAft;
+		final double drivetrainY = rawY - Math.abs(previousSpin)*pivotToAftX/pivotToAft;
+		
+		return new double[] {drivetrainX, drivetrainY};
+	}
+	
+	
+	public boolean isThere(final double threshold) {
+		return moduleA.isThere(threshold) && moduleB.isThere(threshold) && moduleC.isThere(threshold) && moduleD.isThere(threshold);
+	}
+	public void autoMode(final boolean enable) {for (R_SwerveModule module : modules) module.autoMode(enable);}
+	public void stop() {for (R_SwerveModule module : modules) module.set(0.0);}
+	public void completeLoopUpdate() {for (R_SwerveModule module : modules) module.completeLoopUpdate();}
+	
+	
+	
+	//-------------------------------------------------COMPUTATION CODE------------------------------------------
 	private static double[] computeComponents(final double speedX, final double speedY, final double speedSpin) {
 		return new double[] {
 			speedX + speedSpin*pivotToFrontY/pivotToFront,//moduleAX
@@ -161,12 +168,4 @@ public class R_Drivetrain {
 		if (max < 1.0) {max = 1.0;}
 		return new double[] {speedA/max, speedB/max, speedC/max, speedD/max};
 	}
-	
-	
-	public boolean isThere(final double threshold) {
-		return moduleA.isThere(threshold) && moduleB.isThere(threshold) && moduleC.isThere(threshold) && moduleD.isThere(threshold);
-	}
-	public void autoMode(final boolean enable) {for (R_SwerveModule module : modules) module.autoMode(enable);}
-	public void stop() {for (R_SwerveModule module : modules) module.set(0.0);}
-	public void completeLoopUpdate() {for (R_SwerveModule module : modules) module.completeLoopUpdate();}
 }

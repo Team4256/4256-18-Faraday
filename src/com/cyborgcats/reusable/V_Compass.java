@@ -113,6 +113,10 @@ public class V_Compass {
 	}
 	
 	
+	/**
+	 * This function returns the standard deviation of an array of angles in degrees.
+	 * It's smart enough to handle 360-0 boundary condition.
+	**/
 	public static double stdd(final double[] angles) {
 		double sin = 0.0,	cos = 0.0;
 		for (double angle : angles) {sin += Math.sin(Math.toRadians(angle));cos += Math.cos(Math.toRadians(angle));}

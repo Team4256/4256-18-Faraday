@@ -18,7 +18,7 @@ public class R_Talon extends TalonSRX {
 	public static final int kTimeoutMS = 10;
 	private ControlMode controlMode;
 	private boolean updated = false;
-	private double lastSetPoint = 0.0;
+	private Double lastSetpoint = 0.0;
 	private double lastLegalDirection = 1.0;
 	public V_Compass compass;
 	public Convert convert;
@@ -141,7 +141,7 @@ public class R_Talon extends TalonSRX {
 
 
 	public void set(final double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws IllegalAccessException {
-		double currentSetPoint = lastSetPoint;
+		double currentSetPoint = lastSetpoint;
 		switch (controlMode) {
 		case Current:
 			currentSetPoint = setMilliAmps(value);break;
@@ -160,7 +160,7 @@ public class R_Talon extends TalonSRX {
 		}
 		
 		updated = true;
-		if (updateSetPoint) lastSetPoint = currentSetPoint;
+		if (updateSetPoint) lastSetpoint = currentSetPoint;
 	}
 
 	
@@ -224,11 +224,21 @@ public class R_Talon extends TalonSRX {
 	}
 	
 	
+	public void enterNeutral() {
+		neutralOutput();
+		updated = true;
+		lastSetpoint = null;
+	}
+	
+	
 	/**
 	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
 	**/
 	public void completeLoopUpdate() {
-		if (!updated) super.set(controlMode, lastSetPoint);//send a command if there hasn't yet been one, using raw encoder units
+		if (!updated) {
+			if (lastSetpoint != null) super.set(controlMode, lastSetpoint);//send a command if there hasn't yet been one, using raw encoder units
+			else neutralOutput();
+		}
 		
 		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
 	}
