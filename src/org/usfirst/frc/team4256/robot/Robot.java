@@ -84,13 +84,14 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Starting Position").setNumber(0);
 		faraday.getEntry("Simple Auto").setBoolean(false);
 		//{Game Input}
-		gameData_old = DriverStation.getInstance().getGameSpecificMessage();
+		final DriverStation ds = DriverStation.getInstance();
+		gameData_old = ds.getGameSpecificMessage();
 		//{Robot Output}
 		swerve.init();
 		elevator.init();
 		clamp.init();
 
-		setupLogging();
+		setupLogging(ds);
 		
 		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(2.0);moduleC.setTareAngle(26.0);moduleD.setTareAngle(78.0);
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
@@ -287,31 +288,26 @@ public class Robot extends IterativeRobot {
 		pollGameData();
 	}
 	
-	public void setupLogging() {
-		String logFileName = "/U/";
-		DriverStation ds = DriverStation.getInstance();
-		String eventName = ds.getEventName();
-		String matchNumber = Integer.toString(ds.getMatchNumber());
-		String replayNumber = Integer.toString(ds.getReplayNumber());
+
+	private static void pollGameData() {
+		gameData_new = DriverStation.getInstance().getGameSpecificMessage();
+		if ((gameData_new != null) && (gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
+	}
+	
+	private static void setupLogging(final DriverStation ds) {
+		String logFileName = "/U/", eventName = ds.getEventName(), matchNumber = Integer.toString(ds.getMatchNumber()), replayNumber = Integer.toString(ds.getReplayNumber());
 		
 		switch (ds.getMatchType()) {
-			case Practice: logFileName += "Practice_";
-			case Qualification: logFileName += "Qualification_";
-			case Elimination: logFileName += "Elimination_";
-			default: logFileName += "_";
+		case None:
+			logFileName += "Unknown.log";
+			eventName = "None"; matchNumber = "0"; replayNumber = "0";
+			break;
+		case Practice: logFileName += "Practice_";break;
+		case Qualification: logFileName += "Qualification_";break;
+		case Elimination: logFileName += "Elimination_";break;
 		}
 		
-		if (ds.getMatchType() == DriverStation.MatchType.None)
-		{
-			logFileName += "Practice.log";
-			eventName = "None";
-			matchNumber = "0";
-			replayNumber = "0";
-		}
-		else
-		{
-			logFileName += eventName + "_" + matchNumber + "_" + replayNumber + ".log"; 
-		}
+		logFileName += eventName + "_" + matchNumber + "_" + replayNumber + ".log"; 
 		
 		try {
 			logger.addHandler(new FileHandler(logFileName));
@@ -319,11 +315,6 @@ public class Robot extends IterativeRobot {
 			logger.log(Level.CONFIG, "Event:" + eventName);
 			logger.log(Level.CONFIG,  "Match:" + matchNumber);
 			logger.log(Level.CONFIG,  "Replay:" + replayNumber);
-		} catch (SecurityException | IOException e1) { }
-	}
-	
-	public static void pollGameData() {
-		gameData_new = DriverStation.getInstance().getGameSpecificMessage();
-		if ((gameData_new != null) && (gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
+		}catch (SecurityException | IOException e1) {/*ignore exceptions*/}
 	}
 }

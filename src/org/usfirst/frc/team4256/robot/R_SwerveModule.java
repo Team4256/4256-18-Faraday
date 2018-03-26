@@ -156,7 +156,7 @@ public class R_SwerveModule {
 	}
 	
 
-	public void setParentLogger(Logger logger) {
+	public void setParentLogger(final Logger logger) {
 		rotation.setParentLogger(logger);
 		traction.setParentLogger(logger);
 	}

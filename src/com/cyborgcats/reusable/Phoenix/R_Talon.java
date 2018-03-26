@@ -269,7 +269,5 @@ public class R_Talon extends TalonSRX {
 		}
 	}
 
-	public void setParentLogger(Logger logger) {
-		this.logger = logger;
-	}
+	public void setParentLogger(final Logger logger) {this.logger = logger;}
 }
