@@ -186,20 +186,20 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void teleopPeriodic() {//TODO elevator override for climber (back and start)
+	public void teleopPeriodic() {
 		//{speed multipliers}
 		final boolean turbo = driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT);
 		final boolean snail = driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT);
 		
 		//{calculating speed}
 		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//turbo mode
-		if (!turbo) {speed *= 0.7;}//-------------------------------------normal mode
-		if (snail)  {speed *= 0.5;}//-------------------------------------snail mode
+		if (!turbo) speed *= 0.7;//---------------------------------------normal mode
+		if (snail)  speed *= 0.5;//---------------------------------------snail mode
 		speed *= speed;
 		
 		//{calculating spin}
 		double spin = 0.7*driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);//normal mode
-		if (snail)  {spin  *= 0.7;	/*lockWheelsInPlace = true;*/}//------snail mode//TODO this boolean should face all wheels forward or in an X position rather than coasting
+		if (snail) spin  *= 0.7;//----------------------------------------snail mode
 		spin *= spin*Math.signum(spin);
 		final boolean handsOffSpinStick = spin == 0.0;
 		
@@ -207,8 +207,8 @@ public class Robot extends IterativeRobot {
 		if (handsOffSpinStick) {
 			double spinError = 0;
 			//stop rotation drift at high speeds
-			if (speed >= 0.6) {spinError = gyro.wornPath(lockedAngle);}
-			if (Math.abs(spinError) > 3.0) {spin = V_PID.get("spin", spinError);}
+			if (speed >= 0.6) spinError = gyro.wornPath(lockedAngle);
+			if (Math.abs(spinError) > 3.0) spin = V_PID.get("spin", spinError);
 			if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
 		}
 		if (V_Fridge.becomesTrue("hands off", handsOffSpinStick)) {
@@ -217,7 +217,8 @@ public class Robot extends IterativeRobot {
 			V_PID.clear("spin");
 		}
 		
-		swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
+		if (driver.getRawButton(R_Xbox.BUTTON_X)) swerve.formX();//X lock
+		else swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
 		if (!elevator.inClimbingMode()) {
@@ -262,11 +263,8 @@ public class Robot extends IterativeRobot {
 		}
 		
 		
-		if (gyro.netAcceleration() >= 1) {//DANGER RUMBLE
-			driver.setRumble(RumbleType.kLeftRumble, 1.0);
-		}else {
-			driver.setRumble(RumbleType.kLeftRumble, 0.0);
-		}
+		if (gyro.netAcceleration() >= 1) driver.setRumble(RumbleType.kLeftRumble, 1.0);//DANGER RUMBLE
+		else driver.setRumble(RumbleType.kLeftRumble, 0.0);
 		
 		
 		//{completing motor controller updates}
