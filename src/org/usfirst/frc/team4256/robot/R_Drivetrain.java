@@ -11,15 +11,12 @@ public class R_Drivetrain {
 	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
 	private static final double pivotToAft = Math.hypot(pivotToAftX, pivotToAftY*pivotToAftY);
 	
-	private double moduleD_maxSpeed = 70.0;//always put max slightly higher than max observed; TODO test on comp robot
+	private double moduleD_maxSpeed = 140.0;//always put max slightly higher than max observed
 	private double moduleD_previousAngle = 0.0;
 	private double previousSpin = 0.0;
 
 	public final R_Gyro gyro;
-	private final R_SwerveModule moduleA;
-	private final R_SwerveModule moduleB;
-	private final R_SwerveModule moduleC;
-	private final R_SwerveModule moduleD;
+	private final R_SwerveModule moduleA, moduleB, moduleC, moduleD;
 	private final R_SwerveModule[] modules;
 	
 	
@@ -71,7 +68,6 @@ public class R_Drivetrain {
 			angles_final = computeAngles(comps_desired);
 		}
 		
-		
 		//{CONTROL MOTORS, using above angles and computing traction outputs as needed}
 		if (!bad) {
 			for (int i = 0; i < 4; i++) modules[i].swivelTo(angles_final[i]);//control rotation if good
@@ -111,17 +107,14 @@ public class R_Drivetrain {
 	
 	
 	private double[] speedsFromModuleD() {
-		double rawSpeed = Math.abs(moduleD.tractionSpeed());
-		if (rawSpeed > moduleD_maxSpeed) {moduleD_maxSpeed = rawSpeed;}
+		double rawSpeed = moduleD.tractionSpeed()*moduleD.decapitated();
+		if (Math.abs(rawSpeed) > moduleD_maxSpeed) moduleD_maxSpeed = Math.abs(rawSpeed);
 		rawSpeed /= moduleD_maxSpeed;
 		
-		double tan = 1.0/Math.tan(Math.toRadians(V_Compass.validate(moduleD_previousAngle)));
-		if (Double.isNaN(tan)) {tan = 0.0;}
+		final double angle = Math.toRadians(moduleD_previousAngle);
 		
-		final double rawX = rawSpeed/Math.sqrt(1.0 + tan*tan);
-		final double rawY = rawX*tan;
-		final double drivetrainX = rawX - Math.abs(previousSpin)*pivotToAftY/pivotToAft;
-		final double drivetrainY = rawY - Math.abs(previousSpin)*pivotToAftX/pivotToAft;
+		final double drivetrainX = /*linear*/rawSpeed*Math.sin(angle) + /*rotational*/previousSpin*pivotToAftY/pivotToAft;
+		final double drivetrainY = /*linear*/rawSpeed*Math.cos(angle) + /*rotational*/previousSpin*pivotToAftX/pivotToAft;
 		
 		return new double[] {drivetrainX, drivetrainY};
 	}

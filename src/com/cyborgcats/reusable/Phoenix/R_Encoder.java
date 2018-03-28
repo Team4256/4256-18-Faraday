@@ -16,11 +16,7 @@ public enum R_Encoder {
 		this.countsPerRev = countsPerRev;
 	}
 	
-	public FeedbackDevice type() {
-		return feedbackDevice;
-	}
+	public FeedbackDevice type() {return feedbackDevice;}
 	
-	public int countsPerRev() {
-		return countsPerRev;
-	}
+	public int countsPerRev() {return countsPerRev;}
 }

@@ -110,9 +110,9 @@ public class R_Talon extends TalonSRX {
 	}
 	
 	
-	public double getCurrentRPM() {
-		return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));
-	}
+	public double getCurrentRPM() {return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));}
+	
+	public double getCurrentRPS() {return convert.to.RPS.afterGears(getSelectedSensorVelocity(0));}
 	
 	
 	/**

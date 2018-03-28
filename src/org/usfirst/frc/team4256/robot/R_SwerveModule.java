@@ -10,10 +10,10 @@ public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
 	public static final double tractionGearRatio = 40.0/3.0;
 	public static final double tractionWheelCircumference = 2.625*Math.PI;//inches
+	private final R_Talon rotation;
+	private final R_Talon traction;
+	private final boolean hasTractionSensor;
 	private double decapitated = 1.0;
-	private R_Talon rotation;
-	private R_Talon traction;
-	private boolean hasTractionSensor;
 	private double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
 	
@@ -122,6 +122,8 @@ public class R_SwerveModule {
 		return Math.abs(rotation.getCurrentError(true)) <= threshold;
 	}
 	
+	public double decapitated() {return decapitated;}
+	
 	
 	/**
 	 * This function makes sure the module rotates no more than 90 degrees from its current position.
@@ -135,7 +137,7 @@ public class R_SwerveModule {
 	
 	public double tractionSpeed() {
 		if (hasTractionSensor) {
-			return traction.getCurrentRPM()*60.0*tractionWheelCircumference/12.0;
+			return tractionWheelCircumference*traction.getCurrentRPS();
 		}else {
 			throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 		}
@@ -151,9 +153,7 @@ public class R_SwerveModule {
 	}
 	
 	
-	public double deltaDistance() {
-		return tractionDeltaPathLength;
-	}
+	public double deltaDistance() {return tractionDeltaPathLength;}
 	
 
 	public void setParentLogger(final Logger logger) {
