@@ -17,7 +17,7 @@ public class R_Combined {
 	/**
 	 * This function prepares each elevator individually.
 	**/
-	public void init() {//TODO set voltage ramp rates or use current limiting??
+	public void init() {
 		one.init();
 		two.init();
 	}
@@ -60,8 +60,7 @@ public class R_Combined {
 	
 	/**
 	 * This function moves the clamp to desiredInches, prioritizing EChain preservation over speed and CG.
-	 * Basically, this means that elevatorTwo will reach its limit
-	 * in the direction of motion before elevatorOne begins moving.
+	 * Basically, this means that elevatorTwo will reach its limit before elevatorOne begins moving.
 	**/
 	private void setClampHeight(double desiredInches) {
 		desiredInches = validateInches(desiredInches);
@@ -87,7 +86,7 @@ public class R_Combined {
 	
 	/**
 	 * This function moves the hooks to desiredInches, utilizing only elevatorOne.
-	 * Ignores EChain placement.//TODO?
+	 * Ignores EChain placement.
 	**/
 	private void setHookHeight(double desiredInches) {
 		desiredInches = validateInches(desiredInches);
@@ -107,14 +106,8 @@ public class R_Combined {
 	}
 	
 	
-	public void disableClimbMode(final R_Clamp clamp) {
-		climbing = false;
-	}
-	
-	
-	public boolean inClimbingMode() {
-		return climbing;
-	}
+	public void disableClimbMode() {climbing = false;}
+	public boolean inClimbingMode() {return climbing;}
 	
 	
 	public void completeLoopUpdate() {

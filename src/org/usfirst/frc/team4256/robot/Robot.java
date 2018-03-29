@@ -34,8 +34,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Robot extends IterativeRobot {
 	//{Human Input}
-	private static final R_Xbox driver = new R_Xbox(0);
-	private static final R_Xbox gunner = new R_Xbox(1);
+	private static final R_Xbox driver = new R_Xbox(0), gunner = new R_Xbox(1);
 	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz);
@@ -48,15 +47,15 @@ public class Robot extends IterativeRobot {
 	private static V_Odometer odometer;
 	
 	//{Game Input}
-	private static String gameData_old = "";
-	private static String gameData_new = "";
+	private static String gameData_old = "", gameData_new = "";
 	private static boolean haveGameData = false;
 
 	//{Robot Output}
-	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
-	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB);
-	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC);
-	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, false);
+	private static final R_SwerveModule
+	moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA),
+	moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB),
+	moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC),
+	moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, false);
 	private static final R_Drivetrain swerve = new R_Drivetrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
@@ -69,7 +68,7 @@ public class Robot extends IterativeRobot {
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(Parameters.tx2PowerControl);
 
-	private static Logger logger = Logger.getLogger("Robot");
+	private static final Logger logger = Logger.getLogger("Robot");
 	
 	@Override
 	public void robotInit() {
@@ -94,9 +93,9 @@ public class Robot extends IterativeRobot {
 		setupLogging(ds);
 		
 		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(2.0);moduleC.setTareAngle(26.0);moduleD.setTareAngle(78.0);
-		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
+		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
 		clamp.setZero();
@@ -159,12 +158,10 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void testInit() {
-	}
+	public void testInit() {}
 	
 	@Override
-	public void disabledInit() {
-	}
+	public void disabledInit() {}
 	
 	@Override
 	public void robotPeriodic() {
@@ -181,9 +178,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void autonomousPeriodic() {
-		autonomous.run(swerve, clamp, elevator);
-	}
+	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);}
 	
 	@Override
 	public void teleopPeriodic() {
@@ -247,7 +242,7 @@ public class Robot extends IterativeRobot {
 
 		
 		if (elevator.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
-			if (elevator.inClimbingMode()) elevator.disableClimbMode(clamp);
+			if (elevator.inClimbingMode()) elevator.disableClimbMode();
 			else elevator.enableClimbMode(clamp);
 		}
 		
@@ -282,9 +277,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void disabledPeriodic() {
-		pollGameData();
-	}
+	public void disabledPeriodic() {pollGameData();}
 	
 
 	private static void pollGameData() {
