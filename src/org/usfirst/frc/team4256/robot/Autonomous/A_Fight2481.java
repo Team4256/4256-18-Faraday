@@ -215,18 +215,31 @@ final 		 V_Events.Command k = (c, e, g) -> {c.open();//TODO
 												final double error = g.wornPath(180.0);
 												final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 												return spin;};
-final 		 V_Events.Command l = (c, e, g) -> {c.slurp();
-												return 0.0;};
+final 		 V_Events.Command l = (c, e, g) -> {final double error = g.wornPath(180.0);
+												final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
+	
+												if (error < 10) c.slurp();
+	
+												return spin;};
 final 		 V_Events.Command m = (c, e, g) -> {
-												e.setInches(Parameters.ElevatorPresets.SCALE_HIGH.height());
 												final double error = g.wornPath(0.0);
 												final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
 												return spin;};
-final 		 V_Events.Command n = (c, e, g) -> {c.spit(0.5);
-												return 0.0;};
+final		 V_Events.Command n = (c, e, g) -> {
+	e.setInches(Parameters.ElevatorPresets.SCALE_HIGH.height());
+	final double error = g.wornPath(0.0);
+	final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
+	return spin;
+};
+final 		 V_Events.Command o = (c, e, g) -> {final double error = g.wornPath(0.0);
+												final double spin = Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;
+												
+												if (error < 10) c.spit(0.5);
+												
+												return spin;};
 
-			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j, k, l, m, n};//TODO only takes care of stuff up until switch
-			final double[] triggers = new double[] {0.3, 0.7, 0.9, 1.1, 1.9, 2.6, 2.9};
+			final V_Events.Command[] commands = new V_Events.Command[] {h, i, j, k, l, m, n, o};//TODO only takes care of stuff up until switch
+			final double[] triggers = new double[] {0.3, 0.7, 0.9, 1.1, 1.9, 2.2, 2.6, 2.9};
 			events = new V_Events(commands, triggers);
 
 		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
