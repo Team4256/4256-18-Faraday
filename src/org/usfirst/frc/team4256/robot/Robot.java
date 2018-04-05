@@ -177,7 +177,6 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
 		faraday.getEntry("Received Field").setBoolean(haveGameData);
-		SmartDashboard.putNumber("traction encoder", moduleD.tractionSpeed());
 		SmartDashboard.putNumber("a", moduleA.rotationMotor().getCurrentAngle(true));
 		SmartDashboard.putNumber("b", moduleB.rotationMotor().getCurrentAngle(true));
 		SmartDashboard.putNumber("c", moduleC.rotationMotor().getCurrentAngle(true));
