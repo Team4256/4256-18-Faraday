@@ -7,13 +7,18 @@ import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
+import com.cyborgcats.reusable.Autonomous.V_Odometer;
+
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
 import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
 import org.usfirst.frc.team4256.robot.Autonomous.Autonomous;
-import org.usfirst.frc.team4256.robot.Autonomous.V_Odometer;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -29,11 +34,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Robot extends IterativeRobot {
 	//{Human Input}
-	private static final R_Xbox driver = new R_Xbox(0);
-	private static final R_Xbox gunner = new R_Xbox(1);
+	private static final R_Xbox driver = new R_Xbox(0), gunner = new R_Xbox(1);
 	private static double lockedAngle = 0;
 	//{Robot Input}
-	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz, 0.0, 0.0);
+	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz);
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.pressureGauge);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.tx2PowerSensor);
 	
@@ -43,16 +47,16 @@ public class Robot extends IterativeRobot {
 	private static V_Odometer odometer;
 	
 	//{Game Input}
-	private static String gameData_old = "";
-	private static String gameData_new = "";
+	private static String gameData_old = "", gameData_new = "";
 	private static boolean haveGameData = false;
 
 	//{Robot Output}
-	private static final R_SwerveModule moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA);
-	private static final R_SwerveModule moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB);
-	private static final R_SwerveModule moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC);
-	private static final R_SwerveModule moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, false);
-	private static final R_DriveTrain swerve = new R_DriveTrain(gyro, moduleA, moduleB, moduleC, moduleD);
+	private static final R_SwerveModule
+	moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA),
+	moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB),
+	moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC),
+	moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, false);
+	private static final R_Drivetrain swerve = new R_Drivetrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
 	private static final E_One elevatorOne = new E_One(Parameters.ElevatorOne_master, Parameters.ElevatorOne_followerA, Parameters.ElevatorOne_followerB, elevatorOneShifter);
@@ -63,6 +67,8 @@ public class Robot extends IterativeRobot {
 	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
 	
 	private static final DigitalOutput tx2PowerControl = new DigitalOutput(Parameters.tx2PowerControl);
+
+	private static final Logger logger = Logger.getLogger("Robot");
 	
 	@Override
 	public void robotInit() {
@@ -77,15 +83,20 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Starting Position").setNumber(0);
 		faraday.getEntry("Simple Auto").setBoolean(false);
 		//{Game Input}
-		gameData_old = DriverStation.getInstance().getGameSpecificMessage();
+		final DriverStation ds = DriverStation.getInstance();
+		gameData_old = ds.getGameSpecificMessage();
 		//{Robot Output}
 		swerve.init();
 		elevator.init();
 		clamp.init();
+
+		setupLogging(ds);
 		
-		moduleA.setTareAngle(-85.0);moduleB.setTareAngle(2.0);moduleC.setTareAngle(26.0);moduleD.setTareAngle(78.0);
+		moduleA.setTareAngle(-10.0);moduleB.setTareAngle(-80.0);moduleC.setTareAngle(50.0);moduleD.setTareAngle(-2.0);
+		//-85.0, 2.0, 26.0, 78.0
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
+		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
 		clamp.setZero();
@@ -148,12 +159,10 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void testInit() {
-	}
+	public void testInit() {}
 	
 	@Override
-	public void disabledInit() {
-	}
+	public void disabledInit() {}
 	
 	@Override
 	public void robotPeriodic() {
@@ -170,25 +179,23 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void autonomousPeriodic() {
-		autonomous.run(swerve, clamp, elevator);
-	}
+	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);}
 	
 	@Override
-	public void teleopPeriodic() {//TODO elevator override for climber (back and start)
+	public void teleopPeriodic() {
 		//{speed multipliers}
 		final boolean turbo = driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT);
 		final boolean snail = driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT);
 		
 		//{calculating speed}
 		double speed = driver.getCurrentRadius(R_Xbox.STICK_LEFT, true);//turbo mode
-		if (!turbo) {speed *= 0.7;}//-------------------------------------normal mode
-		if (snail)  {speed *= 0.5;}//-------------------------------------snail mode
+		if (!turbo) speed *= 0.7;//---------------------------------------normal mode
+		if (snail)  speed *= 0.5;//---------------------------------------snail mode
 		speed *= speed;
 		
 		//{calculating spin}
 		double spin = 0.7*driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);//normal mode
-		if (snail)  {spin  *= 0.7;	/*lockWheelsInPlace = true;*/}//------snail mode//TODO this boolean should face all wheels forward or in an X position rather than coasting
+		if (snail) spin  *= 0.7;//----------------------------------------snail mode
 		spin *= spin*Math.signum(spin);
 		final boolean handsOffSpinStick = spin == 0.0;
 		
@@ -196,8 +203,8 @@ public class Robot extends IterativeRobot {
 		if (handsOffSpinStick) {
 			double spinError = 0;
 			//stop rotation drift at high speeds
-			if (speed >= 0.6) {spinError = gyro.wornPath(lockedAngle);}
-			if (Math.abs(spinError) > 3.0) {spin = V_PID.get("spin", spinError);}
+			if (speed >= 0.6) spinError = gyro.wornPath(lockedAngle);
+			if (Math.abs(spinError) > 3.0) spin = V_PID.get("spin", spinError);
 			if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
 		}
 		if (V_Fridge.becomesTrue("hands off", handsOffSpinStick)) {
@@ -206,7 +213,8 @@ public class Robot extends IterativeRobot {
 			V_PID.clear("spin");
 		}
 		
-		swerve.holonomic_encoderAware(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
+		if (driver.getRawButton(R_Xbox.BUTTON_X)) swerve.formX();//X lock
+		else swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
 		if (!elevator.inClimbingMode()) {
@@ -235,7 +243,7 @@ public class Robot extends IterativeRobot {
 
 		
 		if (elevator.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
-			if (elevator.inClimbingMode()) elevator.disableClimbMode(clamp);
+			if (elevator.inClimbingMode()) elevator.disableClimbMode();
 			else elevator.enableClimbMode(clamp);
 		}
 		
@@ -251,11 +259,8 @@ public class Robot extends IterativeRobot {
 		}
 		
 		
-		if (gyro.netAcceleration() >= 1) {//DANGER RUMBLE
-			driver.setRumble(RumbleType.kLeftRumble, 1.0);
-		}else {
-			driver.setRumble(RumbleType.kLeftRumble, 0.0);
-		}
+		if (gyro.netAcceleration() >= 1) driver.setRumble(RumbleType.kLeftRumble, 1.0);//DANGER RUMBLE
+		else driver.setRumble(RumbleType.kLeftRumble, 0.0);
 		
 		
 		//{completing motor controller updates}
@@ -273,12 +278,35 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void disabledPeriodic() {
-		pollGameData();
-	}
+	public void disabledPeriodic() {pollGameData();}
 	
-	public static void pollGameData() {
+
+	private static void pollGameData() {
 		gameData_new = DriverStation.getInstance().getGameSpecificMessage();
 		if ((gameData_new != null) && (gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
+	}
+	
+	private static void setupLogging(final DriverStation ds) {
+		String logFileName = "/U/", eventName = ds.getEventName(), matchNumber = Integer.toString(ds.getMatchNumber()), replayNumber = Integer.toString(ds.getReplayNumber());
+		
+		switch (ds.getMatchType()) {
+		case None:
+			logFileName += "Unknown.log";
+			eventName = "None"; matchNumber = "0"; replayNumber = "0";
+			break;
+		case Practice: logFileName += "Practice_";break;
+		case Qualification: logFileName += "Qualification_";break;
+		case Elimination: logFileName += "Elimination_";break;
+		}
+		
+		logFileName += eventName + "_" + matchNumber + "_" + replayNumber + ".log"; 
+		
+		try {
+			logger.addHandler(new FileHandler(logFileName));
+			logger.setLevel(Level.FINE);
+			logger.log(Level.CONFIG, "Event:" + eventName);
+			logger.log(Level.CONFIG,  "Match:" + matchNumber);
+			logger.log(Level.CONFIG,  "Replay:" + replayNumber);
+		}catch (SecurityException | IOException e1) {/*ignore exceptions*/}
 	}
 }

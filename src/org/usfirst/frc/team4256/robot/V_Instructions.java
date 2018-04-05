@@ -15,7 +15,7 @@ public abstract class V_Instructions {
 	 * The array is saved inside the V_Instructions class for use by its other members.
 	 * It then runs through the specified step in the array, commanding swerve to move accordingly.
 	**/
-	public static void follow(final double[][] instructions, final int autoStep, final R_DriveTrain swerve, final R_Gyro gyro) {
+	public static void follow(final double[][] instructions, final int autoStep, final R_Drivetrain swerve, final R_Gyro gyro) {
 		if (autoStep != previousStep) {
 			stepStart = System.currentTimeMillis();
 			if (canMoveOn) {
@@ -27,7 +27,7 @@ public abstract class V_Instructions {
 		if (System.currentTimeMillis() - stepStart < currentInstructions[0]) {
 			double spinError = gyro.wornPath(currentInstructions[3]);
 			if (Math.abs(spinError) < 3) {spinError = 0;}
-			swerve.holonomic_encoderAware(currentInstructions[1], currentInstructions[2], V_PID.get("spin", spinError));
+			swerve.holonomic(currentInstructions[1], currentInstructions[2], V_PID.get("spin", spinError));
 		}
 	}
 	/**

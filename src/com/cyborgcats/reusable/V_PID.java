@@ -3,7 +3,9 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class V_PID {
+public final class V_PID {
+	private V_PID() {}
+	
 	private static final Map<String, double[]> PIDSystems = new HashMap<String, double[]>();
 	
 	public static void set(final String key, final double P, final double I, final double D) {

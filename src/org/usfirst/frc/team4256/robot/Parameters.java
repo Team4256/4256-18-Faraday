@@ -21,7 +21,9 @@
 
 package org.usfirst.frc.team4256.robot;
 
-public abstract class Parameters {
+public final class Parameters {
+	private Parameters() {}
+	
 	//ELECTRONICS
 	public static final int Swerve_rotatorA = 11;//CAN, Talon SRX, front left, PDP 4
 	public static final int Swerve_rotatorB = 12;//CAN, Talon SRX, front right, PDP 5
@@ -63,7 +65,7 @@ public abstract class Parameters {
 	
 	
 	//VALUES
-	public static enum ElevatorPresets {//TODO get accurate numbers
+	public static enum ElevatorPresets {
 		FLOOR(0),
 		SWITCH(30),
 		SCALE_LOW(60),
@@ -82,9 +84,9 @@ public abstract class Parameters {
 	
 	public static final byte Gyrometer_updateHz = 50;
 	
-	public static final double spinP = 0.05;
-	public static final double spinI = 0.000015;
-	public static final double spinD = 4.25;
+	public static final double spinP = 0.05;//0.05
+	public static final double spinI = 0.000015;//0.000015
+	public static final double spinD = 4.25;//4.25
 	
 	//.1838 works well for a leash length of 3, hoping doubling that works for length of 1.5
 	public static final double zedP = 0.1838*2.0;

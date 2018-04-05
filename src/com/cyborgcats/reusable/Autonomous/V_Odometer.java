@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4256.robot.Autonomous;
+package com.cyborgcats.reusable.Autonomous;//TODO could be an interface
 
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;

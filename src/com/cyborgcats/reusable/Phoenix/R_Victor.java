@@ -14,7 +14,7 @@ public class R_Victor extends VictorSPX {
 	
 	private ControlMode controlMode;
 	public static final int kTimeoutMS = 10;
-	private double lastSetPoint = 0.0;
+	private Double lastSetpoint = 0.0;
 	private boolean updated = false;
 	
 	public R_Victor(int deviceID, final ControlMode controlMode) {
@@ -61,8 +61,9 @@ public class R_Victor extends VictorSPX {
 		}
 	}
 	
+	
 	public void set(final double value, final boolean updateSetPoint) throws IllegalAccessException {
-		double currentSetPoint = lastSetPoint;
+		double currentSetPoint = lastSetpoint;
 		switch (controlMode) {
 		case Current:throw new IllegalAccessException("Victor " + Integer.toString(getDeviceID()) + "'s mode is incompatible with Victors");
 		case Follower:break;
@@ -74,8 +75,9 @@ public class R_Victor extends VictorSPX {
 		}
 		
 		updated = true;
-		if (updateSetPoint) lastSetPoint = currentSetPoint;
+		if (updateSetPoint) lastSetpoint = currentSetPoint;
 	}
+	
 	
 	private double setPercent(final double percentage) throws IllegalAccessException {
 		if (controlMode == percent) {
@@ -85,11 +87,23 @@ public class R_Victor extends VictorSPX {
 		}return percentage;
 	}
 	
+	
+	public void enterNeutral() {
+		neutralOutput();
+		updated = true;
+		lastSetpoint = null;
+	}
+	
+	
+	/**
+	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
+	**/
 	public void completeLoopUpdate() {
-		if (!updated) super.set(controlMode, lastSetPoint);//send a command if there hasn't yet been one
+		if (!updated) {
+			if (lastSetpoint != null) super.set(controlMode, lastSetpoint);//send a command if there hasn't yet been one, using raw encoder units
+			else neutralOutput();
+		}
 		
 		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
 	}
-	
-
 }

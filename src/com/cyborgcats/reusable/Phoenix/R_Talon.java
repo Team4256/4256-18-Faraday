@@ -2,6 +2,10 @@ package com.cyborgcats.reusable.Phoenix;
 
 import com.cyborgcats.reusable.V_Compass;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -18,12 +22,13 @@ public class R_Talon extends TalonSRX {
 	public static final int kTimeoutMS = 10;
 	private ControlMode controlMode;
 	private boolean updated = false;
-	private double lastSetPoint = 0.0;
+	private Double lastSetpoint = 0.0;
 	private double lastLegalDirection = 1.0;
 	public V_Compass compass;
 	public Convert convert;
+	private Logger logger;
 	
-	//This constructor is intended for use with an encoder on a motor with limited motion.
+	//This constructor is intended for use with an encoder on a motor with limited rotary motion. To limit linear motion, use built-in Talon commands.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
@@ -34,11 +39,14 @@ public class R_Talon extends TalonSRX {
 			}
 		}else {
 			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
+			configSelectedFeedbackSensor(encoder.type(), 1, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
+			configSelectedFeedbackSensor(encoder.type(), 2, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 		convert = new Convert(encoder.countsPerRev(), gearRatio);
+		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
@@ -48,7 +56,8 @@ public class R_Talon extends TalonSRX {
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
-		compass = new V_Compass(0, 0);
+		compass = new V_Compass(0.0, 0.0);
+		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	
 	
@@ -84,7 +93,7 @@ public class R_Talon extends TalonSRX {
 	
 	/**
 	 * This function returns the current position in revolutions.
-	 * TODO this currently ignores tareAngle, which might be functional but isn't logical
+	 * talon.setSelectedSensorPosition() commands will be taken into account, and compass.getTareAngle() is ignored.
 	**/
 	public double getCurrentRevs() {
 		return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
@@ -93,16 +102,17 @@ public class R_Talon extends TalonSRX {
 	
 	/**
 	 * This function returns the current position in degrees. If wraparound is true, the output will be between 0 and 359.999...
-	 * TODO this currently ignores tareAngle, which might be functional but isn't logical
+	 * Both the compass.getTareAngle() and any talon.setSelectedSensorPosition() commands will be taken into account. DON'T USE BOTH!
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
-		return wraparound ? V_Compass.validateAngle(convert.to.DEGREES.afterGears(getSelectedSensorPosition(0))) : convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		final double raw = convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		return wraparound ? V_Compass.validate(raw - compass.getTareAngle()) : raw - compass.getTareAngle();
 	}
 	
 	
-	public double getCurrentRPM() {
-		return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));
-	}
+	public double getCurrentRPM() {return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));}
+	
+	public double getCurrentRPS() {return convert.to.RPS.afterGears(getSelectedSensorVelocity(0));}
 	
 	
 	/**
@@ -110,17 +120,13 @@ public class R_Talon extends TalonSRX {
 	 * Positive means clockwise and negative means counter-clockwise.
 	 * If the current angle is inside the protected zone, the path goes through the previously breached border.
 	**/
-	public double wornPath(double endAngle) {//ANGLE
-		endAngle = compass.legalizeAngle(endAngle + compass.getTareAngle());
-		double startAngle = getCurrentAngle(true);
-		double currentPathVector = V_Compass.path(startAngle, endAngle);
-		boolean legal = compass.legalizeAngle(startAngle) == startAngle;
-		if (legal) {
-			currentPathVector = compass.legalPath(startAngle, endAngle);
-			lastLegalDirection = Math.signum(currentPathVector);
-		}else if (!legal && Math.signum(currentPathVector) != -lastLegalDirection) {
-			currentPathVector = 360*Math.signum(-currentPathVector) + currentPathVector;
-		}return currentPathVector;
+	public double wornPath(double target) {//ANGLE
+		final double current = getCurrentAngle(true);
+		double path = compass.legalPath(current, target);
+		if (current == compass.legalize(current)) lastLegalDirection = Math.signum(path);
+		else if (Math.signum(path) != -lastLegalDirection) path -= Math.copySign(360, path);
+		
+		return path;
 	}
 	
 	
@@ -142,7 +148,7 @@ public class R_Talon extends TalonSRX {
 
 
 	public void set(final double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws IllegalAccessException {
-		double currentSetPoint = lastSetPoint;
+		double currentSetPoint = lastSetpoint;
 		switch (controlMode) {
 		case Current:
 			currentSetPoint = setMilliAmps(value);break;
@@ -161,7 +167,7 @@ public class R_Talon extends TalonSRX {
 		}
 		
 		updated = true;
-		if (updateSetPoint) lastSetPoint = currentSetPoint;
+		if (updateSetPoint) lastSetpoint = currentSetPoint;
 	}
 
 	
@@ -186,6 +192,7 @@ public class R_Talon extends TalonSRX {
 	private double setPercent(final double percentage) throws IllegalAccessException {
 		if (controlMode == percent) {
 			super.set(controlMode, percentage);
+			logger.log(Level.FINE, Double.toString(percentage));
 		}else {
 			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given percentage in " + controlMode.name() + " mode.");
 		}return percentage;
@@ -196,6 +203,7 @@ public class R_Talon extends TalonSRX {
 		if (controlMode == position) {
 			final double encoderCounts = convert.from.DEGREES.afterGears(getCurrentAngle(false) + wornPath(degrees));
 			super.set(controlMode, encoderCounts);
+			logger.log(Level.FINE, Double.toString(degrees));
 			return encoderCounts;
 		}else {
 			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given degrees in " + controlMode.name() + " mode.");
@@ -207,6 +215,7 @@ public class R_Talon extends TalonSRX {
 		if (controlMode == position) {
 			final double encoderCounts = convert.from.REVS.afterGears(revs);
 			super.set(controlMode, encoderCounts);
+			logger.log(Level.FINE, Double.toString(revs));
 			return encoderCounts;
 		}else {
 			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given revs in " + controlMode.name() + " mode.");
@@ -225,11 +234,21 @@ public class R_Talon extends TalonSRX {
 	}
 	
 	
+	public void enterNeutral() {
+		neutralOutput();
+		updated = true;
+		lastSetpoint = null;
+	}
+	
+	
 	/**
 	 * Run this after all other commands in a system level loop to make sure the Talon receives a command.
 	**/
 	public void completeLoopUpdate() {
-		if (!updated) super.set(controlMode, lastSetPoint);//send a command if there hasn't yet been one, using raw encoder units
+		if (!updated) {
+			if (lastSetpoint != null) super.set(controlMode, lastSetpoint);//send a command if there hasn't yet been one, using raw encoder units
+			else neutralOutput();
+		}
 		
 		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
 	}
@@ -249,4 +268,6 @@ public class R_Talon extends TalonSRX {
 		default:return 0.0;
 		}
 	}
+
+	public void setParentLogger(final Logger logger) {this.logger = logger;}
 }

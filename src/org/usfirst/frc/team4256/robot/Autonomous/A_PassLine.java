@@ -1,10 +1,13 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.R_DriveTrain;
+import org.usfirst.frc.team4256.robot.R_Drivetrain;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import com.cyborgcats.reusable.V_PID;
+import com.cyborgcats.reusable.Autonomous.P_Bezier;
+import com.cyborgcats.reusable.Autonomous.V_Leash;
+import com.cyborgcats.reusable.Autonomous.V_Odometer;
 
 public class A_PassLine implements Autonomous{
 	public final StartingPosition startingPosition;
@@ -32,7 +35,7 @@ public class A_PassLine implements Autonomous{
 		}
 	}
 	
-	public void run(final R_DriveTrain swerve, final R_Clamp clamp, final R_Combined elevator) {//TODO probably have a pause thing too
+	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		//run processing only if ZED values are new
   		if (odometer.newX() && odometer.newY()) {
   			//get most recent ZED values
@@ -54,7 +57,7 @@ public class A_PassLine implements Autonomous{
 			double speed = V_PID.get("zed", errorMagnitude);
 			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
 			
-			swerve.holonomic_encoderAware(errorDirection, speed, 0.0/*spin*/);
+			swerve.holonomic(errorDirection, speed, 0.0/*spin*/);
   		}
 	}
 	

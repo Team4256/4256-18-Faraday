@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4256.robot;
 
+import java.util.logging.Logger;
+
 import com.cyborgcats.reusable.V_Compass;
 import com.cyborgcats.reusable.Phoenix.R_Encoder;
 import com.cyborgcats.reusable.Phoenix.R_Talon;
@@ -8,10 +10,10 @@ public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
 	public static final double tractionGearRatio = 40.0/3.0;
 	public static final double tractionWheelCircumference = 2.625*Math.PI;//inches
-	private double decapitated = 1;
-	private R_Talon rotation;
-	private R_Talon traction;
-	private boolean hasTractionSensor;
+	private final R_Talon rotation;
+	private final R_Talon traction;
+	private final boolean hasTractionSensor;
+	private double decapitated = 1.0;
 	private double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
 	
@@ -41,6 +43,7 @@ public class R_SwerveModule {
 		rotation.config_kD(0, 1.8, R_Talon.kTimeoutMS);
 		
 		traction.init();
+		
 		traction.setInverted(reversedTraction);
 		traction.setNeutralMode(R_Talon.coast);
 		traction.configContinuousCurrentLimit(40, R_Talon.kTimeoutMS);
@@ -56,18 +59,19 @@ public class R_SwerveModule {
 	
 	/**
 	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.
-	 * Useful when correcting for loose mechanical tolerances.
 	**/
 	public void setTareAngle(final double tareAngle) {
-		rotation.compass.setTareAngle(tareAngle);
+		setTareAngle(tareAngle, false);
 	}
 	
+	
 	/**
-	 * This offsets the tare angle by the specified amount. Positive means clockwise and negative means counter-clockwise.
-	 * Useful when correcting for loose mechanical tolerances.
+	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.
+	 * If relativeReference is true, tareAngle will be incremented rather than set.
 	**/
-	public void incrementTareAngle(final double incrementAngle) {
-		setTareAngle(rotation.compass.getTareAngle() + incrementAngle);
+	public void setTareAngle(double tareAngle, final boolean relativeReference) {
+		if (relativeReference) {tareAngle += rotation.compass.getTareAngle();}
+		rotation.compass.setTareAngle(tareAngle);
 	}
 	
 	
@@ -75,16 +79,7 @@ public class R_SwerveModule {
 	 * Use wheel_chassisAngle to specify the wheel's orientation relative to the robot in degrees.
 	**/
 	public void swivelTo(final double wheel_chassisAngle) {
-		swivelTo(wheel_chassisAngle, false);
-	}
-	
-	
-	/**
-	 * Use wheel_chassisAngle to specify the wheel's orientation relative to the robot in degrees.
-	 * If ignore is true, nothing will happen, which is useful for coasting based on variables outside this class's scope.
-	**/
-	public void swivelTo(final double wheel_chassisAngle, final boolean ignore) {
-		if (!ignore) {rotation.quickSet(decapitateAngle(wheel_chassisAngle), true);}//if this doesn't run, complete loop update will eventually set it to be the last angle
+		rotation.quickSet(decapitateAngle(wheel_chassisAngle), true);
 	}
 	
 	
@@ -127,6 +122,8 @@ public class R_SwerveModule {
 		return Math.abs(rotation.getCurrentError(true)) <= threshold;
 	}
 	
+	public double decapitated() {return decapitated;}
+	
 	
 	/**
 	 * This function makes sure the module rotates no more than 90 degrees from its current position.
@@ -134,13 +131,13 @@ public class R_SwerveModule {
 	**/
 	public double decapitateAngle(final double endAngle) {
 		decapitated = Math.abs(rotation.wornPath(endAngle)) > 90 ? -1 : 1;
-		return decapitated == -1 ? V_Compass.validateAngle(endAngle + 180) : V_Compass.validateAngle(endAngle);
+		return decapitated == -1 ? V_Compass.validate(endAngle + 180) : V_Compass.validate(endAngle);
 	}
 
 	
 	public double tractionSpeed() {
 		if (hasTractionSensor) {
-			return traction.getCurrentRPM()*60.0*tractionWheelCircumference/12.0;
+			return tractionWheelCircumference*traction.getCurrentRPS();
 		}else {
 			throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 		}
@@ -156,17 +153,20 @@ public class R_SwerveModule {
 	}
 	
 	
-	public double deltaDistance() {
-		return tractionDeltaPathLength;
-	}
+	public double deltaDistance() {return tractionDeltaPathLength;}
 	
+
+	public void setParentLogger(final Logger logger) {
+		rotation.setParentLogger(logger);
+		traction.setParentLogger(logger);
+	}
 	
 	/**
 	 * This function translates angles from the robot's perspective to the field's orientation.
 	 * It requires an angle and input from the gyro.
 	**/
 	public static double convertToField(final double wheel_robotAngle, final double chassis_fieldAngle) {
-		return V_Compass.validateAngle(wheel_robotAngle + chassis_fieldAngle);
+		return V_Compass.validate(wheel_robotAngle + chassis_fieldAngle);
 	}
 	
 	
@@ -175,6 +175,6 @@ public class R_SwerveModule {
 	 * It requires an angle and input from the gyro.
 	**/
 	public static double convertToRobot(final double wheel_fieldAngle, final double chassis_fieldAngle) {
-		return V_Compass.validateAngle(wheel_fieldAngle - chassis_fieldAngle);
+		return V_Compass.validate(wheel_fieldAngle - chassis_fieldAngle);
 	}
 }

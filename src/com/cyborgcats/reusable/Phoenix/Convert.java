@@ -1,10 +1,10 @@
 package com.cyborgcats.reusable.Phoenix;//COMPLETE 2018
 
 public class Convert {
-	private double countsPerRev;
-	private double gearRatio;
-	public To to;
-	public From from;
+	private final double countsPerRev;
+	private final double gearRatio;
+	public final To to;
+	public final From from;
 	
 	public Convert(final int countsPerRev, final double gearRatio) {
 		this.countsPerRev = (double)countsPerRev;
@@ -13,23 +13,20 @@ public class Convert {
 		this.from = new From();
 	}
 	
-	public enum Unit {
-	REVS_UNIT,
-	DEGREES_UNIT,
-	RPM_UNIT;
-	}
+	private enum Unit {REVS_UNIT, DEGREES_UNIT, RPM_UNIT, RPS_UNIT;}
 
-	public class To {
-		public class Conversion {
-			public Unit unit;
+	public final class To {
+		public final class Conversion {
+			private final Unit unit;
 
-			public Conversion(Unit u) {unit = u;};
+			private Conversion(final Unit u) {unit = u;};
 			
 			public double beforeGears(final int encoderCounts) {
 				switch(unit) {
 				case REVS_UNIT: return encoderCounts/countsPerRev;
 				case DEGREES_UNIT: return 360.0*encoderCounts/countsPerRev;
-				case RPM_UNIT: return encoderCounts/countsPerRev;//TODO this isn't really correct
+				case RPS_UNIT: return 10*encoderCounts/countsPerRev;
+				case RPM_UNIT: return 60*10*encoderCounts/countsPerRev;
 				default: return encoderCounts;
 				}
 			}
@@ -39,23 +36,25 @@ public class Convert {
 			}
 		}
 
-		public Conversion REVS = new Conversion(Unit.REVS_UNIT);
-		public Conversion DEGREES = new Conversion(Unit.DEGREES_UNIT);
-		public Conversion RPM = new Conversion(Unit.RPM_UNIT);
+		public final Conversion REVS = new Conversion(Unit.REVS_UNIT);
+		public final Conversion DEGREES = new Conversion(Unit.DEGREES_UNIT);
+		public final Conversion RPS = new Conversion(Unit.RPS_UNIT);
+		public final Conversion RPM = new Conversion(Unit.RPM_UNIT);
 	}
 	
 	
-	public class From {
-		public class Conversion {
-			public Unit unit;
+	public final class From {
+		public final class Conversion {
+			private final Unit unit;
 			
-			public Conversion(Unit u) {unit = u;};
+			private Conversion(final Unit u) {unit = u;};
 
 			public double beforeGears(final double value) {
 				switch(unit) {
 				case REVS_UNIT: return value*countsPerRev;
 				case DEGREES_UNIT: return value*countsPerRev/360.0;
-				case RPM_UNIT: return value*countsPerRev;
+				case RPS_UNIT: return value*countsPerRev/10;
+				case RPM_UNIT: return value*countsPerRev/(10*60);
 				default: return value;
 				}
 			}
@@ -65,8 +64,9 @@ public class Convert {
 			}
 		}
 		
-		public Conversion REVS = new Conversion(Unit.REVS_UNIT);
-		public Conversion DEGREES = new Conversion(Unit.DEGREES_UNIT);
-		public Conversion RPM = new Conversion(Unit.RPM_UNIT);
+		public final Conversion REVS = new Conversion(Unit.REVS_UNIT);
+		public final Conversion DEGREES = new Conversion(Unit.DEGREES_UNIT);
+		public final Conversion RPS = new Conversion(Unit.RPS_UNIT);
+		public final Conversion RPM = new Conversion(Unit.RPM_UNIT);
 	}
 }

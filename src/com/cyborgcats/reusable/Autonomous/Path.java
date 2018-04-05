@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4256.robot.Autonomous;
+package com.cyborgcats.reusable.Autonomous;
 
 public interface Path {
 	public boolean increment(final double amount);

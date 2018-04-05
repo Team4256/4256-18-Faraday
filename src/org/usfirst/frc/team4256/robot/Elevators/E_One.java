@@ -7,7 +7,7 @@ import com.cyborgcats.reusable.Phoenix.R_Victor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class E_One extends Elevator {
-	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kReverse;//should be kForward
+	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kReverse;//should be kForward, but shifter is broken
 	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kReverse;
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
