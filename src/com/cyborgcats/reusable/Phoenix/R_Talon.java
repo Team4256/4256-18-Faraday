@@ -201,7 +201,7 @@ public class R_Talon extends TalonSRX {
 	
 	private double setDegrees(final double degrees) throws IllegalAccessException {
 		if (controlMode == position) {
-			final double encoderCounts = convert.from.DEGREES.afterGears(getCurrentAngle(false) + wornPath(degrees));
+			final double encoderCounts = getSelectedSensorPosition(0) + convert.from.DEGREES.afterGears(wornPath(degrees));
 			super.set(controlMode, encoderCounts);
 			logger.log(Level.FINE, Double.toString(degrees));
 			return encoderCounts;

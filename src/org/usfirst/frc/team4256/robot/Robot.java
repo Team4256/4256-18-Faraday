@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.hal.PowerJNI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -92,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(-10.0);moduleB.setTareAngle(-80.0);moduleC.setTareAngle(50.0);moduleD.setTareAngle(-2.0);
+		moduleA.setTareAngle(68.0);moduleB.setTareAngle(-39.0);moduleC.setTareAngle(85.0);moduleD.setTareAngle(-85.0);
 		//-85.0, 2.0, 26.0, 78.0
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
@@ -176,6 +177,11 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
 		faraday.getEntry("Received Field").setBoolean(haveGameData);
+		SmartDashboard.putNumber("traction encoder", moduleD.tractionSpeed());
+		SmartDashboard.putNumber("a", moduleA.rotationMotor().getCurrentAngle(true));
+		SmartDashboard.putNumber("b", moduleB.rotationMotor().getCurrentAngle(true));
+		SmartDashboard.putNumber("c", moduleC.rotationMotor().getCurrentAngle(true));
+		SmartDashboard.putNumber("d", moduleD.rotationMotor().getCurrentAngle(true));
 	}
 	
 	@Override
