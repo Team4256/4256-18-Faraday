@@ -4,14 +4,14 @@ import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.V_Compass;
 
 public class R_Drivetrain {
-	private static final double pivotToFrontX = 8.45;//inches, pivot point to front wheel tip, x
-	private static final double pivotToFrontY = 10.06;//inches, pivot point to front wheel tip, y
-	private static final double pivotToFront = Math.hypot(pivotToFrontX, pivotToFrontY);
-	private static final double pivotToAftX = 8.90;//inches, pivot point to aft wheel tip, x
-	private static final double pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
-	private static final double pivotToAft = Math.hypot(pivotToAftX, pivotToAftY);
+	private static final double pivotToFrontX = 8.45,//inches, pivot point to front wheel tip, x
+								pivotToFrontY = 10.06,//inches, pivot point to front wheel tip, y
+								pivotToAftX = 8.90,//inches, pivot point to aft wheel tip, x
+								pivotToAftY = 16.94;//inches, pivot point to aft wheel tip, y
+	private static final double pivotToFront = Math.hypot(pivotToFrontX, pivotToFrontY),
+								pivotToAft = Math.hypot(pivotToAftX, pivotToAftY);
 	
-	private double moduleD_maxSpeed = 140.0;//always put max slightly higher than max observed
+	private double moduleD_maxSpeed = 70.0;//always put max slightly higher than max observed
 	private double moduleD_previousAngle = 0.0;
 	private double previousSpin = 0.0;
 
@@ -56,7 +56,6 @@ public class R_Drivetrain {
 		
 		//{COMPUTE ANGLES}
 		final double[] angles_final;
-		//TODO speed_actual should be compared to some combination of spin and speed, not just speed
 		if ((speed < speed_actual) && (speed_actual > .1)) {
 			final double[] angles_desired = computeAngles(comps_desired);
 			final double stdd_desired = V_Compass.stdd(angles_desired);
@@ -114,8 +113,8 @@ public class R_Drivetrain {
 		
 		final double angle = Math.toRadians(moduleD_previousAngle);
 		
-		final double drivetrainX = /*linear*/rawSpeed*Math.sin(angle) + /*rotational*/previousSpin*pivotToAftY/pivotToAft;
-		final double drivetrainY = /*linear*/rawSpeed*Math.cos(angle) + /*rotational*/previousSpin*pivotToAftX/pivotToAft;
+		final double drivetrainX = /*linear*/rawSpeed*Math.sin(angle) + /*rotational*/previousSpin*pivotToAftY/pivotToAft*Math.signum(rawSpeed);
+		final double drivetrainY = /*linear*/rawSpeed*Math.cos(angle) + /*rotational*/previousSpin*pivotToAftX/pivotToAft*Math.signum(rawSpeed);
 		
 		return new double[] {drivetrainX, drivetrainY};
 	}
