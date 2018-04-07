@@ -202,21 +202,21 @@ public class Robot extends IterativeRobot {
 		double spin = 0.7*driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);//normal mode
 		if (snail) spin  *= 0.7;//----------------------------------------snail mode
 		spin *= spin*Math.signum(spin);
-		final boolean handsOffSpinStick = spin == 0.0;
-		
-		//{adding driver aids}
-		if (handsOffSpinStick) {
-			double spinError = 0;
-			//stop rotation drift at high speeds
-			if (speed >= 0.6) spinError = gyro.wornPath(lockedAngle);
-			if (Math.abs(spinError) > 3.0) spin = V_PID.get("spin", spinError);
-			if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
-		}
-		if (V_Fridge.becomesTrue("hands off", handsOffSpinStick)) {
-			//remember angle when driver stops rotating
-			lockedAngle = gyro.getCurrentAngle();
-			V_PID.clear("spin");
-		}
+//		final boolean handsOffSpinStick = spin == 0.0;
+//		
+//		//{adding driver aids}
+//		if (handsOffSpinStick) {
+//			double spinError = 0;
+//			//stop rotation drift at high speeds
+//			if (speed >= 0.6) spinError = gyro.wornPath(lockedAngle);
+//			if (Math.abs(spinError) > 3.0) spin = V_PID.get("spin", spinError);
+//			if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
+//		}
+//		if (V_Fridge.becomesTrue("hands off", handsOffSpinStick)) {
+//			//remember angle when driver stops rotating
+//			lockedAngle = gyro.getCurrentAngle();
+//			V_PID.clear("spin");
+//		}
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_X)) swerve.formX();//X lock
 		else swerve.holonomic_encoderIgnorant(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
