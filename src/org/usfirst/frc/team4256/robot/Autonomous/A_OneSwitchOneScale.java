@@ -71,7 +71,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			double speed = V_PID.get("zed", errorMagnitude);
 			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
 
-			swerve.holonomic(errorDirection, speed, spin);//TODO spin should get updated even outside the if statement
+			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);//TODO spin should get updated even outside the if statement
   		}
 	}
 

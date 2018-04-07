@@ -38,7 +38,7 @@ public class R_SwerveModule {
 		rotation.init();
 		
 		rotation.setNeutralMode(R_Talon.coast);
-		rotation.config_kP(0, 6.2, R_Talon.kTimeoutMS);
+		rotation.config_kP(0, 6.7, R_Talon.kTimeoutMS);
 		rotation.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		rotation.config_kD(0, 1.0, R_Talon.kTimeoutMS);
 		

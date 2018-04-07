@@ -56,7 +56,7 @@ public class Robot extends IterativeRobot {
 	moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA),
 	moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB),
 	moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC),
-	moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, false);
+	moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, true);
 	private static final R_Drivetrain swerve = new R_Drivetrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(71.0);moduleB.setTareAngle(-32.0);moduleC.setTareAngle(87.0);moduleD.setTareAngle(-78.0);
+		moduleA.setTareAngle(67.0);moduleB.setTareAngle(-51.0);moduleC.setTareAngle(85.0);moduleD.setTareAngle(-78.0);
 		//-85.0, 2.0, 26.0, 78.0
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
@@ -219,7 +219,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_X)) swerve.formX();//X lock
-		else swerve.holonomic(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
+		else swerve.holonomic_encoderIgnorant(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		
 		
 		if (!elevator.inClimbingMode()) {
