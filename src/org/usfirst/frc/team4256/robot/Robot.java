@@ -36,7 +36,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final R_Xbox driver = new R_Xbox(0), gunner = new R_Xbox(1);
-	private static double lockedAngle = 0;
+//	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz);
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.pressureGauge);
@@ -125,14 +125,14 @@ public class Robot extends IterativeRobot {
 		if(!simpleAuto) {
 			if (haveGameData) {
 				autonomous = new A_OneSwitchOneScale(startingPosition, gameData_new, odometer);
-				gyro.setTareAngle(-90.0, false);
+//				gyro.setTareAngle(-90.0, false);
 			}else {
 				autonomous = new A_PassLine(startingPosition, odometer);
-				gyro.setTareAngle(-90.0, false);
+//				gyro.setTareAngle(-90.0, false);
 			}
 		}else {
 			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
-			gyro.setTareAngle(0.0, false);
+//			gyro.setTareAngle(0.0, false);
 		}
 		
 		//{Robot Input}
@@ -149,7 +149,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		//{Robot Input}
 		odometer.disable();
-		lockedAngle = gyro.getCurrentAngle();
+//		lockedAngle = gyro.getCurrentAngle();
 		//{Robot Output}
 		swerve.autoMode(false);
 		
@@ -259,7 +259,7 @@ public class Robot extends IterativeRobot {
 		
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
 			gyro.setTareAngle(gyro.getCurrentAngle(), true);
-			lockedAngle = 0.0;
+//			lockedAngle = 0.0;
 			V_PID.clear("spin");
 		}
 		

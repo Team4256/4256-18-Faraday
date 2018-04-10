@@ -128,7 +128,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			};
 			
 			
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			final double[] triggers = new double[] {0.3, 0.7, 0.9};
 			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
@@ -140,7 +140,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			};
 			
 
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			final double[] triggers = new double[] {0.3, 0.7, 0.9};
 			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
@@ -156,7 +156,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			};
 			
 
-			final double[] triggers = new double[] {0.3, 0.5, 0.9, 1.2, 1.7, 1.9};
+			final double[] triggers = new double[] {0.3, 0.7, 0.9, 1.2, 1.7, 1.9};
 			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else {
@@ -224,7 +224,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 		};
 		
 		
-		final double[] triggers = new double[] {0.3, 0.5, 0.9};
+		final double[] triggers = new double[] {0.3, 0.7, 0.9};
 		events = new V_Events(V_Events.getFromArray(instructions), triggers);
 	}
 	//------------------------------------------------------------------------------------------
@@ -278,7 +278,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			};
 			
 			
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			final double[] triggers = new double[] {0.3, 0.7, 0.9};
 			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
@@ -290,13 +290,13 @@ public class A_OneSwitchOneScale implements Autonomous{
 			};
 			
 			
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			final double[] triggers = new double[] {0.3, 0.7, 0.9};
 			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
 			final int[][] instructions = new int[][] {
-				{0, 3, 0},
+				{4, 3, 0},
 				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0},
 				{1, Parameters.ElevatorPresets.SWITCH.height(), 0},
 				{2, Parameters.ElevatorPresets.FLOOR.height(), 180},
@@ -305,7 +305,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 			};
 			
 			
-			final double[] triggers = new double[] {0.3, 0.5, 0.9};
+			final double[] triggers = new double[] {0.3, 0.7, 0.9, 1.2, 1.6, 1.9};
 			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else {

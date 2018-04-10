@@ -28,7 +28,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
 		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
 		this.clamp = clamp;
-		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, true, 110.0, 230.0);//false for practice
+		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, true, 110.0, 230.0);
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
@@ -64,10 +64,6 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 			stop();
 			break;
 		}
-		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
-		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
-		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
-		if (cubePosition.equals(CubePosition.WithinReach) && cubeLikelyPresent()) cubePosition = CubePosition.Present;
 	}
 	
 	
@@ -102,24 +98,20 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	**/
 	public void open() {
 		clamp.set(OpenState);
+		cubePosition = CubePosition.Absent;
 	}
 	
 	
 	/**
 	 * This function closes the clamp 
 	**/
-	public void close() {
-		clamp.set(CloseState);
-		cubePosition = CubePosition.Present;
-	}
+	public void close() {clamp.set(CloseState);}
 	
 	
 	/**
 	 * This function returns if the clamp is closed or not
 	**/
-	public boolean isOpen() {
-		return clamp.get().equals(OpenState);
-	}
+	public boolean isOpen() {return clamp.get().equals(OpenState);}
 	
 	public boolean hasCube() {return cubePosition.equals(CubePosition.Present);}
 	
@@ -128,7 +120,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	 * This function returns if the cube is in the clamp or not.
 	 **/
 	private boolean cubeLikelyPresent() {
-		if (ultrasonic.getAverageValue() <= 55) counter++;
+		if (ultrasonic.getAverageValue() <= 60) counter++;
 		else counter = 0;
 		return counter > 10;
 	}
@@ -137,17 +129,13 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	/**
 	 * This function returns if the cube is in reach of the clamp or not.
 	**/
-	private boolean cubeInReach() {
-		return ultrasonic.getAverageValue() <= 70;
-	}
+	private boolean cubeInReach() {return ultrasonic.getAverageValue() <= 77;}
 	
 	/**
 	 * This function checks if the rotator is within a threshold of the desired angle.
 	 * Threshold should be specified in degrees.
 	**/
-	public boolean isThere(final double threshold) {
-		return Math.abs(rotator.getCurrentError(true)) <= threshold;
-	}
+	public boolean isThere(final double threshold) {return Math.abs(rotator.getCurrentError(true)) <= threshold;}
 	
 	/**
 	 * This function defines zero for the rotator.
@@ -157,9 +145,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		knowsZero = true;
 	}
 	
-	public void increment(final double degrees) {
-		rotateTo(currentSetpoint + degrees);
-	}
+	public void increment(final double degrees) {rotateTo(currentSetpoint + degrees);}
 	
 	public void rotateTo(double desiredAngle) {
 		desiredAngle = Math.min(Math.max(0.0, desiredAngle), 90.0);//clips values outside of [0.0, 90.0]
@@ -176,5 +162,9 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
+		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
+		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
+		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
+		if (cubePosition.equals(CubePosition.WithinReach) && cubeLikelyPresent() && !isOpen()) cubePosition = CubePosition.Present;
 	}
 }

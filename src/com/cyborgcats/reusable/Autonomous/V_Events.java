@@ -68,6 +68,7 @@ public class V_Events {
 				case 1: c.spit(0.5);break;
 				case 2: c.open();break;
 				case 3: c.rotateTo(0.0);break;
+				case 4: c.close();break;
 				default: break;
 				}
 			
