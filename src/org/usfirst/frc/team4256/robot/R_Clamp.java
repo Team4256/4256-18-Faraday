@@ -7,6 +7,7 @@ import com.cyborgcats.reusable.Phoenix.R_Victor;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class R_Clamp {//TODO make a private subclass for the rotator and a private subclass for intaking and combine them; then double check auto-slurp
 	private enum CubePosition {Absent, WithinReach, Present;}
@@ -166,5 +167,6 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
 		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
 		if (cubePosition.equals(CubePosition.WithinReach) && cubeLikelyPresent() && !isOpen()) cubePosition = CubePosition.Present;
+		SmartDashboard.putNumber("ultrasonic", ultrasonic.getAverageValue());
 	}
 }

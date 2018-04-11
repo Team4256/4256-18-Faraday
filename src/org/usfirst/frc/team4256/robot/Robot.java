@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(96.0);moduleB.setTareAngle(-48.0);moduleC.setTareAngle(88.0);moduleD.setTareAngle(-72.0);
+		moduleA.setTareAngle(124.0);moduleB.setTareAngle(-48.0);moduleC.setTareAngle(92.0);moduleD.setTareAngle(-66.0);
 		//-67.0, -51.0, 85.0, -78.0
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
@@ -246,6 +246,8 @@ public class Robot extends IterativeRobot {
 			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevator.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}
 
+		if (clamp.hasCube()) {driver.setRumble(null, 0.5); gunner.setRumble(null, 0.5);}
+		else {driver.setRumble(null, 0); gunner.setRumble(null, 0);}
 		
 		if (elevator.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
 			if (elevator.inClimbingMode()) elevator.disableClimbMode();
