@@ -245,9 +245,6 @@ public class Robot extends IterativeRobot {
 				 if (driver.getAxisPress(R_Xbox.AXIS_LT, 0.1)) elevator.increment(-0.7*driver.getRawAxis(R_Xbox.AXIS_LT));//ELEVATOR INCREMENTS (driver)
 			else if (driver.getAxisPress(R_Xbox.AXIS_RT, 0.1)) elevator.increment(0.7*driver.getRawAxis(R_Xbox.AXIS_RT));
 		}
-
-		if (clamp.hasCube()) {driver.setRumble(null, 0.5); gunner.setRumble(null, 0.5);}
-		else {driver.setRumble(null, 0); gunner.setRumble(null, 0);}
 		
 		if (elevator.inClimbingMode() != V_Fridge.freeze("Button Start", driver.getRawButton(R_Xbox.BUTTON_START))) {//CLIMBING MODE
 			if (elevator.inClimbingMode()) elevator.disableClimbMode();
@@ -266,8 +263,11 @@ public class Robot extends IterativeRobot {
 		}
 		
 		
-		if (gyro.netAcceleration() >= 1) driver.setRumble(RumbleType.kLeftRumble, 1.0);//DANGER RUMBLE
-		else driver.setRumble(RumbleType.kLeftRumble, 0.0);
+		final double rumbleAmount = clamp.hasCube() ? 0.4 : 0.0;
+		driver.setRumble(RumbleType.kLeftRumble, rumbleAmount); driver.setRumble(RumbleType.kRightRumble, rumbleAmount);
+		gunner.setRumble(RumbleType.kLeftRumble, rumbleAmount); gunner.setRumble(RumbleType.kRightRumble, rumbleAmount);
+//		if (gyro.netAcceleration() >= 1) driver.setRumble(RumbleType.kLeftRumble, 1.0);//DANGER RUMBLE
+//		else driver.setRumble(RumbleType.kLeftRumble, 0.0);
 		
 		
 		//{completing motor controller updates}
