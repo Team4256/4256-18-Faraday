@@ -93,8 +93,8 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(67.0);moduleB.setTareAngle(-51.0);moduleC.setTareAngle(85.0);moduleD.setTareAngle(-78.0);
-		//-85.0, 2.0, 26.0, 78.0
+		moduleA.setTareAngle(96.0);moduleB.setTareAngle(-48.0);moduleC.setTareAngle(88.0);moduleD.setTareAngle(-72.0);
+		//-67.0, -51.0, 85.0, -78.0
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);

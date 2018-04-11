@@ -9,8 +9,8 @@ public interface Autonomous {
 	public double initOdometerPosX();
 	
 	public static final double leftStartX = -127.54, centerStartX = 11.21, rightStartX = 106.94;
-	public static final double switchX = 101.0, cubeX = 65.0, scaleX = 73.11/*83.11*/;
-	public static final double startY = 28.75, switchY = 166.6, cubeY = 210.0, scaleY = 286.13/*296.13*/;
+	public static final double switchX = 101.0, cubeX = 65.0, scaleX = 65.11/*83.11*/;
+	public static final double startY = 28.75, switchY = 166.6, cubeY = 210.0, scaleY = 288.0;
 	
 	public enum StartingPosition {LEFT, CENTER, RIGHT};
 	public enum FieldPieceConfig {LEFT, RIGHT};

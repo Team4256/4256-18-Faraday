@@ -129,7 +129,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	/**
 	 * This function returns if the cube is in reach of the clamp or not.
 	**/
-	private boolean cubeInReach() {return ultrasonic.getAverageValue() <= 77;}
+	private boolean cubeInReach() {return ultrasonic.getAverageValue() <= 80;}
 	
 	/**
 	 * This function checks if the rotator is within a threshold of the desired angle.
