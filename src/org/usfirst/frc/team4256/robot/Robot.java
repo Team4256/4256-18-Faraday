@@ -125,14 +125,12 @@ public class Robot extends IterativeRobot {
 		if(!simpleAuto) {
 			if (haveGameData) {
 				autonomous = new A_OneSwitchOneScale(startingPosition, gameData_new, odometer);
-//				gyro.setTareAngle(-90.0, false);
 			}else {
 				autonomous = new A_PassLine(startingPosition, odometer);
-//				gyro.setTareAngle(-90.0, false);
 			}
 		}else {
 			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
-//			gyro.setTareAngle(0.0, false);
+			odometer.disable();
 		}
 		
 		//{Robot Input}
