@@ -122,9 +122,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 		if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
 			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-				{0, 3, 0},
-				{3, Parameters.ElevatorPresets.SWITCH.height(), 0},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 0}
+				{0, 3, 0, 0},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 0},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 0}
 			};
 			
 			
@@ -134,9 +134,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
 			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-				{0, 3, 0},
-				{3, Parameters.ElevatorPresets.SWITCH.height(), 0},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 0}
+				{0, 3, 0, 0},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 0},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 0}
 			};
 			
 
@@ -146,12 +146,12 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
 			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
 			final int[][] instructions = new int[][] {
-				{0, 3, 0},
-				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0},
-				{1, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0},
-				{2, Parameters.ElevatorPresets.FLOOR.height(), 180},
-				{0, Parameters.ElevatorPresets.SWITCH.height(), 180},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+				{0, 3, 0, 0},
+				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 0},
+				{1, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 0},
+				{2, Parameters.ElevatorPresets.FLOOR.height(), 180, 1},
+				{0, Parameters.ElevatorPresets.SWITCH.height(), 180, 1},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180, 1}
 				
 			};
 			
@@ -162,9 +162,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}else {
 			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
 			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-				{0, 3, 180},
-				{3, Parameters.ElevatorPresets.SWITCH.height(), 180},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+				{0, 3, 180, 1},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 180, 1},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180, 1}
 			};
 
 			
@@ -218,9 +218,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 	private void useEvents_center() {
 		// at 1.0, reaches switch; at 2.0, reaches new cube; at 3.0, reaches scale//TODO this was just copy pasted
 		final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-			{0, 3, 0},
-			{3, Parameters.ElevatorPresets.SWITCH.height(), 0},
-			{1, Parameters.ElevatorPresets.SWITCH.height(), 0}
+			{0, 3, 0, 0},
+			{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 0},
+			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 0}
 		};
 		
 		
@@ -272,9 +272,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 		if (switchTarget.equals(FieldPieceConfig.RIGHT) && scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches easy scale
 			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-				{0, 3, 270},
-				{3, Parameters.ElevatorPresets.SWITCH.height(), 270},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 270}
+				{0, 3, 270, 1},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 270, 1},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 270, 1}
 			};
 			
 			
@@ -284,9 +284,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}else if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
 			// at 1.0, reaches easy switch; at 2.0, reaches new cube; at 3.0, reaches hard scale
 			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-				{0, 3, 270},
-				{3, Parameters.ElevatorPresets.SWITCH.height(), 270},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 270}
+				{0, 3, 270, 1},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 270, 1},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 270, 1}
 			};
 			
 			
@@ -296,12 +296,12 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}else if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
 			final int[][] instructions = new int[][] {
-				{4, 3, 0},
-				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 0},
-				{2, Parameters.ElevatorPresets.FLOOR.height(), 180},
-				{0, Parameters.ElevatorPresets.SWITCH.height(), 180},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+				{4, 3, 0, 0},
+				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 0},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 0},
+				{2, Parameters.ElevatorPresets.FLOOR.height(), 180, 1},
+				{0, Parameters.ElevatorPresets.SWITCH.height(), 180, 1},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180, 1}
 			};
 			
 			
@@ -311,9 +311,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}else {
 			// at 1.0, almost to hard switch; at 2.0, reaches new cube/hard switch; at 3.0, reaches hard scale
 			final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-				{0, 3, 180},
-				{3, Parameters.ElevatorPresets.SWITCH.height(), 180},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 180}
+				{0, 3, 180, 1},
+				{3, Parameters.ElevatorPresets.SWITCH.height(), 180, 1},
+				{1, Parameters.ElevatorPresets.SWITCH.height(), 180, 1}
 			};
 			
 			

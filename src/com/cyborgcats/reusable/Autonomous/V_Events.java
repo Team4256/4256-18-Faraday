@@ -49,6 +49,7 @@ public class V_Events {
 	 * The first column determines clamp state (0 is slurp, 1 is spit, 2 is open).
 	 * The second column determines elevator height (in inches).
 	 * The third column represents the desired robot orientation (angle in degrees).
+	 * The fourth column determines whether spin is active (0 is off, 1 is on).
 	 * 
 	 * An array of executable commands is returned.
 	*/
@@ -75,7 +76,7 @@ public class V_Events {
 				e.setInches((double)elevatorHeight);
 			
 				final double error = g.wornPath((double)desiredAngle);
-				return Math.abs(error) > 5.0 ? Math.signum(error)*0.25 : 0.0;			
+				return (instruction[3] == 1 && Math.abs(error) > 5.0) ? Math.signum(error)*0.25 : 0.0;
 			};
 		}
 		
