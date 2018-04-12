@@ -33,6 +33,10 @@ public final class Parameters {
 	public static final int Swerve_driveB = 22;//CAN, Talon SRX, front right, PDP 1
 	public static final int Swerve_driveC = 23;//CAN, Talon SRX, aft left, PDP 2
 	public static final int Swerve_driveD = 24;//CAN, Talon SRX, aft right, PDP 3
+	public static final int Swerve_magnetA = 0;//Digital Input ID for Magnetic Alignment
+	public static final int Swerve_magnetB = 1;//Digital Input ID for Magnetic Alignment
+	public static final int Swerve_magnetC = 2;//Digital Input ID for Magnetic Alignment
+	public static final int Swerve_magnetD = 3;//Digital Input ID for Magnetic Alignment
 	
 	public static final int Intake_left = 15;//CAN, Victor SPX, PDP 8
 	public static final int Intake_right = 16;//CAN, Victor SPX, PDP 9

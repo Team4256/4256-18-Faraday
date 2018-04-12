@@ -6,6 +6,8 @@ import com.cyborgcats.reusable.V_Compass;
 import com.cyborgcats.reusable.Phoenix.R_Encoder;
 import com.cyborgcats.reusable.Phoenix.R_Talon;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+
 public class R_SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
 	public static final double tractionGearRatio = 40.0/3.0;
@@ -16,18 +18,21 @@ public class R_SwerveModule {
 	private double decapitated = 1.0;
 	private double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
+	private DigitalInput magnet;
 	
 	//This constructor is intended for use with the module which has an encoder on the traction motor.
-	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction) {
+	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction, final int magnetID) {
 		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
 		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent, R_Encoder.RS7_QUAD, flippedSensorTraction);
 		hasTractionSensor = true;
+		magnet = new DigitalInput(magnetID);
 	}
 	//This constructor is intended for all other modules.
-	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID) {
+	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final int magnetID) {
 		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
 		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent);
 		hasTractionSensor = false;
+		magnet = new DigitalInput(magnetID);
 	}
 	
 	
@@ -99,6 +104,14 @@ public class R_SwerveModule {
 		traction.quickSet(speed*decapitated, false);
 	}
 	
+	public void magneticAlignment(final double offset) {
+		if (magnet.get()) rotation.quickSet(rotation.getCurrentRevs() + 0.01, false);
+		else {
+			rotation.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
+			rotation.quickSet(0.0, false);
+			setTareAngle(offset);
+		}
+	}
 	
 	/**
 	 * A shortcut to call completeLoopUpdate on all the Talons in the module.

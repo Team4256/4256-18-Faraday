@@ -53,10 +53,10 @@ public class Robot extends IterativeRobot {
 
 	//{Robot Output}
 	private static final R_SwerveModule
-	moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA),
-	moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB),
-	moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC),
-	moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, true);
+	moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA, Parameters.Swerve_magnetA),
+	moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB, Parameters.Swerve_magnetB),
+	moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC, Parameters.Swerve_magnetC),
+	moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, true, Parameters.Swerve_magnetD);
 	private static final R_Drivetrain swerve = new R_Drivetrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(35.0);moduleB.setTareAngle(-31.0);moduleC.setTareAngle(86.0);moduleD.setTareAngle(-73.0);
+		moduleA.setTareAngle(111.0);moduleB.setTareAngle(20.0);moduleC.setTareAngle(16.0);moduleD.setTareAngle(-95.0);
 		//-67.0, -51.0, 85.0, -78.0
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
@@ -254,8 +254,10 @@ public class Robot extends IterativeRobot {
 		final double gunnerLeftX = gunner.getRawAxis(R_Xbox.AXIS_LEFT_X);
 		if (Math.abs(gunnerLeftX) > 0.5) clamp.rotateTo(45.0*(Math.signum(gunnerLeftX) + 1.0));
 		else clamp.increment(-2.0*gunner.getDeadbandedAxis(R_Xbox.AXIS_LEFT_Y));
-
 		
+		
+		if (driver.getRawButton(R_Xbox.BUTTON_Y)) swerve.align();//SWERVE ALIGNMENT
+
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
 			gyro.setTareAngle(gyro.getCurrentAngle(), true);
 //			lockedAngle = 0.0;

@@ -34,7 +34,7 @@ public class R_Drivetrain {
 	**/
 	public void init() {
 		moduleA.init(/*reversed traction*/true);//practice: true, comp: false
-		moduleB.init(/*reversed traction*/true);//practice: true, comp: false
+		moduleB.init(/*reversed traction*/false);//practice: true, comp: false
 		moduleC.init(/*reversed traction*/false);//practice: false, comp: false
 		moduleD.init(/*reversed traction*/true);//practice: true, comp: true
 	}
@@ -119,6 +119,13 @@ public class R_Drivetrain {
 		return new double[] {drivetrainX, drivetrainY};
 	}
 	
+	
+	public void align() {
+		moduleA.magneticAlignment(-75.0);
+		moduleB.magneticAlignment(-115.0);
+		moduleC.magneticAlignment(-5.0);
+		moduleD.magneticAlignment(-25.0);
+	}
 	
 	public void formX() {moduleA.swivelTo(-45.0); moduleB.swivelTo(45.0); moduleC.swivelTo(45.0); moduleD.swivelTo(-45.0);}
 	public boolean isThere(final double threshold) {
