@@ -91,5 +91,5 @@ public final class Parameters {
 	//.1838 works well for a leash length of 3, hoping doubling that works for length of 1.5
 	public static final double zedP = 0.1838*2.0;
 	public static final double zedI = 0.0;
-	public static final double zedD = 1.0;
+	public static final double zedD = 1.2;
 }

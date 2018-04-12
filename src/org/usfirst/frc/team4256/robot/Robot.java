@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(124.0);moduleB.setTareAngle(-48.0);moduleC.setTareAngle(92.0);moduleD.setTareAngle(-66.0);
+		moduleA.setTareAngle(35.0);moduleB.setTareAngle(-31.0);moduleC.setTareAngle(86.0);moduleD.setTareAngle(-73.0);
 		//-67.0, -51.0, 85.0, -78.0
 		//competition robot: -64.0, 80.0, -10.0, 25.0
 		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
@@ -285,7 +285,11 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void disabledPeriodic() {pollGameData();}
+	public void disabledPeriodic() {
+		pollGameData();
+		driver.setRumble(RumbleType.kLeftRumble, 0.0); driver.setRumble(RumbleType.kRightRumble, 0.0);
+		gunner.setRumble(RumbleType.kLeftRumble, 0.0); gunner.setRumble(RumbleType.kRightRumble, 0.0);
+	}
 	
 
 	private static void pollGameData() {
