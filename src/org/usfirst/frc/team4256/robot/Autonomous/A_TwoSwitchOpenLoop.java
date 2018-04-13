@@ -1,19 +1,22 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
+
+import edu.wpi.first.networktables.NetworkTable;
+
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.R_Drivetrain;
 
 public class A_TwoSwitchOpenLoop implements Autonomous {
-	public final FieldPieceConfig switchTarget;
-	public final FieldPieceConfig scaleTarget;
+	public final FieldPieceConfig switchTarget, scaleTarget;
 	public final StartingPosition startingPosition;
+	private final NetworkTable visionTable;
 	
 	private Long start = null;
 	public double initOdometerPosX = 0.0;
 	
-	public A_TwoSwitchOpenLoop(final int startingPosition, final String gameData) {
+	public A_TwoSwitchOpenLoop(final int startingPosition, final String gameData, final NetworkTable visionTable) {
 		//{organize initialization data}
 		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
 		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
@@ -23,6 +26,8 @@ public class A_TwoSwitchOpenLoop implements Autonomous {
 		case(2):this.startingPosition = StartingPosition.RIGHT; break;
 		default:this.startingPosition = StartingPosition.CENTER;break;
 		}
+		
+		this.visionTable = visionTable;
 	}
 	
 	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {

@@ -15,9 +15,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
 import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
+import org.usfirst.frc.team4256.robot.Autonomous.A_TwoSwitchOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.Autonomous;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -129,7 +129,8 @@ public class Robot extends IterativeRobot {
 				autonomous = new A_PassLine(startingPosition, odometer);
 			}
 		}else {
-			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
+//			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
+			autonomous = new A_TwoSwitchOpenLoop(startingPosition, gameData_new, zed.getSubTable("Cubes"));
 			odometer.disable();
 		}
 		

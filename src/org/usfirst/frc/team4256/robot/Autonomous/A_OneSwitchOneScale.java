@@ -14,8 +14,7 @@ import com.cyborgcats.reusable.Autonomous.V_Odometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class A_OneSwitchOneScale implements Autonomous{
-	public final FieldPieceConfig switchTarget;
-	public final FieldPieceConfig scaleTarget;
+	public final FieldPieceConfig switchTarget, scaleTarget;
 	public final StartingPosition startingPosition;
 	private final V_Odometer odometer;
 

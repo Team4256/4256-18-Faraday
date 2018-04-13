@@ -6,8 +6,7 @@ import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.R_Drivetrain;
 
 public class A_ForwardOpenLoop implements Autonomous {
-	public final FieldPieceConfig switchTarget;
-	public final FieldPieceConfig scaleTarget;
+	public final FieldPieceConfig switchTarget, scaleTarget;
 	public final StartingPosition startingPosition;
 	
 	private Long start = null;

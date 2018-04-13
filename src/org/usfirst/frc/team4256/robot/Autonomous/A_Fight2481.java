@@ -12,8 +12,7 @@ import com.cyborgcats.reusable.Autonomous.V_Leash;
 import com.cyborgcats.reusable.Autonomous.V_Odometer;
 
 public class A_Fight2481 implements Autonomous{
-	public final FieldPieceConfig switchTarget;
-	public final FieldPieceConfig scaleTarget;
+	public final FieldPieceConfig switchTarget, scaleTarget;
 	public final StartingPosition startingPosition;
 	private final V_Odometer odometer;
 
