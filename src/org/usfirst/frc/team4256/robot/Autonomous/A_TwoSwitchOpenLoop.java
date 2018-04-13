@@ -3,8 +3,12 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
+
+import com.cyborgcats.reusable.V_PID;
+
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.R_Drivetrain;
 
@@ -32,16 +36,25 @@ public class A_TwoSwitchOpenLoop implements Autonomous {
 	
 	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		ensureTimerHasStarted();
-		final double direction = switchTarget.equals(FieldPieceConfig.RIGHT) ? 15.0 : -15.0;
-		if (System.currentTimeMillis() - start < 1500) {
-			swerve.holonomic_encoderIgnorant(direction, 0.5, 0.0);
+		
+		final double error = swerve.gyro.wornPath(0.0);
+		final double spin = Math.abs(error) > 1.0 ? 0.07*Math.signum(error) : 0.0;
+		
+		final double direction = switchTarget.equals(FieldPieceConfig.RIGHT) ? 25.0 : -32.0;
+		if (System.currentTimeMillis() - start < 1200) {//BEGIN DRIVING TO SWITCH
+			swerve.holonomic_encoderIgnorant(direction, 0.6, spin);
 			clamp.close();
 			elevator.setInches(3.0);
-		}else if (System.currentTimeMillis() - start < 3000) {
-			swerve.holonomic_encoderIgnorant(direction, 0.5, 0.0);
+		}else if (System.currentTimeMillis() - start < 2200) {//FINISH DRIVING TO SWITCH AND RAISE ELVATOR
+			swerve.holonomic_encoderIgnorant(direction, 0.5, spin);
 			elevator.setInches(ElevatorPresets.SWITCH.height());
+		}else if (System.currentTimeMillis() - start < 2300) {
+			swerve.holonomic_encoderIgnorant(direction, 0.0, 0.0);//STOP DRIVING AND SPIT
+			clamp.spit(0.5);
+		}else if (System.currentTimeMillis() - start < 2600) {//DRIVE BACK TOWARD MIDDLE
+			swerve.holonomic_encoderIgnorant(180.0, 0.5, spin);
 		}else {
-			swerve.holonomic_encoderIgnorant(0.0, 0.0, 0.0);
+			swerve.holonomic_encoderIgnorant(0.0, 0.0, 0.0);//STOP DRIVING AND SPIT
 			clamp.spit(0.5);
 		}
 	}
