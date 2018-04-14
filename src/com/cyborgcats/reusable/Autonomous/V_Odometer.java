@@ -34,8 +34,8 @@ public class V_Odometer {
 	
 	private void onUpdatedX(final double x) {this.x.set(x);}
 	private void onUpdatedY(final double y) {this.y.set(y);}
-	private double zedX() {final double angle = gyro.getCurrentAngle(); return zedX*Math.cos(angle) + zedY*Math.sin(angle);}
-	private double zedY() {final double angle = gyro.getCurrentAngle(); return zedY*Math.cos(angle) + zedX*Math.sin(angle);}
+	private double zedX() {final double angle = Math.toRadians(gyro.getCurrentAngle()); return zedX*Math.cos(angle) + zedY*Math.sin(angle);}
+	private double zedY() {final double angle = Math.toRadians(gyro.getCurrentAngle()); return zedY*Math.cos(angle) + zedX*Math.sin(angle);}
 	
 	private class ConsumableDouble {
 		private boolean isNew = false;
