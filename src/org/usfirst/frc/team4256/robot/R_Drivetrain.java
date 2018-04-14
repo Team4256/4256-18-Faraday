@@ -106,6 +106,13 @@ public class R_Drivetrain {
 	}
 	
 	
+	public void align() {
+		moduleA.magneticAlignment(-75.0);
+		moduleB.magneticAlignment(-115.0);
+		moduleC.magneticAlignment(-5.0);
+		moduleD.magneticAlignment(-25.0);
+	}
+	
 	private double[] speedsFromModuleD() {
 		double rawSpeed = moduleD.tractionSpeed()*moduleD.decapitated();
 		if (Math.abs(rawSpeed) > moduleD_maxSpeed) moduleD_maxSpeed = Math.abs(rawSpeed);
@@ -117,14 +124,6 @@ public class R_Drivetrain {
 		final double drivetrainY = /*linear*/rawSpeed*Math.cos(angle) + /*rotational*/previousSpin*pivotToAftX/pivotToAft*Math.signum(rawSpeed);
 		
 		return new double[] {drivetrainX, drivetrainY};
-	}
-	
-	
-	public void align() {
-		moduleA.magneticAlignment(-75.0);
-		moduleB.magneticAlignment(-115.0);
-		moduleC.magneticAlignment(-5.0);
-		moduleD.magneticAlignment(-25.0);
 	}
 	
 	public void formX() {moduleA.swivelTo(-45.0); moduleB.swivelTo(45.0); moduleC.swivelTo(45.0); moduleD.swivelTo(-45.0);}
