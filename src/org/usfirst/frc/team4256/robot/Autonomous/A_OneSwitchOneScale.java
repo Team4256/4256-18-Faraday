@@ -72,10 +72,10 @@ public class A_OneSwitchOneScale implements Autonomous{
 			//use error components to compute commands that swerve understands
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
 			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
-			double speed = V_PID.get("zed", errorMagnitude);
+			double speed = V_PID.get("zed", errorMagnitude);//DO NOT use I gain with this because errorMagnitude is always positive
 			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
 
-			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);//TODO spin should get updated even outside the if statement
+			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
   		}
 	}
 

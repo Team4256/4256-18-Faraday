@@ -149,20 +149,14 @@ public class R_SwerveModule {
 
 	
 	public double tractionSpeed() {
-		if (hasTractionSensor) {
-			return tractionWheelCircumference*traction.getCurrentRPS();
-		}else {
-			throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
-		}
+		if (hasTractionSensor) return tractionWheelCircumference*traction.getCurrentRPS();
+		else throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 	}
 	
 	
 	public double tractionPathLength() {
-		if (hasTractionSensor) {
-			return traction.getCurrentRevs()*tractionWheelCircumference;
-		}else {
-			return 0.0;
-		}
+		if (hasTractionSensor) return traction.getCurrentRevs()*tractionWheelCircumference;
+		else return 0.0;
 	}
 	
 	

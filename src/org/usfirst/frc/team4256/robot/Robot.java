@@ -78,7 +78,7 @@ public class Robot extends IterativeRobot {
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED");
-		odometer = new V_Odometer(zed);
+		odometer = new V_Odometer(zed, gyro);
 		odometer.init();
 		//{Human Input}
 		faraday.getEntry("Starting Position").setNumber(0);
@@ -182,6 +182,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("b", moduleB.rotationMotor().getCurrentAngle(true));
 		SmartDashboard.putNumber("c", moduleC.rotationMotor().getCurrentAngle(true));
 		SmartDashboard.putNumber("d", moduleD.rotationMotor().getCurrentAngle(true));
+		SmartDashboard.putNumber("ZED X----", odometer.getX());
+		SmartDashboard.putNumber("ZED Y----", odometer.getY());
 	}
 	
 	@Override

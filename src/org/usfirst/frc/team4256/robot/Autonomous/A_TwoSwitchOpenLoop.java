@@ -3,11 +3,8 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
-
-import com.cyborgcats.reusable.V_PID;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.R_Drivetrain;

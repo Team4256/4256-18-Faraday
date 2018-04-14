@@ -80,9 +80,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	/**
 	 * This function stops the clamp motors (thereby stopping slurp and spit).
 	**/
-	public void stop() {
-		setWheelSpeed(0.0);
-	}
+	public void stop() {setWheelSpeed(0.0);}
 	
 	
 	/**
