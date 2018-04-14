@@ -88,11 +88,11 @@ public final class Parameters {
 	
 	public static final byte Gyrometer_updateHz = 50;
 	
-	public static final double spinP = 0.05;//0.05
-	public static final double spinI = 0.000015;//0.000015
-	public static final double spinD = 4.25;//4.25
+	public static final double spinP = 0.05;
+	public static final double spinI = 0.000015;
+	public static final double spinD = 4.25;
 	
-	//.1838 works well for a leash length of 3, hoping doubling that works for length of 1.5
+	//.1838 works well for a leash length of 3, doubling that works for length of 1.5
 	public static final double zedP = 0.1838*2.0;
 	public static final double zedI = 0.0;
 	public static final double zedD = 1.2;

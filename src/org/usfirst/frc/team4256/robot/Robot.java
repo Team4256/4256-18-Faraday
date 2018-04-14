@@ -78,7 +78,7 @@ public class Robot extends IterativeRobot {
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED");
-		odometer = new V_Odometer(zed);
+		odometer = new V_Odometer(zed, gyro);
 		odometer.init();
 		//{Human Input}
 		faraday.getEntry("Starting Position").setNumber(0);
