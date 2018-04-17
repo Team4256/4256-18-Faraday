@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4256.robot.Autonomous;
+package org.usfirst.frc.team4256.robot.Autonomous;//COMPLETE MARCH, untested
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.R_Drivetrain;
@@ -9,7 +9,7 @@ import com.cyborgcats.reusable.Autonomous.P_Bezier;
 import com.cyborgcats.reusable.Autonomous.V_Leash;
 import com.cyborgcats.reusable.Autonomous.V_Odometer;
 
-public class A_PassLine implements Autonomous{
+public class A_PassLine implements Autonomous {
 	public final StartingPosition startingPosition;
 	private final V_Odometer odometer;
 	
@@ -53,11 +53,11 @@ public class A_PassLine implements Autonomous{
 			
 			//use error components to compute commands that swerve understands
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
-			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
+			final double errorMagnitude = Math.hypot(errorX, errorY);
 			double speed = V_PID.get("zed", errorMagnitude);
-			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
+			if (speed > 0.7) speed = 0.7;
 			
-			swerve.holonomic_encoderIgnorant(errorDirection, speed, 0.0/*spin*/);
+			swerve.holonomic_encoderIgnorant(errorDirection, speed, /*spin*/0.0);
   		}
 	}
 	

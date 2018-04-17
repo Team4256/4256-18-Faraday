@@ -71,9 +71,9 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 			//use error components to compute commands that swerve understands
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
-			final double errorMagnitude = Math.sqrt(errorX*errorX + errorY*errorY);
+			final double errorMagnitude = Math.hypot(errorX, errorY);
 			double speed = V_PID.get("zed", errorMagnitude);//DO NOT use I gain with this because errorMagnitude is always positive
-			if (Math.abs(speed) > 0.7) speed = 0.7*Math.signum(speed);
+			if (speed > 0.7) speed = 0.7;
 
 			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
   		}
@@ -150,17 +150,15 @@ public class A_OneSwitchOneScale implements Autonomous{
 		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
 			// at 1.0, reaches easy scale; at 2.0, reaches new cube/hard switch
 			final int[][] instructions = new int[][] {
-				{0, 3, 0, 0},
-				{3, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 0},
-				{1, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 0},
-				{2, Parameters.ElevatorPresets.FLOOR.height(), 180, 1},
-				{0, Parameters.ElevatorPresets.SWITCH.height(), 180, 1},
-				{1, Parameters.ElevatorPresets.SWITCH.height(), 180, 1}
-				
+				{4, 3, 0, 5},
+				{3, 3, 0, 5},
+				{4, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 3},
+				{4, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 1},
+				{1, Parameters.ElevatorPresets.SCALE_HIGH.height(), 0, 0}
 			};
 			
 
-			final double[] triggers = new double[] {0.3, 0.7, 0.9, 1.2, 1.7, 1.9};
+			final double[] triggers = new double[] {0.1, 0.2, 0.6, 0.8, 1.0};
 			events = new V_Events(V_Events.getFromArray(instructions), triggers);
 
 		}else {

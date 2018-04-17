@@ -180,8 +180,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("b", moduleB.rotationMotor().getCurrentAngle(true));
 		SmartDashboard.putNumber("c", moduleC.rotationMotor().getCurrentAngle(true));
 		SmartDashboard.putNumber("d", moduleD.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("ZED X----", odometer.getX());
-		SmartDashboard.putNumber("ZED Y----", odometer.getY());
+		SmartDashboard.putNumber("ZED Xa", odometer.getX());
+		SmartDashboard.putNumber("ZED Ya", odometer.getY());
 	}
 	
 	@Override
