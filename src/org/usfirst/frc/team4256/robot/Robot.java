@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
+import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
 import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
 import org.usfirst.frc.team4256.robot.Autonomous.A_TwoSwitchOpenLoop;
@@ -125,14 +126,11 @@ public class Robot extends IterativeRobot {
 		final long start = System.currentTimeMillis();
 		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
 		if(!simpleAuto) {
-			if (haveGameData) {
-				autonomous = new A_OneSwitchOneScale(startingPosition, gameData_new, odometer);
-			}else {
-				autonomous = new A_PassLine(startingPosition, odometer);
-			}
+			if (haveGameData) autonomous = new A_OneSwitchOneScale(startingPosition, gameData_new, odometer);
+			else autonomous = new A_PassLine(startingPosition, odometer);
 		}else {
-//			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
-			autonomous = new A_TwoSwitchOpenLoop(startingPosition, gameData_new, zed.getSubTable("Cubes"));
+			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
+//			autonomous = new A_TwoSwitchOpenLoop(startingPosition, gameData_new, zed.getSubTable("Cubes"));
 			odometer.disable();
 		}
 		
@@ -178,10 +176,10 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
 		faraday.getEntry("Received Field").setBoolean(haveGameData);
-		SmartDashboard.putNumber("a", moduleA.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("b", moduleB.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("c", moduleC.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("d", moduleD.rotationMotor().getCurrentAngle(true));
+		faraday.getEntry("Module Angles").setNumberArray(new Number[] {moduleA.rotationMotor().getCurrentAngle(true),
+																	   moduleB.rotationMotor().getCurrentAngle(true),
+																	   moduleC.rotationMotor().getCurrentAngle(true),
+																	   moduleD.rotationMotor().getCurrentAngle(true)});
 		SmartDashboard.putNumber("ZED Xa", odometer.getX());
 		SmartDashboard.putNumber("ZED Ya", odometer.getY());
 	}

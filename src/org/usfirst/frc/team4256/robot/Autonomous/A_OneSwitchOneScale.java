@@ -11,8 +11,6 @@ import com.cyborgcats.reusable.Autonomous.V_Events;
 import com.cyborgcats.reusable.Autonomous.V_Leash;
 import com.cyborgcats.reusable.Autonomous.V_Odometer;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class A_OneSwitchOneScale implements Autonomous{
 	public final FieldPieceConfig switchTarget, scaleTarget;
 	public final StartingPosition startingPosition;
@@ -65,9 +63,6 @@ public class A_OneSwitchOneScale implements Autonomous{
 						 desiredY = leash.getY();
 			final double errorX = desiredX - actualX,
 						 errorY = desiredY - actualY;
-			
-			SmartDashboard.putNumber("error X", errorX);
-			SmartDashboard.putNumber("error Y", errorY);
 
 			//use error components to compute commands that swerve understands
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
@@ -176,58 +171,28 @@ public class A_OneSwitchOneScale implements Autonomous{
 	}
 	//------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------
-	private void useLeash_center() {
+	private V_Leash useLeash_center() {
 		initOdometerPosX = centerStartX;
+		
+		P_Bezier bezier;
 
-		if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
-			//{left switch then left scale}
-			final P_Bezier a = new P_Bezier(centerStartX, startY, -58, 130, -104, 42, -switchX, switchY, 0.0);//get to left switch
-			final P_Bezier b = new P_Bezier(-switchX, switchY, -115, 202, -91, 228, -cubeX, cubeY, 1.0);//get to new cube
-			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -80, 252, -70, 270, -scaleX, scaleY, 2.0);//get to easy left
-
-			final P_Bezier[] path = new P_Bezier[] {a, b, c};
-			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
-
-		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
-			//{left switch then right scale}
-			final P_Bezier a = new P_Bezier(centerStartX, startY, -58, 130, -104, 42, -switchX, switchY, 0.0);//get to left switch
-			final P_Bezier b = new P_Bezier(-switchX, switchY, -115, 202, -91, 228, -cubeX, cubeY, 1.0);//get to new cube
-			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -30, 279, 94, 180, scaleX, scaleY, 2.0);//get to right scale
-
-			final P_Bezier[] path = new P_Bezier[] {a, b, c};
-			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
-
-		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
-			//{right switch then left scale}
-			final P_Bezier a = new P_Bezier(centerStartX, startY, 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
-			final P_Bezier b = new P_Bezier(switchX, switchY, 115, 202, 91, 228, cubeX, cubeY, 1.0);//get to new cube
-			final P_Bezier c = new P_Bezier(cubeX, cubeY, 30, 279, -94, 180, -scaleX, scaleY, 2.0);//get to left scale
-
-			final P_Bezier[] path = new P_Bezier[] {a, b, c};
-			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
-
-		}else {
-			//{right switch then right scale}
-			final P_Bezier a = new P_Bezier(centerStartX, startY, 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
-			final P_Bezier b = new P_Bezier(switchX, switchY, 115, 202, 91, 228, cubeX, cubeY, 1.0);//get to new cube
-			final P_Bezier c = new P_Bezier(cubeX, cubeY, 80, 252, 70, 270, scaleX, scaleY, 2.0);//get to right scale
-
-			final P_Bezier[] path = new P_Bezier[] {a, b, c};
-			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
-		}
+		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerStartX, startY, -58, 130, -104, 42, -switchX, switchY, 0.0);//get to left switch
+		else bezier = new P_Bezier(centerStartX, startY, 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
+		
+		leash = new V_Leash(new P_Bezier[] {bezier}, /*leash length*/1.5, /*growth rate*/0.1);
+		return leash;
 	}
 
-	private void useEvents_center() {
-		// at 1.0, reaches switch; at 2.0, reaches new cube; at 3.0, reaches scale//TODO this was just copy pasted
-		final int[][] instructions = new int[][] {//TODO only takes care of stuff up until switch
-			{0, 3, 0, 0},
-			{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 0},
-			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 0}
+	private V_Events useEvents_center() {
+		// at 1.0, reaches switch
+		final int[][] instructions = new int[][] {
+			{4, 3, 0, 7},
+			{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 7},
+			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 7}
 		};
 		
-		
-		final double[] triggers = new double[] {0.3, 0.7, 0.9};
-		events = new V_Events(V_Events.getFromArray(instructions), triggers);
+		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.3, 0.6, 0.9});
+		return events;
 	}
 	//------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------
