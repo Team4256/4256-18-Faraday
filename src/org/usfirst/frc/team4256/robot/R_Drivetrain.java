@@ -107,10 +107,10 @@ public class R_Drivetrain {
 	
 	
 	public void align() {
-		moduleA.magneticAlignment(-75.0);
-		moduleB.magneticAlignment(-115.0);
-		moduleC.magneticAlignment(-5.0);
-		moduleD.magneticAlignment(-25.0);
+		moduleA.magneticAlignment(-90.0);
+		moduleB.magneticAlignment(180.0);
+		moduleC.magneticAlignment(0.0);
+		moduleD.magneticAlignment(90.0);
 	}
 	
 	private double[] speedsFromModuleD() {
