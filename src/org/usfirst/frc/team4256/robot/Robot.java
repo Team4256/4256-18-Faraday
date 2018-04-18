@@ -39,8 +39,8 @@ public class Robot extends IterativeRobot {
 //	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz);
-	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.pressureGauge);
-	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.tx2PowerSensor);
+	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.PRESSURE_GAUGE);
+	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.TX2_POWER_SENSOR);
 	
 	private static Autonomous autonomous;
 	private static NetworkTableInstance nt;
@@ -53,21 +53,21 @@ public class Robot extends IterativeRobot {
 
 	//{Robot Output}
 	private static final R_SwerveModule
-	moduleA = new R_SwerveModule(Parameters.Swerve_rotatorA,/*flipped sensor*/ false, Parameters.Swerve_driveA, Parameters.Swerve_magnetA),
-	moduleB = new R_SwerveModule(Parameters.Swerve_rotatorB,/*flipped sensor*/ false, Parameters.Swerve_driveB, Parameters.Swerve_magnetB),
-	moduleC = new R_SwerveModule(Parameters.Swerve_rotatorC,/*flipped sensor*/ false, Parameters.Swerve_driveC, Parameters.Swerve_magnetC),
-	moduleD = new R_SwerveModule(Parameters.Swerve_rotatorD,/*flipped sensor*/ false, Parameters.Swerve_driveD, true, Parameters.Swerve_magnetD);
+	moduleA = new R_SwerveModule(Parameters.SWERVE_ROTATOR_A,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_A, Parameters.SWERVE_MAGNET_A),
+	moduleB = new R_SwerveModule(Parameters.SWERVE_ROTATOR_B,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_B, Parameters.SWERVE_MAGNET_B),
+	moduleC = new R_SwerveModule(Parameters.SWERVE_ROTATOR_C,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_C, Parameters.SWERVE_MAGNET_C),
+	moduleD = new R_SwerveModule(Parameters.SWERVE_ROTATOR_D,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_D, true, Parameters.SWERVE_MAGNET_D);
 	private static final R_Drivetrain swerve = new R_Drivetrain(gyro, moduleA, moduleB, moduleC, moduleD);
 	
-	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ElevatorOne_shifterModule, Parameters.ElevatorOne_shifterForward, Parameters.ElevatorOne_shifterReverse);
-	private static final E_One elevatorOne = new E_One(Parameters.ElevatorOne_master, Parameters.ElevatorOne_followerA, Parameters.ElevatorOne_followerB, elevatorOneShifter);
-	private static final E_Two elevatorTwo = new E_Two(Parameters.ElevatorTwo_master);
+	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ELEVATOR_ONE_SHIFTER_MODULE, Parameters.ELEVATOR_ONE_SHIFTER_FORWARD, Parameters.ELEVATOR_ONE_SHIFTER_REVERSE);
+	private static final E_One elevatorOne = new E_One(Parameters.ELEVATOR_ONE_MASTER, Parameters.ELEVATOR_ONE_FOLLOWER_A, Parameters.ELEVATOR_ONE_FOLLOWER_B, elevatorOneShifter);
+	private static final E_Two elevatorTwo = new E_Two(Parameters.ELEVATOR_TWO_MASTER);
 	private static final R_Combined elevator = new R_Combined(elevatorOne, elevatorTwo);
 	
-	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.Clamp_module, Parameters.Clamp_forward, Parameters.Clamp_reverse);
-	private static final R_Clamp clamp = new R_Clamp(Parameters.Intake_left, Parameters.Intake_right, clampShifter, Parameters.clampyRotator, Parameters.ultrasonic);
+	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.CLAMP_MODUlE, Parameters.CLAMP_FORWARD, Parameters.CLAMP_REVERSE);
+	private static final R_Clamp clamp = new R_Clamp(Parameters.INTAKE_LEFT, Parameters.INTAKE_RIGHT, clampShifter, Parameters.CLAMPY_ROTATOR, Parameters.ULTRASONIC);
 	
-	private static final DigitalOutput tx2PowerControl = new DigitalOutput(Parameters.tx2PowerControl);
+	private static final DigitalOutput tx2PowerControl = new DigitalOutput(Parameters.TX2_POWER_CONTROL);
 
 	private static final Logger logger = Logger.getLogger("Robot");
 	
@@ -100,8 +100,8 @@ public class Robot extends IterativeRobot {
 		elevatorTwo.setZero(0.0);
 		clamp.setZero();
 
-		V_PID.set("zed", Parameters.zedP, Parameters.zedI, Parameters.zedD);
-		V_PID.set("spin", Parameters.spinP, Parameters.spinI, Parameters.spinD);
+		V_PID.set("zed", Parameters.ZED_P, Parameters.ZED_I, Parameters.ZED_D);
+		V_PID.set("spin", Parameters.SPIN_P, Parameters.SPIN_I, Parameters.SPIN_D);
 		
 		if (!tx2PowerSensor.get()) {
 			tx2PowerControl.set(true);
