@@ -68,7 +68,7 @@ public class A_ThreeScale implements Autonomous{
 			final double errorDirection = Math.toDegrees(Math.atan2(errorX, errorY));
 			final double errorMagnitude = Math.hypot(errorX, errorY);
 			double speed = V_PID.get("zed", errorMagnitude);//DO NOT use I gain with this because errorMagnitude is always positive
-			if (speed > 0.7) speed = 0.7;
+			if (speed > 0.6) speed = 0.6;
 
 			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
   		}
