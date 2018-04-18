@@ -15,9 +15,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.Autonomous.A_OneSwitchOneScale;
+import org.usfirst.frc.team4256.robot.Autonomous.A_ForwardOpenLoop;
 import org.usfirst.frc.team4256.robot.Autonomous.A_PassLine;
-import org.usfirst.frc.team4256.robot.Autonomous.A_TwoSwitchOpenLoop;
+import org.usfirst.frc.team4256.robot.Autonomous.A_ThreeScale;
 import org.usfirst.frc.team4256.robot.Autonomous.Autonomous;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -93,12 +93,8 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		
-		  
 		moduleA.setTareAngle(-120.0);moduleB.setTareAngle(-2.0);moduleC.setTareAngle(20.0);moduleD.setTareAngle(88.0);
-		//-67.0, -51.0, 85.0, -78.0
-		//competition robot: -64.0, 80.0, -10.0, 25.0
-		//practice robot:	 -26.0,	-104.0, 75.0, 48.0
+
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		elevatorOne.setZero(0.0);
 		elevatorTwo.setZero(0.0);
@@ -125,14 +121,11 @@ public class Robot extends IterativeRobot {
 		final long start = System.currentTimeMillis();
 		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
 		if(!simpleAuto) {
-			if (haveGameData) {
-				autonomous = new A_OneSwitchOneScale(startingPosition, gameData_new, odometer);
-			}else {
-				autonomous = new A_PassLine(startingPosition, odometer);
-			}
+			if (haveGameData) autonomous = new A_ThreeScale(startingPosition, gameData_new, odometer);
+			else autonomous = new A_PassLine(startingPosition, odometer);
 		}else {
-//			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
-			autonomous = new A_TwoSwitchOpenLoop(startingPosition, gameData_new, zed.getSubTable("Cubes"));
+			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
+//			autonomous = new A_TwoSwitchOpenLoop(startingPosition, gameData_new, zed.getSubTable("Cubes"));
 			odometer.disable();
 		}
 		
@@ -178,12 +171,12 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
 		faraday.getEntry("Received Field").setBoolean(haveGameData);
-		SmartDashboard.putNumber("a", moduleA.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("b", moduleB.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("c", moduleC.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("d", moduleD.rotationMotor().getCurrentAngle(true));
-		SmartDashboard.putNumber("ZED X----", odometer.getX());
-		SmartDashboard.putNumber("ZED Y----", odometer.getY());
+		faraday.getEntry("Module Angles").setNumberArray(new Number[] {moduleA.rotationMotor().getCurrentAngle(true),
+																	   moduleB.rotationMotor().getCurrentAngle(true),
+																	   moduleC.rotationMotor().getCurrentAngle(true),
+																	   moduleD.rotationMotor().getCurrentAngle(true)});
+		SmartDashboard.putNumber("ZED Xa", odometer.getX());
+		SmartDashboard.putNumber("ZED Ya", odometer.getY());
 	}
 	
 	@Override

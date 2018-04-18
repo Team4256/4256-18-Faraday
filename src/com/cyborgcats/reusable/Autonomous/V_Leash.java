@@ -31,15 +31,13 @@ public class V_Leash {
 	}
 	
 	private double getActualLength(final double currentX, final double currentY) {
-		final double differenceX = path[currentSegment].getX() - currentX;
-		final double differenceY = path[currentSegment].getY() - currentY;
-		return Math.sqrt(differenceX*differenceX + differenceY*differenceY);
+		final double differenceX = path[currentSegment].getX() - currentX,
+					 differenceY = path[currentSegment].getY() - currentY;
+		return Math.hypot(differenceX, differenceY);
 	}
 	
 	public void maintainLength(final double currentX, final double currentY) {
-		while (!doneGeneratingTargets && getActualLength(currentX, currentY) < desiredLength) {
-			increment(growthRate);
-		}
+		while (!doneGeneratingTargets && getActualLength(currentX, currentY) < desiredLength) increment(growthRate);
 	}
 	
 	public double getX() {return path[currentSegment].getX();}

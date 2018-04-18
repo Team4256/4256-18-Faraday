@@ -76,7 +76,7 @@ public class V_Events {
 				e.setInches((double)elevatorHeight);
 			
 				final double error = g.wornPath((double)desiredAngle);
-				return Math.abs(error) > 5.0 ? Math.signum(error)*(double)instruction[3]/100.0 : 0.0;
+				return Math.abs(error) > 2.0 ? Math.signum(error)*(double)instruction[3]/100.0 : 0.0;
 			};
 		}
 		

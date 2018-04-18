@@ -6,7 +6,7 @@ import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 
 public class V_Odometer {
-	private static final double zedX = -0.825, zedY = 0.425;
+	private static final double zedX = -0.75, zedY = 0.425;
 	private final NetworkTable zed, position;
 	private double tareX = 0.0, tareY = 0.0;
 	private ConsumableDouble x = new ConsumableDouble();
