@@ -13,6 +13,8 @@ public class V_Odometer {
 	private ConsumableDouble y = new ConsumableDouble();
 	private final R_Gyro gyro;
 	
+	private double gyroAngle = 0.0;
+	
 	public V_Odometer(final NetworkTable zed, final R_Gyro gyro) {
 		this.zed = zed;
 		this.position = zed.getSubTable("Position");
@@ -34,8 +36,8 @@ public class V_Odometer {
 	
 	private void onUpdatedX(final double x) {this.x.set(x);}
 	private void onUpdatedY(final double y) {this.y.set(y);}
-	private double zedX() {final double angle = Math.toRadians(gyro.getCurrentAngle()); return zedX*Math.cos(angle) + zedY*Math.sin(angle);}
-	private double zedY() {final double angle = Math.toRadians(gyro.getCurrentAngle()); return zedY*Math.cos(angle) + zedX*Math.sin(angle);}
+	private double zedX() {return zedX*Math.cos(gyroAngle) + zedY*Math.sin(gyroAngle);}
+	private double zedY() {return zedY*Math.cos(gyroAngle) + zedX*Math.sin(gyroAngle);}
 	
 	private class ConsumableDouble {
 		private boolean isNew = false;
@@ -46,5 +48,6 @@ public class V_Odometer {
 		public boolean isNew() {return isNew;}
 	}
 	
+	public void update() {gyroAngle = Math.toRadians(gyro.getCurrentAngle());}
 	public void disable() {zed.getEntry("Enable Odometry").setBoolean(false);}
 }

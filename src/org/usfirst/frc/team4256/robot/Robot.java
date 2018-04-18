@@ -180,7 +180,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	@Override
-	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);}
+	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);		odometer.update();}
 	
 	@Override
 	public void teleopPeriodic() {
