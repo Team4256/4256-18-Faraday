@@ -3,7 +3,6 @@ package org.usfirst.frc.team4256.robot.Autonomous;
 import org.usfirst.frc.team4256.robot.Parameters;
 import org.usfirst.frc.team4256.robot.R_Clamp;
 import org.usfirst.frc.team4256.robot.R_Drivetrain;
-import org.usfirst.frc.team4256.robot.Autonomous.Autonomous.FieldPieceConfig;
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import com.cyborgcats.reusable.V_PID;
@@ -147,7 +146,7 @@ public class A_ThreeScale implements Autonomous{
 			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 7}
 		};
 		
-		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.3, 0.6, 0.9});
+		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 0.9});
 		return events;
 	}
 	//------------------------------------------------------------------------------------------
