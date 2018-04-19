@@ -10,8 +10,8 @@ public interface Autonomous {
 	
 	public static final double leftStartX = -127.54, centerStartX = 11.21, rightStartX = 106.94;
 	public static final double switchX = 53.0, cubeX = 65.0, scaleX = 74.11;
-	public static final double startY = 28.75, switchY = 166.6, cubeY = 210.0, scaleY = 276.0;
-	
+	public static final double startY = 28.75, switchY = 120.0, cubeY = 210.0, scaleY = 276.0;
+	//switchY = 166.6
 	public enum StartingPosition {LEFT, CENTER, RIGHT};
 	public enum FieldPieceConfig {LEFT, RIGHT};
 }

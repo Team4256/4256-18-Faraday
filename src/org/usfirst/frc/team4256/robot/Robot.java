@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(-98.0);moduleB.setTareAngle(-5.0);moduleC.setTareAngle(2.0);moduleD.setTareAngle(-92.0);
+		moduleA.setTareAngle(-51.0);moduleB.setTareAngle(-18.0);moduleC.setTareAngle(-78.0);moduleD.setTareAngle(-76.0);
 
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		elevatorOne.setZero(0.0);

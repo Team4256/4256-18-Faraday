@@ -55,7 +55,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		//{do stuff based on the enum}
 		switch (cubePosition) {
 		case Absent://open and begin intaking
-			open();//TODO theoretically will open, but if ultrasonic sensor doesn't update instantaneously then it will close again right away
+			open(false);//TODO theoretically will open, but if ultrasonic sensor doesn't update instantaneously then it will close again right away
 			setWheelSpeed(-intakeConstant);
 			break;
 		case WithinReach://hug cube
@@ -91,18 +91,18 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		intakeRight.quickSet(percent);
 	}
 	
-	
+	public void open() {open(true);}
 	/**
 	 * This function opens the clamp 
 	**/
-	public void open() {
+	public void open(final boolean setAbsent) {
 		clamp.set(OpenState);
-		cubePosition = CubePosition.Absent;
+		if (setAbsent) cubePosition = CubePosition.Absent;
 	}
 	
 	
 	/**
-	 * This function closes the clamp 
+	 * This function closes the clamp
 	**/
 	public void close() {clamp.set(CloseState);}
 	
@@ -119,8 +119,9 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	 * This function returns if the cube is in the clamp or not.
 	 **/
 	private boolean cubeLikelyPresent() {
-		if (ultrasonic.getAverageValue() <= 60) counter++;
-		else counter = 0;
+		if (ultrasonic.getAverageValue() <= 65) counter++;
+		else counter--;
+		if (counter < 0) counter = 0;
 		return counter > 10;
 	}
 	
@@ -161,10 +162,10 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
-		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
-		if (cubeInReach()) cubePosition = CubePosition.WithinReach;
 		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
-		if (cubePosition.equals(CubePosition.WithinReach) && cubeLikelyPresent() && !isOpen()) cubePosition = CubePosition.Present;
+		if (cubeLikelyPresent() && !isOpen()) cubePosition = CubePosition.Present;
+		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
+		else if (cubeInReach()) cubePosition = CubePosition.WithinReach;
 		SmartDashboard.putNumber("ultrasonic", ultrasonic.getAverageValue());
 	}
 }

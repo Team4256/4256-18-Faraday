@@ -131,8 +131,8 @@ public class A_ThreeScale implements Autonomous{
 		
 		P_Bezier bezier;
 
-		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerStartX, startY, -58, 130, -104, 42, -switchX, switchY, 0.0);//get to left switch
-		else bezier = new P_Bezier(centerStartX, startY, 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
+		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerStartX, startY, -29, 80, -51, 59, -switchX, switchY, 0.0);//get to left switch
+		else bezier = new P_Bezier(centerStartX, startY, 32, 84, 53, 60, switchX, switchY, 0.0);//get to right switch
 		
 		leash = new V_Leash(new P_Bezier[] {bezier}, /*leash length*/1.5, /*growth rate*/0.1);
 		return leash;

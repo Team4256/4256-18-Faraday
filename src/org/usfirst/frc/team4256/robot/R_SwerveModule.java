@@ -19,6 +19,7 @@ public class R_SwerveModule {
 	private double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
 	private DigitalInput magnet;
+	private boolean aligned = true;
 	
 	//This constructor is intended for use with the module which has an encoder on the traction motor.
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction, final int magnetID) {
@@ -106,16 +107,16 @@ public class R_SwerveModule {
 	
 	public boolean magneticAlignment(final double offset) {
 		if (magnet.get()) {
-			rotation.quickSet(rotation.getCurrentRevs() + 0.02, false);
+			aligned = false;
+			rotation.quickSet(rotation.getCurrentRevs() + 0.05, false);
 			return true;
-		}
-		else {
-//			rotation.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
-//			rotation.quickSet(0.0, false);
-			setTareAngle(rotation.getCurrentAngle(true) + offset);
+		}else if (!aligned) {
+			setTareAngle(rotation.getCurrentAngle(true) + offset, true);
+			decapitated = 1;
 			traction.setInverted(true);
-			return false;
+			aligned = true;
 		}
+		return false;
 	}
 	
 	/**
