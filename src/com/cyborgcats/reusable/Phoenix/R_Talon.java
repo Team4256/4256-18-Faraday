@@ -33,8 +33,8 @@ public class R_Talon extends TalonSRX {
 		super(deviceID);
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
-			case CTRE_MAG_ABSOLUTE: throw new IllegalNoEncoderException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
-			case CTRE_MAG_RELATIVE: throw new IllegalNoEncoderException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			case CTRE_MAG_ABSOLUTE: throw new NoEncoderException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			case CTRE_MAG_RELATIVE: throw new NoEncoderException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
 			default: break;
 			}
 		}else {
@@ -141,7 +141,7 @@ public class R_Talon extends TalonSRX {
 	public void quickSet(final double value, final boolean treatAsDegrees) {
 		try {
 			this.set(value, treatAsDegrees, true);
-		} catch (IllegalUnimplementedModeException e) {
+		} catch (UnimplementedModeException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
@@ -149,7 +149,7 @@ public class R_Talon extends TalonSRX {
 	}
 
 
-	public void set(final double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws IllegalUnimplementedModeException, IllegalAccessException {
+	public void set(final double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws UnimplementedModeException, IllegalAccessException {
 		double currentSetPoint = lastSetpoint;
 		switch (controlMode) {
 		case Current:
@@ -165,7 +165,7 @@ public class R_Talon extends TalonSRX {
 		case Velocity:
 			currentSetPoint = setRPM(value);break;
 		case Disabled:break;
-		default:throw new IllegalUnimplementedModeException("Talon " + Integer.toString(getDeviceID()) + "'s mode is unimplemented.");
+		default:throw new UnimplementedModeException("Talon " + Integer.toString(getDeviceID()) + "'s mode is unimplemented.");
 		}
 		
 		updated = true;

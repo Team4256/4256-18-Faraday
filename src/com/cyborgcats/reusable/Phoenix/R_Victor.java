@@ -56,13 +56,15 @@ public class R_Victor extends VictorSPX {
 	public void quickSet(final double value) {
 		try {
 			this.set(value, true);
+		} catch (UnimplementedModeException e) {
+			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	
-	public void set(final double value, final boolean updateSetPoint) throws IllegalAccessException {
+	public void set(final double value, final boolean updateSetPoint) throws UnimplementedModeException, IllegalAccessException {
 		double currentSetPoint = lastSetpoint;
 		switch (controlMode) {
 		case Current:throw new IllegalAccessException("Victor " + Integer.toString(getDeviceID()) + "'s mode is incompatible with Victors");
@@ -71,7 +73,7 @@ public class R_Victor extends VictorSPX {
 		case Position:throw new IllegalAccessException("Victor " + Integer.toString(getDeviceID()) + "'s mode is incompatible with Victors");
 		case Velocity:throw new IllegalAccessException("Victor " + Integer.toString(getDeviceID()) + "'s mode is incompatible with Victors");
 		case Disabled:break;
-		default:throw new IllegalAccessException("Victor " + Integer.toString(getDeviceID()) + "'s mode is unimplemented.");
+		default:throw new UnimplementedModeException("Victor " + Integer.toString(getDeviceID()) + "'s mode is unimplemented.");
 		}
 		
 		updated = true;

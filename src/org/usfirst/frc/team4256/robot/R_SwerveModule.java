@@ -3,6 +3,7 @@ package org.usfirst.frc.team4256.robot;
 import java.util.logging.Logger;
 
 import com.cyborgcats.reusable.V_Compass;
+import com.cyborgcats.reusable.Phoenix.NoEncoderException;
 import com.cyborgcats.reusable.Phoenix.R_Encoder;
 import com.cyborgcats.reusable.Phoenix.R_Talon;
 
@@ -155,7 +156,7 @@ public class R_SwerveModule {
 	
 	public double tractionSpeed() {
 		if (hasTractionSensor) return tractionWheelCircumference*traction.getCurrentRPS();
-		else throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
+		else throw new NoEncoderException("Cannot get traction motor speed without an encoder!");
 	}
 	
 	
