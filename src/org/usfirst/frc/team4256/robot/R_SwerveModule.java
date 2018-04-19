@@ -104,12 +104,17 @@ public class R_SwerveModule {
 		traction.quickSet(speed*decapitated, false);
 	}
 	
-	public void magneticAlignment(final double offset) {
-		if (magnet.get()) rotation.quickSet(rotation.getCurrentRevs() + 0.01, false);
+	public boolean magneticAlignment(final double offset) {
+		if (magnet.get()) {
+			rotation.quickSet(rotation.getCurrentRevs() + 0.01, false);
+			return true;
+		}
 		else {
 			rotation.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
 			rotation.quickSet(0.0, false);
 			setTareAngle(offset);
+			traction.setInverted(true);
+			return false;
 		}
 	}
 	

@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(-120.0);moduleB.setTareAngle(-2.0);moduleC.setTareAngle(20.0);moduleD.setTareAngle(88.0);
+		moduleA.setTareAngle(-98.0);moduleB.setTareAngle(-5.0);moduleC.setTareAngle(2.0);moduleD.setTareAngle(-92.0);
 
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		elevatorOne.setZero(0.0);
@@ -171,10 +171,11 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
 		faraday.getEntry("Received Field").setBoolean(haveGameData);
-		faraday.getEntry("Module Angles").setNumberArray(new Number[] {moduleA.rotationMotor().getCurrentAngle(true),
-																	   moduleB.rotationMotor().getCurrentAngle(true),
-																	   moduleC.rotationMotor().getCurrentAngle(true),
-																	   moduleD.rotationMotor().getCurrentAngle(true)});
+		faraday.getEntry("Module A").setNumber(moduleA.rotationMotor().getCurrentAngle(true));
+		faraday.getEntry("Module B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
+		faraday.getEntry("Module C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
+		faraday.getEntry("Module D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
+
 		SmartDashboard.putNumber("ZED Xa", odometer.getX());
 		SmartDashboard.putNumber("ZED Ya", odometer.getY());
 	}
@@ -252,7 +253,7 @@ public class Robot extends IterativeRobot {
 		else clamp.increment(-2.0*gunner.getDeadbandedAxis(R_Xbox.AXIS_LEFT_Y));
 		
 		
-		if (driver.getRawButton(R_Xbox.BUTTON_Y)) swerve.align();//SWERVE ALIGNMENT
+		if (gunner.getRawButton(R_Xbox.BUTTON_START)) swerve.align();//SWERVE ALIGNMENT
 
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
 			gyro.setTareAngle(gyro.getCurrentAngle(), true);

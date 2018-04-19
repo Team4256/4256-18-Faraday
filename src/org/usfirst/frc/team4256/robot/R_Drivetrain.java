@@ -3,6 +3,8 @@ package org.usfirst.frc.team4256.robot;
 import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.V_Compass;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class R_Drivetrain {
 	private static final double pivotToFrontX = 8.45,//inches, pivot point to front wheel tip, x
 								pivotToFrontY = 10.06,//inches, pivot point to front wheel tip, y
@@ -33,9 +35,9 @@ public class R_Drivetrain {
 	 * This function prepares each swerve module individually.
 	**/
 	public void init() {
-		moduleA.init(/*reversed traction*/false);
+		moduleA.init(/*reversed traction*/true);
 		moduleB.init(/*reversed traction*/false);
-		moduleC.init(/*reversed traction*/false);
+		moduleC.init(/*reversed traction*/true);
 		moduleD.init(/*reversed traction*/false);
 	}
 	
@@ -107,10 +109,11 @@ public class R_Drivetrain {
 	
 	
 	public void align() {
-		moduleA.magneticAlignment(-90.0);
-		moduleB.magneticAlignment(180.0);
-		moduleC.magneticAlignment(0.0);
-		moduleD.magneticAlignment(90.0);
+		final boolean a = moduleA.magneticAlignment(-90.0),
+					  b = moduleB.magneticAlignment(180.0),
+					  c = moduleC.magneticAlignment(0.0),
+					  d = moduleD.magneticAlignment(90.0);
+		SmartDashboard.putBoolean("aligning", a || b || c || d);
 	}
 	
 	private double[] speedsFromModuleD() {
