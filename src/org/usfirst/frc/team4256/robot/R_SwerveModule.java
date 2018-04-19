@@ -106,13 +106,13 @@ public class R_SwerveModule {
 	
 	public boolean magneticAlignment(final double offset) {
 		if (magnet.get()) {
-			rotation.quickSet(rotation.getCurrentRevs() + 0.01, false);
+			rotation.quickSet(rotation.getCurrentRevs() + 0.02, false);
 			return true;
 		}
 		else {
-			rotation.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
-			rotation.quickSet(0.0, false);
-			setTareAngle(offset);
+//			rotation.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
+//			rotation.quickSet(0.0, false);
+			setTareAngle(rotation.getCurrentAngle(true) + offset, true);
 			traction.setInverted(true);
 			return false;
 		}
