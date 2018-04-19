@@ -112,7 +112,7 @@ public class R_SwerveModule {
 		else {
 //			rotation.setSelectedSensorPosition(0, 0, R_Talon.kTimeoutMS);
 //			rotation.quickSet(0.0, false);
-			setTareAngle(rotation.getCurrentAngle(true) + offset, true);
+			setTareAngle(rotation.getCurrentAngle(true) + offset);
 			traction.setInverted(true);
 			return false;
 		}
