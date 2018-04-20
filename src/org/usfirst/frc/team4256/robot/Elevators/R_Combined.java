@@ -66,8 +66,7 @@ public class R_Combined {
 		desiredInches = validateInches(desiredInches);
 		
 		final double currentElOnePosition = one.getInches();
-		final boolean desiredAboveCurrentElOne = desiredInches > currentElOnePosition;
-		if (desiredAboveCurrentElOne) {
+		if (desiredInches > currentElOnePosition) {
 			one.setTorque(false);//when moving up, go really fast
 			if (desiredInches <= currentElOnePosition + E_Two.maximumHeight) {
 				two.setInches(desiredInches - one.getInches());
