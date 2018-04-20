@@ -19,7 +19,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	private DoubleSolenoid clamp;
 	private R_Talon rotator;
 	private AnalogInput ultrasonic;
-	private static int counter = 0;
+	private int counter_hasCube = 0;
 	private static double currentSetpoint = 0.0;
 	public boolean knowsZero = false;
 	
@@ -55,7 +55,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		//{do stuff based on the enum}
 		switch (cubePosition) {
 		case Absent://open and begin intaking
-			open(false);//TODO theoretically will open, but if ultrasonic sensor doesn't update instantaneously then it will close again right away
+			open();
 			setWheelSpeed(-intakeConstant);
 			break;
 		case WithinReach://hug cube
@@ -73,7 +73,6 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	**/
 	public void spit(final double strength) {
 		setWheelSpeed(Math.abs(strength));
-		cubePosition = CubePosition.Absent;
 	}
 	
 	
@@ -91,13 +90,12 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		intakeRight.quickSet(percent);
 	}
 	
-	public void open() {open(true);}
 	/**
 	 * This function opens the clamp 
 	**/
-	public void open(final boolean setAbsent) {
+	public void open() {
 		clamp.set(OpenState);
-		if (setAbsent) cubePosition = CubePosition.Absent;
+		counter_hasCube = 0;
 	}
 	
 	
@@ -119,10 +117,10 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	 * This function returns if the cube is in the clamp or not.
 	 **/
 	private boolean cubeLikelyPresent() {
-		if (ultrasonic.getAverageValue() <= 65) counter++;
-		else counter--;
-		if (counter < 0) counter = 0;
-		return counter > 10;
+		if (ultrasonic.getAverageValue() <= 65) counter_hasCube++;
+		else counter_hasCube -= 2;
+		counter_hasCube = Math.max(0, Math.min(counter_hasCube, 25));
+		return counter_hasCube == 25;
 	}
 	
 	
@@ -162,10 +160,14 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	public void completeLoopUpdate() {
 		intakeLeft.completeLoopUpdate();
 		intakeRight.completeLoopUpdate();
+	}
+	
+	public void beginLoopUpdate() {
 		//if the cube was previously in reach and the ultrasonic sensor says the cube is all the way in, update the enum
 		if (cubeLikelyPresent() && !isOpen()) cubePosition = CubePosition.Present;
 		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
 		else if (cubeInReach()) cubePosition = CubePosition.WithinReach;
+		else cubePosition = CubePosition.Absent;
 		SmartDashboard.putNumber("ultrasonic", ultrasonic.getAverageValue());
 	}
 }

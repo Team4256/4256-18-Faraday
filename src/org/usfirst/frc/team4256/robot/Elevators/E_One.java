@@ -153,7 +153,7 @@ public class E_One extends Elevator {
 	
 	@Override
 	public void setZero(final double offsetInchesFromCurrent) {
-		master.setSelectedSensorPosition((int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
+		master.setSelectedSensorPosition(-(int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
 		enableSoftLimits();
 		knowsZero = true;
 	}

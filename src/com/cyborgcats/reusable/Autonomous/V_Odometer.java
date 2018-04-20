@@ -29,8 +29,8 @@ public class V_Odometer {
 	
 	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
 	
-	public double getX(final boolean adjustForZED) {return adjustForZED ? x.get() - tareX - zedX() : x.get() - tareX;}
-	public double getY(final boolean adjustForZED) {return adjustForZED ? y.get() - tareY - zedY() : y.get() - tareY;}
+	public double getX(final boolean adjustForZED) {return adjustForZED ? x.get() - tareX - zedX() : x.get();}
+	public double getY(final boolean adjustForZED) {return adjustForZED ? y.get() - tareY - zedY() : y.get();}
 	public boolean newX() {return x.isNew();}
 	public boolean newY() {return y.isNew();}
 	

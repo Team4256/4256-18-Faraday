@@ -146,7 +146,7 @@ public class A_ThreeScale implements Autonomous{
 			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 7}
 		};
 		
-		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 0.9});
+		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 1.0});
 		return events;
 	}
 	//------------------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ public class A_ThreeScale implements Autonomous{
 	}
 
 	private void useEvents_right() {
-		if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
+		if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			final int[][] instructions = new int[][] {
 				{4, 3, 0, 5},
 				{3, 3, 0, 5},
@@ -184,7 +184,7 @@ public class A_ThreeScale implements Autonomous{
 			
 			events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 0.6, 0.8, 1.0});
 		}else {
-			if (switchTarget.equals(FieldPieceConfig.LEFT)) {
+			if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
 				final int[][] instructions = new int[][] {
 					{4, 3, 270, 3},
 					{3, Parameters.ElevatorPresets.SWITCH.height(), 270, 3},

@@ -52,8 +52,8 @@ public class A_Fight2481 implements Autonomous{
 		//run path processing only if ZED values are new
   		if (odometer.newX() && odometer.newY()) {
   			//get most recent ZED values
-			final double actualX = odometer.getX(),
-						 actualY = odometer.getY();
+			final double actualX = odometer.getX(true),
+						 actualY = odometer.getY(true);
 
 			//ensure that the desired position stays a leash length away
 			leash.maintainLength(actualX, actualY);

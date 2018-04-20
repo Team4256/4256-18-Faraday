@@ -39,8 +39,8 @@ public class A_PassLine implements Autonomous {
 		//run processing only if ZED values are new
   		if (odometer.newX() && odometer.newY()) {
   			//get most recent ZED values
-			final double actualX = odometer.getX(),
-						 actualY = odometer.getY();
+			final double actualX = odometer.getX(true),
+						 actualY = odometer.getY(true);
 			
 			//ensure that the desired position stays a leash length away
 			leash.maintainLength(actualX, actualY);

@@ -93,11 +93,11 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(-94.0);moduleB.setTareAngle(-4.0);moduleC.setTareAngle(4.0);moduleD.setTareAngle(-76.0);
+		moduleA.setTareAngle(-82.0);moduleB.setTareAngle(-20.0);moduleC.setTareAngle(4.0);moduleD.setTareAngle(-76.0);
 
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
-		elevatorOne.setZero(0.0);
-		elevatorTwo.setZero(0.0);
+		elevatorOne.setZero(0.5);
+		elevatorTwo.setZero(0.5);
 		clamp.setZero();
 
 		V_PID.set("zed", Parameters.ZED_P, Parameters.ZED_I, Parameters.ZED_D);
@@ -119,7 +119,7 @@ public class Robot extends IterativeRobot {
 		
 		//{Game Input}
 		final long start = System.currentTimeMillis();
-		while (!haveGameData && (System.currentTimeMillis() - start <= 5000)) pollGameData();
+		while (!haveGameData && (System.currentTimeMillis() - start <= 2500)) pollGameData();
 		if(!simpleAuto) {
 			if (haveGameData) autonomous = new A_ThreeScale(startingPosition, gameData_new, odometer);
 			else autonomous = new A_PassLine(startingPosition, odometer);
@@ -171,10 +171,11 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
 		faraday.getEntry("Received Field").setBoolean(haveGameData);
-		faraday.getEntry("Module A").setNumber(moduleA.rotationMotor().getCurrentAngle(true));
-		faraday.getEntry("Module B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
-		faraday.getEntry("Module C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
-		faraday.getEntry("Module D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
+		if (gameData_new != null) faraday.getEntry("Field Data").setString(gameData_new);
+		faraday.getEntry("Angle A").setNumber(moduleA.rotationMotor().getCurrentAngle(true));
+		faraday.getEntry("Angle B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
+		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
+		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
 
 		SmartDashboard.putNumber("ZED Xa", odometer.getX(true));
 		SmartDashboard.putNumber("ZED Ya", odometer.getY(true));
@@ -185,6 +186,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopPeriodic() {
+		clamp.beginLoopUpdate();
 		//{speed multipliers}
 		final boolean turbo = driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT);
 		final boolean snail = driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT);
@@ -294,6 +296,7 @@ public class Robot extends IterativeRobot {
 	private static void pollGameData() {
 		gameData_new = DriverStation.getInstance().getGameSpecificMessage();
 		if ((gameData_new != null) && (gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
+		else haveGameData = false;
 	}
 	
 	private static void setupLogging(final DriverStation ds) {
