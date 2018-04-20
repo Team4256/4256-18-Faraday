@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(-51.0);moduleB.setTareAngle(-18.0);moduleC.setTareAngle(-78.0);moduleD.setTareAngle(-76.0);
+		moduleA.setTareAngle(-94.0);moduleB.setTareAngle(-4.0);moduleC.setTareAngle(4.0);moduleD.setTareAngle(-76.0);
 
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		elevatorOne.setZero(0.0);
@@ -130,7 +130,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//{Robot Input}
-		odometer.setOrigin(odometer.getX() - autonomous.initOdometerPosX()/12.0, odometer.getY() - Autonomous.startY/12.0);
+		odometer.setOrigin(odometer.getX(false) - autonomous.initOdometerPosX()/12.0, odometer.getY(false) - Autonomous.startY/12.0);
 		
 		//{Robot Output}
 		swerve.autoMode(true);
@@ -176,8 +176,8 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Module C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Module D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
 
-		SmartDashboard.putNumber("ZED Xa", odometer.getX());
-		SmartDashboard.putNumber("ZED Ya", odometer.getY());
+		SmartDashboard.putNumber("ZED Xa", odometer.getX(true));
+		SmartDashboard.putNumber("ZED Ya", odometer.getY(true));
 	}
 	
 	@Override
