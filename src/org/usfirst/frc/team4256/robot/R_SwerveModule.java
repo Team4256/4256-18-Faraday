@@ -30,10 +30,7 @@ public class R_SwerveModule {
 	}
 	//This constructor is intended for all other modules.
 	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final int magnetID) {
-		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
-		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent);
-		hasTractionSensor = false;
-		magnet = new DigitalInput(magnetID);
+		this(rotatorID, flippedSensor, tractionID, false, magnetID);
 	}
 	
 	
