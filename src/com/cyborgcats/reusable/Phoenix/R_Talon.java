@@ -30,7 +30,7 @@ public class R_Talon extends TalonSRX {
 	
 	//This constructor is intended for use with an encoder on a motor with limited rotary motion. To limit linear motion, use built-in Talon commands.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
-		super(deviceID);
+		this(deviceID, controlMode);
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
 			case CTRE_MAG_ABSOLUTE: throw new NoEncoderException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
@@ -43,20 +43,18 @@ public class R_Talon extends TalonSRX {
 			configSelectedFeedbackSensor(encoder.type(), 2, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
 		setSensorPhase(flippedSensor);
-		this.controlMode = controlMode;
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 		convert = new Convert(encoder.countsPerRev(), gearRatio);
-		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
 		this(deviceID, gearRatio, controlMode, encoder, flippedSensor, 0.0, 0.0);
 	}
 	//This constructor is intended for a motor without an encoder.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
+	public R_Talon(final int deviceID, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
-		compass = new V_Compass(0.0, 0.0);
+//		compass = new V_Compass(0.0, 0.0);//TODO why was this here if there are no encoders?
 		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	
