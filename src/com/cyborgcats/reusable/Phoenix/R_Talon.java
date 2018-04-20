@@ -24,13 +24,13 @@ public class R_Talon extends TalonSRX {
 	private boolean updated = false;
 	private Double lastSetpoint = 0.0;
 	private double lastLegalDirection = 1.0;
-	public V_Compass compass;
+	public final V_Compass compass;
 	public Convert convert;
 	private Logger logger;
 	
 	//This constructor is intended for use with an encoder on a motor with limited rotary motion. To limit linear motion, use built-in Talon commands.
 	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
-		this(deviceID, controlMode);
+		super(deviceID);
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
 			case CTRE_MAG_ABSOLUTE: throw new NoEncoderException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
@@ -42,6 +42,7 @@ public class R_Talon extends TalonSRX {
 			configSelectedFeedbackSensor(encoder.type(), 1, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 			configSelectedFeedbackSensor(encoder.type(), 2, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 		}
+		this.controlMode = controlMode;
 		setSensorPhase(flippedSensor);
 		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
 		convert = new Convert(encoder.countsPerRev(), gearRatio);
@@ -54,7 +55,7 @@ public class R_Talon extends TalonSRX {
 	public R_Talon(final int deviceID, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
-//		compass = new V_Compass(0.0, 0.0);//TODO why was this here if there are no encoders?
+		compass = new V_Compass(0.0, 0.0);
 		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	
