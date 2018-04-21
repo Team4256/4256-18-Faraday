@@ -141,9 +141,9 @@ public class A_ThreeScale implements Autonomous{
 	private V_Events useEvents_center() {
 		// at 1.0, reaches switch
 		final int[][] instructions = new int[][] {
-			{4, 3, 0, 7},
-			{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 7},
-			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 7}
+			{4, 3, 0, 5},
+			{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 5},
+			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 5}
 		};
 		
 		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 1.0});
