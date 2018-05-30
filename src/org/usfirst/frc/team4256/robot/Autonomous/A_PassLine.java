@@ -7,16 +7,16 @@ import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 import com.cyborgcats.reusable.V_PID;
 import com.cyborgcats.reusable.Autonomous.P_Bezier;
 import com.cyborgcats.reusable.Autonomous.V_Leash;
-import com.cyborgcats.reusable.Autonomous.V_Odometer;
+import com.cyborgcats.reusable.Autonomous.Odometer;
 
 public class A_PassLine implements Autonomous {
 	public final StartingPosition startingPosition;
-	private final V_Odometer odometer;
+	private final Odometer odometer;
 	
 	public V_Leash leash;
 	public double initOdometerPosX = 0.0;
 	
-	public A_PassLine(final int startingPosition, final V_Odometer odometer) {
+	public A_PassLine(final int startingPosition, final Odometer odometer) {
 		//{organize initialization data}
 		switch (startingPosition) {//ROBOT
 		case(0):this.startingPosition = StartingPosition.LEFT;break;
@@ -36,11 +36,12 @@ public class A_PassLine implements Autonomous {
 	}
 	
 	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
+		odometer.update();//only run this when the robot is not rotating
 		//run processing only if ZED values are new
   		if (odometer.newX() && odometer.newY()) {
   			//get most recent ZED values
-			final double actualX = odometer.getX(true),
-						 actualY = odometer.getY(true);
+			final double actualX = odometer.getX(),
+						 actualY = odometer.getY();
 			
 			//ensure that the desired position stays a leash length away
 			leash.maintainLength(actualX, actualY);

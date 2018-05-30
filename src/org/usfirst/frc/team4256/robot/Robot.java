@@ -7,7 +7,8 @@ import com.cyborgcats.reusable.R_Gyro;
 import com.cyborgcats.reusable.R_Xbox;
 import com.cyborgcats.reusable.V_Fridge;
 import com.cyborgcats.reusable.V_PID;
-import com.cyborgcats.reusable.Autonomous.V_Odometer;
+import com.cyborgcats.reusable.Autonomous.O_Encoder;
+import com.cyborgcats.reusable.Autonomous.Odometer;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -45,7 +46,7 @@ public class Robot extends IterativeRobot {
 	private static Autonomous autonomous;
 	private static NetworkTableInstance nt;
 	private static NetworkTable faraday, zed;
-	private static V_Odometer odometer;
+	private static Odometer odometer;
 	
 	//{Game Input}
 	private static String gameData_old = "", gameData_new = "";
@@ -78,7 +79,8 @@ public class Robot extends IterativeRobot {
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED");
-		odometer = new V_Odometer(zed, gyro);
+//		odometer = new O_ZED(zed);
+		odometer = new O_Encoder(moduleD);
 		odometer.init();
 		//{Human Input}
 		faraday.getEntry("Starting Position").setNumber(0);
@@ -130,7 +132,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//{Robot Input}
-		odometer.setOrigin(odometer.getX(false) - autonomous.initOdometerPosX()/12.0, odometer.getY(false) - Autonomous.startY/12.0);
+		odometer.setOrigin(odometer.getX() - autonomous.initOdometerPosX()/12.0, odometer.getY() - Autonomous.startY/12.0);
 		
 		//{Robot Output}
 		swerve.autoMode(true);
@@ -177,12 +179,12 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
 
-		SmartDashboard.putNumber("ZED Xa", odometer.getX(true));
-		SmartDashboard.putNumber("ZED Ya", odometer.getY(true));
+		SmartDashboard.putNumber("ZED Xa", odometer.getX());
+		SmartDashboard.putNumber("ZED Ya", odometer.getY());
 	}
 	
 	@Override
-	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);		odometer.update();}
+	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);}
 	
 	@Override
 	public void teleopPeriodic() {
