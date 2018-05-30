@@ -2,18 +2,22 @@ package com.cyborgcats.reusable.Autonomous;
 
 import org.usfirst.frc.team4256.robot.R_SwerveModule;
 
+import com.cyborgcats.reusable.R_Gyro;
+
 public class O_Encoder extends Odometer {
 	private R_SwerveModule module;
+	private R_Gyro gyro;
 	private double tareX = 0.0, tareY = 0.0;
 	private ConsumableDouble x = new ConsumableDouble();
 	private ConsumableDouble y = new ConsumableDouble();
 	
-	public O_Encoder(final R_SwerveModule module) {
+	public O_Encoder(final R_SwerveModule module, final R_Gyro gyro) {
 		this.module = module;
+		this.gyro = gyro;
 	}
 	
-	public void updateX() {x.increment(module.deltaXDistance());}
-	public void updateY() {y.increment(module.deltaYDistance());}
+	public void updateX() {x.increment(module.deltaXDistance(gyro.getCurrentAngle()));}
+	public void updateY() {y.increment(module.deltaYDistance(gyro.getCurrentAngle()));}
 	public void update() {updateX();updateY();}
 
 	@Override

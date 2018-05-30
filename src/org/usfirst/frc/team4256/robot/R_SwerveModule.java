@@ -161,14 +161,14 @@ public class R_SwerveModule {
 	
 	
 	public double tractionPathLength() {
-		if (hasTractionSensor) return traction.getCurrentRevs()*tractionWheelCircumference;
+		if (hasTractionSensor) return traction.getCurrentRevs()*tractionWheelCircumference/12.0;
 		else return 0.0;
 	}
 	
 	
 	public double deltaDistance() {return tractionDeltaPathLength;}
-	public double deltaXDistance() {return tractionDeltaPathLength*Math.sin(rotation.getCurrentAngle(true)*Math.PI/180.0);}
-	public double deltaYDistance() {return tractionDeltaPathLength*Math.cos(rotation.getCurrentAngle(true)*Math.PI/180.0);}
+	public double deltaXDistance(final double gyroAngle) {return tractionDeltaPathLength*Math.sin(convertToField(rotation.getCurrentAngle(true), gyroAngle)*Math.PI/180.0);}
+	public double deltaYDistance(final double gyroAngle) {return tractionDeltaPathLength*Math.cos(convertToField(rotation.getCurrentAngle(true), gyroAngle)*Math.PI/180.0);}
 	
 	public R_Talon rotationMotor() {return rotation;}
 	public R_Talon tractionMotor() {return traction;}

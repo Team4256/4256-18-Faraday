@@ -80,7 +80,7 @@ public class Robot extends IterativeRobot {
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED");
 //		odometer = new O_ZED(zed);
-		odometer = new O_Encoder(moduleD);
+		odometer = new O_Encoder(moduleD, gyro);
 		odometer.init();
 		//{Human Input}
 		faraday.getEntry("Starting Position").setNumber(0);
@@ -178,9 +178,6 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Angle B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
-
-		SmartDashboard.putNumber("ZED Xa", odometer.getX());
-		SmartDashboard.putNumber("ZED Ya", odometer.getY());
 	}
 	
 	@Override
@@ -188,6 +185,11 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void teleopPeriodic() {
+		odometer.update();
+		SmartDashboard.putNumber("x", odometer.getX());
+		SmartDashboard.putNumber("y", odometer.getY());
+		
+		
 		clamp.beginLoopUpdate();
 		//{speed multipliers}
 		final boolean turbo = driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT);
