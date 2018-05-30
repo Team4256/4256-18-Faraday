@@ -167,6 +167,8 @@ public class R_SwerveModule {
 	
 	
 	public double deltaDistance() {return tractionDeltaPathLength;}
+	public double deltaXDistance() {return tractionDeltaPathLength*Math.sin(rotation.getCurrentAngle(true)*Math.PI/180.0);}
+	public double deltaYDistance() {return tractionDeltaPathLength*Math.cos(rotation.getCurrentAngle(true)*Math.PI/180.0);}
 	
 	public R_Talon rotationMotor() {return rotation;}
 	public R_Talon tractionMotor() {return traction;}
