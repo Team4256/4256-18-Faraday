@@ -15,8 +15,8 @@ public abstract class Odometer {
 		private boolean isNew = false;
 		private double value = 0.0;
 		
-		public void set(final double value) {this.value = value;	isNew = true;}
-		public void increment(final double value) {this.value += value;		isNew = true;}
+		public void set(final double val) {this.value = val;	isNew = true;}
+		public void increment(final double val) {this.value += val;		isNew = true;}
 		public double get() {isNew = false;		return value;}
 		public boolean isNew() {return isNew;}
 	}

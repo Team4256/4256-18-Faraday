@@ -44,14 +44,16 @@ public class R_SwerveModule {
 		rotation.init();
 		
 		rotation.setNeutralMode(R_Talon.coast);
-		rotation.config_kP(0, 6.7, R_Talon.kTimeoutMS);
+		rotation.config_kP(0, 15.0, R_Talon.kTimeoutMS);
 		rotation.config_kI(0, 0.0, R_Talon.kTimeoutMS);
-		rotation.config_kD(0, 1.0, R_Talon.kTimeoutMS);
+		rotation.config_kD(0, 2.0, R_Talon.kTimeoutMS);
 		
 		traction.init();
 		
 		traction.setInverted(reversedTraction);
 		traction.setNeutralMode(R_Talon.coast);
+		traction.configPeakOutputForward(.9166, 0);//%, delay to wait for error code
+		traction.configPeakOutputReverse(-.9166, 0);
 		traction.configContinuousCurrentLimit(40, R_Talon.kTimeoutMS);
 		traction.configPeakCurrentLimit(45, R_Talon.kTimeoutMS);
 		traction.configPeakCurrentDuration(250, R_Talon.kTimeoutMS);
@@ -123,8 +125,13 @@ public class R_SwerveModule {
 	 * A shortcut to call completeLoopUpdate on all the Talons in the module.
 	**/
 	public void completeLoopUpdate() {
-		rotation.completeLoopUpdate();
-		traction.completeLoopUpdate();
+		completeLoopUpdate(true);
+	}
+	public void completeLoopUpdate(final boolean doMotors) {
+		if (doMotors) {
+			rotation.completeLoopUpdate();
+			traction.completeLoopUpdate();
+		}
 		
 		if (hasTractionSensor) {
 			final double currentPathLength = tractionPathLength();

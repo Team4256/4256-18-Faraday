@@ -83,7 +83,7 @@ public class Robot extends IterativeRobot {
 		odometer = new O_Encoder(moduleD, gyro);
 		odometer.init();
 		//{Human Input}
-		faraday.getEntry("Starting Position").setNumber(0);
+		faraday.getEntry("Starting Position").setNumber(1);
 		faraday.getEntry("Simple Auto").setBoolean(false);
 		//{Game Input}
 		final DriverStation ds = DriverStation.getInstance();
@@ -95,11 +95,11 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(-78.0);moduleB.setTareAngle(17.0);moduleC.setTareAngle(45.0);moduleD.setTareAngle(-77.0);
+		moduleA.setTareAngle(-78.0);moduleB.setTareAngle(-28.0);moduleC.setTareAngle(45.0);moduleD.setTareAngle(-77.0);
 
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		elevatorOne.setZero(0.5);
-		elevatorTwo.setZero(0.5);
+		elevatorTwo.setZero(1.0);
 		clamp.setZero();
 
 		V_PID.set("zed", Parameters.ZED_P, Parameters.ZED_I, Parameters.ZED_D);
@@ -132,7 +132,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//{Robot Input}
-		odometer.setOrigin(odometer.getX() - autonomous.initOdometerPosX()/12.0, odometer.getY() - Autonomous.startY/12.0);
+		odometer.setOrigin(odometer.getX()/* - autonomous.initOdometerPosX()/12.0*/, odometer.getY() - 30.0/12.0/* - Autonomous.startY/12.0*/);
 		
 		//{Robot Output}
 		swerve.autoMode(true);
@@ -178,14 +178,23 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Angle B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
+		odometer.update();
 	}
 	
 	@Override
-	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);}
+	public void autonomousPeriodic() {
+		autonomous.run(swerve, clamp, elevator);
+		SmartDashboard.putNumber("x auto", odometer.getX());
+		SmartDashboard.putNumber("y auto", odometer.getY());
+		moduleA.completeLoopUpdate(false);
+		moduleB.completeLoopUpdate(false);
+		moduleC.completeLoopUpdate(false);
+		moduleD.completeLoopUpdate(false);
+		
+	}
 	
 	@Override
 	public void teleopPeriodic() {
-		odometer.update();
 		SmartDashboard.putNumber("x", odometer.getX());
 		SmartDashboard.putNumber("y", odometer.getY());
 		

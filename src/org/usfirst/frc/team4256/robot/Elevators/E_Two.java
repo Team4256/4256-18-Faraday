@@ -6,7 +6,7 @@ import com.cyborgcats.reusable.Phoenix.R_Talon;
 public class E_Two extends Elevator {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
-	protected static final double maximumHeight = 40.5;//inches
+	protected static final double maximumHeight = 42.0;//inches
 	protected static final double climbingHeight = 0.0;//inches
 	private R_Talon master;
 	private int maximumEncoderValue;

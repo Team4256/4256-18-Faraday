@@ -9,6 +9,9 @@ import com.cyborgcats.reusable.V_PID;
 import com.cyborgcats.reusable.Autonomous.P_Bezier;
 import com.cyborgcats.reusable.Autonomous.V_Events;
 import com.cyborgcats.reusable.Autonomous.V_Leash;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.cyborgcats.reusable.Autonomous.Odometer;
 
 public class A_ThreeScale implements Autonomous{
@@ -20,7 +23,7 @@ public class A_ThreeScale implements Autonomous{
 	public V_Events events;
 	public double initOdometerPosX = 0.0;
 
-	public A_ThreeScale(final int startingPosition, final String gameData, final Odometer odometer) {
+	public A_ThreeScale(final int startingPosition, final String gameData, final Odometer m_odometer) {
 		//{organize initialization data}
 		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
 		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
@@ -31,7 +34,7 @@ public class A_ThreeScale implements Autonomous{
 		default:this.startingPosition = StartingPosition.CENTER;break;
 		}
 
-		this.odometer = odometer;
+		this.odometer = m_odometer;
 
 		switch (this.startingPosition) {
 		case LEFT:  useLeash_left();
@@ -45,15 +48,16 @@ public class A_ThreeScale implements Autonomous{
 		}
 	}
 
+	
 	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		events.check(leash.getIndependentVariable());
   		final double spin = events.execute(clamp, elevator, swerve.gyro);
 
 		//run path processing only if ZED values are new
-  		if (odometer.newX() && odometer.newY()) {
+//  		if (odometer.newX() && odometer.newY()) {
   			//get most recent ZED values
-			final double actualX = odometer.getX(),
-						 actualY = odometer.getY();
+			final double actualX = odometer.getX();
+			final double actualY = odometer.getY();
 
 			//ensure that the desired position stays a leash length away
 			leash.maintainLength(actualX, actualY);
@@ -71,7 +75,7 @@ public class A_ThreeScale implements Autonomous{
 			if (speed > 0.6) speed = 0.6;
 
 			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
-  		}
+//  		}
 	}
 
 	public double initOdometerPosX() {return initOdometerPosX;}
