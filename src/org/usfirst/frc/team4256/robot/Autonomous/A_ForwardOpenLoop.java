@@ -42,7 +42,7 @@ public class A_ForwardOpenLoop implements Autonomous {
 		}
 	}
 	
-	public double initOdometerPosX() {return initOdometerPosX;}
+	public double initX() {return initOdometerPosX;}
 	
 	private void ensureTimerHasStarted() {if (start == null) start = System.currentTimeMillis();}
 }

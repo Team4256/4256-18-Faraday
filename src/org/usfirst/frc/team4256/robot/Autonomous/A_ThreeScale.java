@@ -10,8 +10,6 @@ import com.cyborgcats.reusable.Autonomous.P_Bezier;
 import com.cyborgcats.reusable.Autonomous.V_Events;
 import com.cyborgcats.reusable.Autonomous.V_Leash;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import com.cyborgcats.reusable.Autonomous.Odometer;
 
 public class A_ThreeScale implements Autonomous{
@@ -53,11 +51,11 @@ public class A_ThreeScale implements Autonomous{
 		events.check(leash.getIndependentVariable());
   		final double spin = events.execute(clamp, elevator, swerve.gyro);
 
-		//run path processing only if ZED values are new
-//  		if (odometer.newX() && odometer.newY()) {
-  			//get most recent ZED values
-			final double actualX = odometer.getX();
-			final double actualY = odometer.getY();
+		//run path processing only if odometer values are new
+  		if (odometer.newX() || odometer.newY()) {
+  			//get most recent odometer values
+			final double actualX = odometer.getX(true);
+			final double actualY = odometer.getY(true);
 
 			//ensure that the desired position stays a leash length away
 			leash.maintainLength(actualX, actualY);
@@ -75,28 +73,28 @@ public class A_ThreeScale implements Autonomous{
 			if (speed > 0.6) speed = 0.6;
 
 			swerve.holonomic_encoderIgnorant(errorDirection, speed, spin);
-//  		}
+  		}
 	}
 
-	public double initOdometerPosX() {return initOdometerPosX;}
+	public double initX() {return initOdometerPosX;}
 
 	//------------------------------------------------------------------------------------------
 	private void useLeash_left() {
 		initOdometerPosX = leftStartX;
 		
 		if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
-			final P_Bezier a = new P_Bezier(leftStartX, startY, -120, 215, -86, 242, -scaleX, scaleY, 0.0);//get to easy scale
+			final P_Bezier a = new P_Bezier(leftStartX, initY, -120, 215, -86, 242, -scaleX, scaleY, 0.0);//get to easy scale
 
 			final P_Bezier[] path = new P_Bezier[] {a};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			if (switchTarget.equals(FieldPieceConfig.LEFT)) {
-				final P_Bezier a = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier a = new P_Bezier(leftStartX, initY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
 				
 				final P_Bezier[] path = new P_Bezier[] {a};
 				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}else {
-				final P_Bezier a = new P_Bezier(leftStartX, startY, leftStartX, 93, leftStartX, 93, leftStartX, switchY, 0.0);//drive forward
+				final P_Bezier a = new P_Bezier(leftStartX, initY, leftStartX, 93, leftStartX, 93, leftStartX, switchY, 0.0);//drive forward
 				leash = new V_Leash(new P_Bezier[] {a}, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 		}
@@ -135,8 +133,8 @@ public class A_ThreeScale implements Autonomous{
 		
 		P_Bezier bezier;
 
-		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerStartX, startY, -30, 82, -52, 60, -switchX, switchY, 0.0);//get to left switch
-		else bezier = new P_Bezier(centerStartX, startY, 30, 82, 52, 60, switchX, switchY, 0.0);//get to right switch
+		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerStartX, initY, -30, 82, -52, 60, -switchX, switchY, 0.0);//get to left switch
+		else bezier = new P_Bezier(centerStartX, initY, 30, 82, 52, 60, switchX, switchY, 0.0);//get to right switch
 		
 		leash = new V_Leash(new P_Bezier[] {bezier}, /*leash length*/1.5, /*growth rate*/0.1);
 		return leash;
@@ -159,18 +157,18 @@ public class A_ThreeScale implements Autonomous{
 		initOdometerPosX = rightStartX;
 		
 		if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
-			final P_Bezier a = new P_Bezier(rightStartX, startY, 120, 215, 86, 242, scaleX, scaleY, 0.0);//get to easy scale
+			final P_Bezier a = new P_Bezier(rightStartX, initY, 120, 215, 86, 242, scaleX, scaleY, 0.0);//get to easy scale
 
 			final P_Bezier[] path = new P_Bezier[] {a};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
-				final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier a = new P_Bezier(rightStartX, initY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
 
 				final P_Bezier[] path = new P_Bezier[] {a};
 				leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}else {
-				final P_Bezier a = new P_Bezier(rightStartX, startY, rightStartX, 89, rightStartX, 89, rightStartX, switchY, 0.0);//drive forward
+				final P_Bezier a = new P_Bezier(rightStartX, initY, rightStartX, 89, rightStartX, 89, rightStartX, switchY, 0.0);//drive forward
 				leash = new V_Leash(new P_Bezier[] {a}, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 		}

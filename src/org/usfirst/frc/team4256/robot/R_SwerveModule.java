@@ -121,23 +121,20 @@ public class R_SwerveModule {
 		return false;
 	}
 	
-	/**
-	 * A shortcut to call completeLoopUpdate on all the Talons in the module.
-	**/
-	public void completeLoopUpdate() {
-		completeLoopUpdate(true);
-	}
-	public void completeLoopUpdate(final boolean doMotors) {
-		if (doMotors) {
-			rotation.completeLoopUpdate();
-			traction.completeLoopUpdate();
-		}
-		
+	
+	public void checkTractionEncoder() {
 		if (hasTractionSensor) {
 			final double currentPathLength = tractionPathLength();
 			tractionDeltaPathLength = currentPathLength - tractionPreviousPathLength;
 			tractionPreviousPathLength = currentPathLength;
 		}
+	}
+	/**
+	 * A shortcut to call completeLoopUpdate on all the Talons in the module.
+	**/
+	public void completeLoopUpdate() {
+		rotation.completeLoopUpdate();
+		traction.completeLoopUpdate();
 	}
 	
 	

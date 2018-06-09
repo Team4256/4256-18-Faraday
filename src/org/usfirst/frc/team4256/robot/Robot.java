@@ -37,7 +37,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final R_Xbox driver = new R_Xbox(0), gunner = new R_Xbox(1);
-//	private static double lockedAngle = 0;
 	//{Robot Input}
 	private static final R_Gyro gyro = new R_Gyro(Parameters.Gyrometer_updateHz);
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.PRESSURE_GAUGE);
@@ -79,15 +78,17 @@ public class Robot extends IterativeRobot {
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
 		zed = nt.getTable("ZED");
-//		odometer = new O_ZED(zed);
-		odometer = new O_Encoder(moduleD, gyro);
+		odometer = new O_Encoder(moduleD, gyro);//new O_ZED(zed);
 		odometer.init();
+		
 		//{Human Input}
 		faraday.getEntry("Starting Position").setNumber(1);
 		faraday.getEntry("Simple Auto").setBoolean(false);
+		
 		//{Game Input}
 		final DriverStation ds = DriverStation.getInstance();
 		gameData_old = ds.getGameSpecificMessage();
+		
 		//{Robot Output}
 		swerve.init();
 		elevator.init();
@@ -116,7 +117,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		//{Human Input}
-		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(0).floatValue());
+		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(1).floatValue());
 		final boolean simpleAuto = faraday.getEntry("Simple Auto").getBoolean(false);
 		
 		//{Game Input}
@@ -127,12 +128,12 @@ public class Robot extends IterativeRobot {
 			else autonomous = new A_PassLine(startingPosition, odometer);
 		}else {
 			autonomous = new A_ForwardOpenLoop(startingPosition, gameData_new);
-//			autonomous = new A_TwoSwitchOpenLoop(startingPosition, gameData_new, zed.getSubTable("Cubes"));
 			odometer.disable();
 		}
 		
 		//{Robot Input}
-		odometer.setOrigin(odometer.getX()/* - autonomous.initOdometerPosX()/12.0*/, odometer.getY() - 30.0/12.0/* - Autonomous.startY/12.0*/);
+		zed.getEntry("Enable Odometry").setBoolean(false);//TODO if we want to switch back to ZED make sure to remove this line
+		odometer.setOrigin(odometer.getX(false) - autonomous.initX()/12.0, odometer.getY(false) - Autonomous.initY/12.0);
 		
 		//{Robot Output}
 		swerve.autoMode(true);
@@ -145,7 +146,6 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		//{Robot Input}
 		odometer.disable();
-//		lockedAngle = gyro.getCurrentAngle();
 		//{Robot Output}
 		swerve.autoMode(false);
 		
@@ -178,28 +178,20 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Angle B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
+		
+		moduleD.checkTractionEncoder();
 		odometer.update();
+		faraday.getEntry("X").setNumber(odometer.getX(/*markAsRead*/false));
+		faraday.getEntry("Y").setNumber(odometer.getY(/*markAsRead*/false));
 	}
 	
 	@Override
-	public void autonomousPeriodic() {
-		autonomous.run(swerve, clamp, elevator);
-		SmartDashboard.putNumber("x auto", odometer.getX());
-		SmartDashboard.putNumber("y auto", odometer.getY());
-		moduleA.completeLoopUpdate(false);
-		moduleB.completeLoopUpdate(false);
-		moduleC.completeLoopUpdate(false);
-		moduleD.completeLoopUpdate(false);
-		
-	}
+	public void autonomousPeriodic() {autonomous.run(swerve, clamp, elevator);}
 	
 	@Override
 	public void teleopPeriodic() {
-		SmartDashboard.putNumber("x", odometer.getX());
-		SmartDashboard.putNumber("y", odometer.getY());
-		
-		
 		clamp.beginLoopUpdate();
+		
 		//{speed multipliers}
 		final boolean turbo = driver.getRawButton(R_Xbox.BUTTON_STICK_LEFT);
 		final boolean snail = driver.getRawButton(R_Xbox.BUTTON_STICK_RIGHT);
@@ -214,21 +206,6 @@ public class Robot extends IterativeRobot {
 		double spin = 0.7*driver.getDeadbandedAxis(R_Xbox.AXIS_RIGHT_X);//normal mode
 		if (snail) spin  *= 0.7;//----------------------------------------snail mode
 		spin *= spin*Math.signum(spin);
-//		final boolean handsOffSpinStick = spin == 0.0;
-//		
-//		//{adding driver aids}
-//		if (handsOffSpinStick) {
-//			double spinError = 0;
-//			//stop rotation drift at high speeds
-//			if (speed >= 0.6) spinError = gyro.wornPath(lockedAngle);
-//			if (Math.abs(spinError) > 3.0) spin = V_PID.get("spin", spinError);
-//			if (Math.abs(spin) > 1.0) spin = Math.signum(spin);
-//		}
-//		if (V_Fridge.becomesTrue("hands off", handsOffSpinStick)) {
-//			//remember angle when driver stops rotating
-//			lockedAngle = gyro.getCurrentAngle();
-//			V_PID.clear("spin");
-//		}
 		
 		if (driver.getRawButton(R_Xbox.BUTTON_X)) swerve.formX();//X lock
 		else swerve.holonomic_encoderIgnorant(driver.getCurrentAngle(R_Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
@@ -272,7 +249,6 @@ public class Robot extends IterativeRobot {
 
 		if (V_Fridge.becomesTrue("gyro reset", driver.getRawButton(R_Xbox.BUTTON_BACK))) {//GYRO RESET
 			gyro.setTareAngle(gyro.getCurrentAngle(), true);
-//			lockedAngle = 0.0;
 			V_PID.clear("spin");
 		}
 		

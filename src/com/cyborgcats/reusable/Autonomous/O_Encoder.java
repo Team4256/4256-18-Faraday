@@ -27,10 +27,10 @@ public class O_Encoder extends Odometer {
 	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
 
 	@Override
-	public double getX() {return x.get() - tareX;}
+	public double getX(final boolean markAsRead) {return x.get(markAsRead) - tareX;}
 
 	@Override
-	public double getY() {return y.get() - tareY;}
+	public double getY(final boolean markAsRead) {return y.get(markAsRead) - tareY;}
 
 	@Override
 	public boolean newX() {return x.isNew();}

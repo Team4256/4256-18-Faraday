@@ -37,11 +37,11 @@ public class A_PassLine implements Autonomous {
 	
 	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		odometer.update();//only run this when the robot is not rotating
-		//run processing only if ZED values are new
-  		if (odometer.newX() && odometer.newY()) {
-  			//get most recent ZED values
-			final double actualX = odometer.getX(),
-						 actualY = odometer.getY();
+		//run processing only if odometer values are new
+  		if (odometer.newX() || odometer.newY()) {
+  			//get most recent odometer values
+			final double actualX = odometer.getX(true),
+						 actualY = odometer.getY(true);
 			
 			//ensure that the desired position stays a leash length away
 			leash.maintainLength(actualX, actualY);
@@ -62,12 +62,12 @@ public class A_PassLine implements Autonomous {
   		}
 	}
 	
-	public double initOdometerPosX() {return initOdometerPosX;}
+	public double initX() {return initOdometerPosX;}
 	
 	private void useLeash_left() {
 		initOdometerPosX = leftStartX;
 		
-		final P_Bezier a = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to nearest switch
+		final P_Bezier a = new P_Bezier(leftStartX, initY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to nearest switch
 		P_Bezier[] path = new P_Bezier[] {a};
 		leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 	}
@@ -75,7 +75,7 @@ public class A_PassLine implements Autonomous {
 	private void useLeash_center() {
 		initOdometerPosX = centerStartX;
 		
-		final P_Bezier a = new P_Bezier(centerStartX, startY, 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
+		final P_Bezier a = new P_Bezier(centerStartX, initY, 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
 		P_Bezier[] path = new P_Bezier[] {a};
 		leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 	}
@@ -83,7 +83,7 @@ public class A_PassLine implements Autonomous {
 	private void useLeash_right() {
 		initOdometerPosX = rightStartX;
 		
-		final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to nearest switch
+		final P_Bezier a = new P_Bezier(rightStartX, initY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to nearest switch
 		P_Bezier[] path = new P_Bezier[] {a};
 		leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 	}

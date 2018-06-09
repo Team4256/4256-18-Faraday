@@ -4,8 +4,8 @@ public abstract class Odometer {
 	public abstract void init();
 	public abstract void setOrigin(final double x, final double y);
 	
-	public abstract double getX();
-	public abstract double getY();
+	public abstract double getX(final boolean markAsRead);
+	public abstract double getY(final boolean markAsRead);
 	public abstract boolean newX();
 	public abstract boolean newY();
 	public abstract void update();
@@ -17,7 +17,7 @@ public abstract class Odometer {
 		
 		public void set(final double val) {this.value = val;	isNew = true;}
 		public void increment(final double val) {this.value += val;		isNew = true;}
-		public double get() {isNew = false;		return value;}
+		public double get(final boolean markAsRead) {if (markAsRead) isNew = false;		return value;}
 		public boolean isNew() {return isNew;}
 	}
 }

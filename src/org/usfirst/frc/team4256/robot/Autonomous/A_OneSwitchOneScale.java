@@ -49,11 +49,11 @@ public class A_OneSwitchOneScale implements Autonomous{
 		events.check(leash.getIndependentVariable());
   		final double spin = events.execute(clamp, elevator, swerve.gyro);
 
-		//run path processing only if ZED values are new
-  		if (odometer.newX() && odometer.newY()) {
-  			//get most recent ZED values
-			final double actualX = odometer.getX(),
-						 actualY = odometer.getY();
+		//run path processing only if odometer values are new
+  		if (odometer.newX() || odometer.newY()) {
+  			//get most recent odometer values
+			final double actualX = odometer.getX(true),
+						 actualY = odometer.getY(true);
 
 			//ensure that the desired position stays a leash length away
 			leash.maintainLength(actualX, actualY);
@@ -74,7 +74,7 @@ public class A_OneSwitchOneScale implements Autonomous{
   		}
 	}
 
-	public double initOdometerPosX() {return initOdometerPosX;}
+	public double initX() {return initOdometerPosX;}
 
 	//------------------------------------------------------------------------------------------
 	private void useLeash_left() {
@@ -82,7 +82,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		if (switchTarget.equals(FieldPieceConfig.LEFT) && scaleTarget.equals(FieldPieceConfig.LEFT)) {
 			//{easy switch then easy scale}
-			final P_Bezier a = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
+			final P_Bezier a = new P_Bezier(leftStartX, initY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
 			final P_Bezier b = new P_Bezier(-switchX, switchY, -115, 202, -91, 228, -cubeX, cubeY, 1.0);//get to new cube
 			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -80, 252, -70, 270, -scaleX, scaleY, 2.0);//get to easy scale
 
@@ -91,7 +91,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		}else if (switchTarget.equals(FieldPieceConfig.LEFT)) {
 			//{easy switch then hard scale}
-			final P_Bezier a = new P_Bezier(leftStartX, startY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
+			final P_Bezier a = new P_Bezier(leftStartX, initY, -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
 			final P_Bezier b = new P_Bezier(-switchX, switchY, -115, 202, -91, 228, -cubeX, cubeY, 1.0);//get to new cube
 			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -30, 289, 94, 190, scaleX, scaleY, 2.0);//get to hard scale
 
@@ -100,7 +100,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		}else if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
 			//{easy scale then hard switch}
-			final P_Bezier a = new P_Bezier(leftStartX, startY, -120, 215, -86, 242, -scaleX, scaleY, 0.0);//get to easy scale
+			final P_Bezier a = new P_Bezier(leftStartX, initY, -120, 215, -86, 242, -scaleX, scaleY, 0.0);//get to easy scale
 			final P_Bezier b = new P_Bezier(-scaleX, scaleY, -91, 193, 50, 277, cubeX, cubeY, 1.0);//get to new cube/hard switch
 
 			final P_Bezier[] path = new P_Bezier[] {a, b};
@@ -108,7 +108,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		}else {
 			//{hard switch then hard scale}
-			final P_Bezier a = new P_Bezier(leftStartX, startY, -112, 140, -166, 268, 22, 255, 0.0);
+			final P_Bezier a = new P_Bezier(leftStartX, initY, -112, 140, -166, 268, 22, 255, 0.0);
 			final P_Bezier b = new P_Bezier(22, 255, 41, 251, 55, 235, cubeX, cubeY, 1.0);//get to new cube/hard switch
 			final P_Bezier c = new P_Bezier(cubeX, cubeY, 82, 240, 73, 264, scaleX, scaleY, 2.0);//get to hard scale
 
@@ -176,8 +176,8 @@ public class A_OneSwitchOneScale implements Autonomous{
 		
 		P_Bezier bezier;
 
-		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerStartX, startY, -58, 130, -104, 42, -switchX, switchY, 0.0);//get to left switch
-		else bezier = new P_Bezier(centerStartX, startY, 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
+		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerStartX, initY, -30, 82, -52, 60, -switchX, switchY, 0.0);//get to left switch
+		else bezier = new P_Bezier(centerStartX, initY, 30, 82, 52, 60, switchX, switchY, 0.0);//get to right switch
 		
 		leash = new V_Leash(new P_Bezier[] {bezier}, /*leash length*/1.5, /*growth rate*/0.1);
 		return leash;
@@ -186,12 +186,12 @@ public class A_OneSwitchOneScale implements Autonomous{
 	private V_Events useEvents_center() {
 		// at 1.0, reaches switch
 		final int[][] instructions = new int[][] {
-			{4, 3, 0, 7},
-			{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 7},
-			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 7}
+			{4, 3, 0, 5},
+			{3, Parameters.ElevatorPresets.SWITCH.height(), 0, 5},
+			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 5}
 		};
 		
-		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.3, 0.6, 0.9});
+		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 1.0});
 		return events;
 	}
 	//------------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		if (switchTarget.equals(FieldPieceConfig.RIGHT) && scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			//{easy switch then easy scale}
-			final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
+			final P_Bezier a = new P_Bezier(rightStartX, initY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
 			final P_Bezier b = new P_Bezier(switchX, switchY, 115, 202, 91, 228, cubeX, cubeY, 1.0);//get to new cube
 			final P_Bezier c = new P_Bezier(cubeX, cubeY, 80, 252, 70, 270, scaleX, scaleY, 2.0);//get to easy scale
 
@@ -210,7 +210,7 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		}else if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
 			//{easy switch then hard scale}
-			final P_Bezier a = new P_Bezier(rightStartX, startY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
+			final P_Bezier a = new P_Bezier(rightStartX, initY, 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
 			final P_Bezier b = new P_Bezier(switchX, switchY, 115, 202, 91, 228, cubeX, cubeY, 1.0);//get to new cube
 			final P_Bezier c = new P_Bezier(cubeX, cubeY, 30, 289, -94, 190, -scaleX, scaleY, 2.0);//get to hard scale
 
@@ -219,14 +219,14 @@ public class A_OneSwitchOneScale implements Autonomous{
 
 		}else if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
 			//{easy scale then hard switch}
-			final P_Bezier a = new P_Bezier(rightStartX, startY, 120, 215, 86, 242, scaleX, scaleY, 0.0);//get to easy scale
+			final P_Bezier a = new P_Bezier(rightStartX, initY, 120, 215, 86, 242, scaleX, scaleY, 0.0);//get to easy scale
 //			final P_Bezier b = new P_Bezier(scaleX, scaleY, 91, 193, -50, 277, -cubeX, cubeY, 1.0);//get to new cube/hard switch
 
 			final P_Bezier[] path = new P_Bezier[] {a/*, b*/};
 			leash = new V_Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			//{hard switch then hard scale}
-			final P_Bezier a = new P_Bezier(rightStartX, startY, 112, 140, 166, 268, -22, 255, 0.0);
+			final P_Bezier a = new P_Bezier(rightStartX, initY, 112, 140, 166, 268, -22, 255, 0.0);
 			final P_Bezier b = new P_Bezier(-22, 255, -41, 251, -55, 235, -cubeX, cubeY, 1.0);//get to new cube/hard switch
 			final P_Bezier c = new P_Bezier(-cubeX, cubeY, -82, 240, -73, 264, -scaleX, scaleY, 2.0);//get to hard scale
 

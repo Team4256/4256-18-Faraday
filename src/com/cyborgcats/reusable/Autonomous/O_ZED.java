@@ -27,11 +27,9 @@ public class O_ZED extends Odometer{
 	@Override
 	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
 	@Override
-//	public double getX(final boolean adjustForZED) {return adjustForZED ? x.get() - tareX - zedX() : x.get();}
-	public double getX() {return x.get() - tareX;}
+	public double getX(final boolean markAsRead) {return x.get(markAsRead) - tareX;}
 	@Override
-//	public double getY(final boolean adjustForZED) {return adjustForZED ? y.get() - tareY - zedY() : y.get();}
-	public double getY() {return y.get() - tareY;}
+	public double getY(final boolean markAsRead) {return y.get(markAsRead) - tareY;}
 	@Override
 	public boolean newX() {return x.isNew();}
 	@Override
@@ -41,6 +39,8 @@ public class O_ZED extends Odometer{
 	private void onUpdatedY(final double y) {this.y.set(y);}
 //	private double zedX() {return zedX*Math.cos(gyroAngle) + zedY*Math.sin(gyroAngle);}
 //	private double zedY() {return zedY*Math.cos(gyroAngle) + zedX*Math.sin(gyroAngle);}
+//	public double getX(final boolean adjustForRotation) {return adjustForZED ? x.get() - tareX - zedX() : x.get();}
+//	public double getY(final boolean adjustForRotation) {return adjustForZED ? y.get() - tareY - zedY() : y.get();}
 	
 	@Override
 	public void update() {/*gyroAngle = Math.toRadians(gyro.getCurrentAngle());*/}
