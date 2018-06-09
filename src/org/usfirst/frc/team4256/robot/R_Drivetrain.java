@@ -81,19 +81,21 @@ public class R_Drivetrain {
 			for (int i = 0; i < 4; i++) modules[i].set(speeds_final[i]);//control traction if good and there
 		}else stop();//otherwise, stop traction
 		
+		if (spin < 0.07) moduleD.checkTractionEncoder();
+		
 		//{UPDATE RECORDS}
 		previousSpin = spin;
 	}
 	
 	
-	public void holonomic_encoderIgnorant(final double direction, double speed, final double speedSpin) {
+	public void holonomic_encoderIgnorant(final double direction, double speed, final double spin) {
 		//{PREPARE VARIABLES}
 		speed = Math.abs(speed);
 		final double chassis_fieldAngle = gyro.getCurrentAngle();
 		final double forward = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
 					 strafe  = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
-		final double[] comps_desired = computeComponents(strafe, forward, speedSpin);
-		final boolean bad = speed == 0.0 && speedSpin == 0.0;
+		final double[] comps_desired = computeComponents(strafe, forward, spin);
+		final boolean bad = speed == 0.0 && spin == 0.0;
 		
 		//{CONTROL MOTORS, computing outputs as needed}
 		if (!bad) {
@@ -105,6 +107,8 @@ public class R_Drivetrain {
 			final double[] speeds_final = computeSpeeds(comps_desired);
 			for (int i = 0; i < 4; i++) modules[i].set(speeds_final[i]);//control traction if good and there
 		}else stop();//otherwise, stop traction
+		
+		if (spin < 0.07) moduleD.checkTractionEncoder();
 	}
 	
 	

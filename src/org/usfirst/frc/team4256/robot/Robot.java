@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.hal.PowerJNI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -97,8 +96,8 @@ public class Robot extends IterativeRobot {
 		setupLogging(ds);
 		
 		moduleA.setTareAngle(-78.0);moduleB.setTareAngle(-28.0);moduleC.setTareAngle(45.0);moduleD.setTareAngle(-77.0);
-
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
+		
 		elevatorOne.setZero(0.5);
 		elevatorTwo.setZero(1.0);
 		clamp.setZero();
@@ -178,8 +177,7 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Angle B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
-		
-		moduleD.checkTractionEncoder();
+
 		odometer.update();
 		faraday.getEntry("X").setNumber(odometer.getX(/*markAsRead*/false));
 		faraday.getEntry("Y").setNumber(odometer.getY(/*markAsRead*/false));
