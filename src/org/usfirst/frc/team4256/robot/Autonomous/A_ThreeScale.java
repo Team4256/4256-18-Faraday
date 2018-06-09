@@ -10,6 +10,8 @@ import com.cyborgcats.reusable.Autonomous.P_Bezier;
 import com.cyborgcats.reusable.Autonomous.V_Events;
 import com.cyborgcats.reusable.Autonomous.V_Leash;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.cyborgcats.reusable.Autonomous.Odometer;
 
 public class A_ThreeScale implements Autonomous{
@@ -49,6 +51,7 @@ public class A_ThreeScale implements Autonomous{
 	
 	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
 		events.check(leash.getIndependentVariable());
+		SmartDashboard.putNumber("indVar", leash.getIndependentVariable());
   		final double spin = events.execute(clamp, elevator, swerve.gyro);
 
 		//run path processing only if odometer values are new
@@ -148,7 +151,7 @@ public class A_ThreeScale implements Autonomous{
 			{1, Parameters.ElevatorPresets.SWITCH.height(), 0, 5}
 		};
 		
-		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 1.0});
+		events = new V_Events(V_Events.getFromArray(instructions), new double[] {0.1, 0.2, 0.92});
 		return events;
 	}
 	//------------------------------------------------------------------------------------------

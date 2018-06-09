@@ -16,7 +16,7 @@ public class R_SwerveModule {
 	private final R_Talon traction;
 	private final boolean hasTractionSensor;
 	private double decapitated = 1.0;
-	private double tractionDeltaPathLength = 0.0;
+	public double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
 	private DigitalInput magnet;
 	private boolean aligned = true;
@@ -41,7 +41,7 @@ public class R_SwerveModule {
 		rotation.init();
 		
 		rotation.setNeutralMode(R_Talon.coast);
-		rotation.config_kP(0, 15.0, R_Talon.kTimeoutMS);
+		rotation.config_kP(0, 12.0, R_Talon.kTimeoutMS);
 		rotation.config_kI(0, 0.0, R_Talon.kTimeoutMS);
 		rotation.config_kD(0, 2.0, R_Talon.kTimeoutMS);
 		
@@ -124,6 +124,13 @@ public class R_SwerveModule {
 			final double currentPathLength = tractionPathLength();
 			tractionDeltaPathLength = currentPathLength - tractionPreviousPathLength;
 			tractionPreviousPathLength = currentPathLength;
+		}
+	}
+	public void resetTractionEncoder() {
+		if (hasTractionSensor) {
+			tractionDeltaPathLength = 0.0;
+			tractionPreviousPathLength = 0.0;
+			traction.setSelectedSensorPosition(0, 0, 0);
 		}
 	}
 	/**

@@ -95,7 +95,7 @@ public class Robot extends IterativeRobot {
 
 		setupLogging(ds);
 		
-		moduleA.setTareAngle(-78.0);moduleB.setTareAngle(-28.0);moduleC.setTareAngle(45.0);moduleD.setTareAngle(-77.0);
+		moduleA.setTareAngle(-45.0);moduleB.setTareAngle(0.0);moduleC.setTareAngle(6.0);moduleD.setTareAngle(48.0);
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
 		
 		elevatorOne.setZero(0.5);
@@ -132,7 +132,9 @@ public class Robot extends IterativeRobot {
 		
 		//{Robot Input}
 		zed.getEntry("Enable Odometry").setBoolean(false);//TODO if we want to switch back to ZED make sure to remove this line
-		odometer.setOrigin(odometer.getX(false) - autonomous.initX()/12.0, odometer.getY(false) - Autonomous.initY/12.0);
+		moduleD.resetTractionEncoder();
+		odometer.update();
+		odometer.setCurrent(autonomous.initX()/12.0, Autonomous.initY/12.0);
 		
 		//{Robot Output}
 		swerve.autoMode(true);
@@ -277,6 +279,7 @@ public class Robot extends IterativeRobot {
 		pollGameData();
 		driver.setRumble(RumbleType.kLeftRumble, 0.0); driver.setRumble(RumbleType.kRightRumble, 0.0);
 		gunner.setRumble(RumbleType.kLeftRumble, 0.0); gunner.setRumble(RumbleType.kRightRumble, 0.0);
+		moduleD.tractionDeltaPathLength = 0.0;
 	}
 	
 

@@ -36,8 +36,8 @@ public class R_Drivetrain {
 	**/
 	public void init() {
 		moduleA.init(/*reversed traction*/true);
-		moduleB.init(/*reversed traction*/true);
-		moduleC.init(/*reversed traction*/false);
+		moduleB.init(/*reversed traction*/false);
+		moduleC.init(/*reversed traction*/true);
 		moduleD.init(/*reversed traction*/false);
 	}
 	
@@ -79,7 +79,10 @@ public class R_Drivetrain {
 		if (!bad && isThere(6.0)) {
 			final double[] speeds_final = computeSpeeds(comps_desired);
 			for (int i = 0; i < 4; i++) modules[i].set(speeds_final[i]);//control traction if good and there
-		}else stop();//otherwise, stop traction
+		}else {
+			stop();//otherwise, stop traction
+			moduleD.tractionDeltaPathLength = 0.0;
+		}
 		
 		if (spin < 0.07) moduleD.checkTractionEncoder();
 		
@@ -106,7 +109,10 @@ public class R_Drivetrain {
 		if (!bad && isThere(10.0)) {
 			final double[] speeds_final = computeSpeeds(comps_desired);
 			for (int i = 0; i < 4; i++) modules[i].set(speeds_final[i]);//control traction if good and there
-		}else stop();//otherwise, stop traction
+		}else {
+			stop();//otherwise, stop traction
+			moduleD.tractionDeltaPathLength = 0.0;
+		}
 		
 		if (spin < 0.07) moduleD.checkTractionEncoder();
 	}

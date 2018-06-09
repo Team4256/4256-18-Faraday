@@ -25,7 +25,7 @@ public class O_ZED extends Odometer{
 		position.addEntryListener("Y", (position, key, entry, value, flags) -> {this.onUpdatedY(value.getDouble());}, EntryListenerFlags.kUpdate);
 	}
 	@Override
-	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
+	public void setCurrent(final double x, final double y) {tareX = getX(false) - x;	tareY = getY(false) - y;}
 	@Override
 	public double getX(final boolean markAsRead) {return x.get(markAsRead) - tareX;}
 	@Override

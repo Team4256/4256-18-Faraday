@@ -5,6 +5,8 @@ import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
 
 import com.cyborgcats.reusable.R_Gyro;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class V_Events {
 	private final Command[] commands;//list of actions
 	private final double[] triggers;//list of values where independentVariable triggers an action
@@ -30,6 +32,7 @@ public class V_Events {
 			step++;
 			if (step + 2 > triggers.length) doneRunning = true;
 		}
+		SmartDashboard.putNumber("autoStep", step);
 	}
 	
 	public double execute(final R_Clamp clamp, final R_Combined elevator, final R_Gyro gyro) {

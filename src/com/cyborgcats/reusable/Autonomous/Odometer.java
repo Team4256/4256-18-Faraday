@@ -2,7 +2,7 @@ package com.cyborgcats.reusable.Autonomous;
 
 public abstract class Odometer {
 	public abstract void init();
-	public abstract void setOrigin(final double x, final double y);
+	public abstract void setCurrent(final double x, final double y);
 	
 	public abstract double getX(final boolean markAsRead);
 	public abstract double getY(final boolean markAsRead);

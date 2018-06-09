@@ -7,7 +7,7 @@ import com.cyborgcats.reusable.R_Gyro;
 public class O_Encoder extends Odometer {
 	private R_SwerveModule module;
 	private R_Gyro gyro;
-	private double tareX = 0.0, tareY = 0.0;
+//	private double tareX = 0.0, tareY = 0.0;
 	private ConsumableDouble x = new ConsumableDouble();
 	private ConsumableDouble y = new ConsumableDouble();
 	
@@ -24,13 +24,13 @@ public class O_Encoder extends Odometer {
 	public void init() {}//unused
 
 	@Override
-	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
+	public void setCurrent(final double x, final double y) {this.x.set(x);	this.y.set(y);;}
 
 	@Override
-	public double getX(final boolean markAsRead) {return x.get(markAsRead) - tareX;}
+	public double getX(final boolean markAsRead) {return x.get(markAsRead)/* - tareX*/;}
 
 	@Override
-	public double getY(final boolean markAsRead) {return y.get(markAsRead) - tareY;}
+	public double getY(final boolean markAsRead) {return y.get(markAsRead)/* - tareY*/;}
 
 	@Override
 	public boolean newX() {return x.isNew();}
