@@ -53,7 +53,7 @@ public class R_Talon extends TalonSRX {
 		this(deviceID, gearRatio, controlMode, encoder, flippedSensor, 0.0, 0.0);
 	}
 	//This constructor is intended for a motor without an encoder.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode) {
+	public R_Talon(final int deviceID, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
 		compass = new V_Compass(0.0, 0.0);
