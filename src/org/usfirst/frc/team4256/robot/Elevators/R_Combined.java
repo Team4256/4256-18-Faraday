@@ -1,8 +1,10 @@
 package org.usfirst.frc.team4256.robot.Elevators;
 
-import org.usfirst.frc.team4256.robot.R_Clamp;
+import org.usfirst.frc.team4256.robot.Clamp;
 
-public class R_Combined {
+import com.cyborgcats.reusable.Subsystem;
+
+public class R_Combined implements Subsystem {
 	private static final double initialClimbingHeight = 81.0;//inches
 	private E_One one;
 	private E_Two two;
@@ -95,7 +97,7 @@ public class R_Combined {
 	}
 	
 	
-	public void enableClimbMode(final R_Clamp clamp) {
+	public void enableClimbMode(final Clamp clamp) {
 		two.setInches(E_Two.climbingHeight);
 		clamp.close();
 		clamp.rotateTo(90.0);
@@ -114,4 +116,15 @@ public class R_Combined {
 		two.completeLoopUpdate();
 	}
 
+	@Override
+	public boolean perform(String action, double[] data) {
+		switch(Abilities.valueOf(action)) {
+		case SET: setInches(data[0]); break;
+		case INCREMENT: increment(data[0]); break;
+		default: throw new IllegalStateException("The elevator cannot " + action);
+		}
+		return (one.isThere(2.0) && two.isThere(2.0));
+	}
+
+	public static enum Abilities {SET, INCREMENT}
 }

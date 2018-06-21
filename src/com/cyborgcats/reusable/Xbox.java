@@ -2,7 +2,7 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 
 import edu.wpi.first.wpilibj.XboxController;
 
-public class R_Xbox extends XboxController {
+public class Xbox extends XboxController {
 	public static final int AXIS_LEFT_X = 0;
 	public static final int AXIS_LEFT_Y = 1;
 	public static final int AXIS_LT = 2;
@@ -33,7 +33,7 @@ public class R_Xbox extends XboxController {
 	public static final int POV_WEST = 270;
 	public static final int POV_NORTH_WEST = 315;
 	
-	public R_Xbox(final int port) {
+	public Xbox(final int port) {
 		super(port);
 	}
 	private double[] deadbands = new double[6];
@@ -163,11 +163,11 @@ public class R_Xbox extends XboxController {
 		final boolean badX = Math.abs(x) <= deadbands[stick[0]];
 		final boolean badY = Math.abs(y) <= deadbands[stick[1]];
 		if (deadbanded && badX && badY) {
-			return V_Compass.convertToAngle(previousAxisValues[stick[0]], previousAxisValues[stick[1]]);
+			return Compass.convertToAngle(previousAxisValues[stick[0]], previousAxisValues[stick[1]]);
 		}else {
 			previousAxisValues[stick[0]] = x;
 			previousAxisValues[stick[1]] = y;
-			return V_Compass.convertToAngle(x, y);
+			return Compass.convertToAngle(x, y);
 		}
 	}
 	

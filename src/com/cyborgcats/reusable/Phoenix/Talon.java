@@ -1,6 +1,6 @@
 package com.cyborgcats.reusable.Phoenix;
 
-import com.cyborgcats.reusable.V_Compass;
+import com.cyborgcats.reusable.Compass;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import java.util.logging.Level;
@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-public class R_Talon extends TalonSRX {
+public class Talon extends TalonSRX {
 	public static final ControlMode current = ControlMode.Current;
 	public static final ControlMode follower = ControlMode.Follower;
 	public static final ControlMode percent = ControlMode.PercentOutput;
@@ -24,12 +24,12 @@ public class R_Talon extends TalonSRX {
 	private boolean updated = false;
 	private Double lastSetpoint = 0.0;
 	private double lastLegalDirection = 1.0;
-	public V_Compass compass;
+	public Compass compass;
 	public Convert convert;
 	private Logger logger;
 	
 	//This constructor is intended for use with an encoder on a motor with limited rotary motion. To limit linear motion, use built-in Talon commands.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
+	public Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final Encoder encoder, final boolean flippedSensor, final double protectedZoneStart, final double protectedZoneSize) {
 		super(deviceID);
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
@@ -44,19 +44,19 @@ public class R_Talon extends TalonSRX {
 		}
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
-		compass = new V_Compass(protectedZoneStart, protectedZoneSize);
+		compass = new Compass(protectedZoneStart, protectedZoneSize);
 		convert = new Convert(encoder.countsPerRev(), gearRatio);
 		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	//This constructor is intended for use with an encoder on a motor which can spin freely.
-	public R_Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final R_Encoder encoder, final boolean flippedSensor) {
+	public Talon(final int deviceID, final double gearRatio, final ControlMode controlMode, final Encoder encoder, final boolean flippedSensor) {
 		this(deviceID, gearRatio, controlMode, encoder, flippedSensor, 0.0, 0.0);
 	}
 	//This constructor is intended for a motor without an encoder.
-	public R_Talon(final int deviceID, final ControlMode controlMode) {
+	public Talon(final int deviceID, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
-		compass = new V_Compass(0.0, 0.0);
+		compass = new Compass(0.0, 0.0);
 		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	
@@ -106,7 +106,7 @@ public class R_Talon extends TalonSRX {
 	**/
 	public double getCurrentAngle(final boolean wraparound) {//ANGLE
 		final double raw = convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
-		return wraparound ? V_Compass.validate(raw - compass.getTareAngle()) : raw - compass.getTareAngle();
+		return wraparound ? Compass.validate(raw - compass.getTareAngle()) : raw - compass.getTareAngle();
 	}
 	
 	

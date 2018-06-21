@@ -3,8 +3,8 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 import java.util.HashMap;
 import java.util.Map;
 
-public final class V_Fridge {//this class helps with boolean states
-	private V_Fridge() {}
+public final class Fridge {//this class helps with boolean states
+	private Fridge() {}
 	
 	private static final Map<String, Boolean> previousStates = new HashMap<String, Boolean>();
 	public static final Map<String, Boolean> toggleStates = new HashMap<String, Boolean>();

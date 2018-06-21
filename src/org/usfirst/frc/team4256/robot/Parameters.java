@@ -77,13 +77,10 @@ public final class Parameters {
 		
 		private final int height;
 		
-		ElevatorPresets(final int height) {
-			this.height = height;
-		}
+		ElevatorPresets(final int height) {this.height = height;}
 		
-		public int height() {
-			return height;
-		}
+		public int height() {return height;}
+		public String heightString() {return Double.toString(height);}
 	}
 	
 	public static final byte Gyrometer_updateHz = 50;

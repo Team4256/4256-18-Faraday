@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4256.robot.Elevators;
 
-import com.cyborgcats.reusable.Phoenix.R_Encoder;
-import com.cyborgcats.reusable.Phoenix.R_Talon;
-import com.cyborgcats.reusable.Phoenix.R_Victor;
+import com.cyborgcats.reusable.Phoenix.Encoder;
+import com.cyborgcats.reusable.Phoenix.Talon;
+import com.cyborgcats.reusable.Phoenix.Victor;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
@@ -13,15 +13,15 @@ public class E_One extends Elevator {
 	private static final double sprocketCircumference = 2.873*Math.PI;//inches
 	protected static final double maximumHeight = 42.5;//inches
 	protected static final double hookBaseline = 44.0;//inches
-	private R_Talon master;
-	private R_Victor followerA;
+	private Talon master;
+	private Victor followerA;
 	private DoubleSolenoid shifter;
 	private int maximumEncoderValue;
 	public boolean knowsZero = false;
 
 	public E_One(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter) {
-		master = new R_Talon(masterID, gearRatio, R_Talon.position, R_Encoder.OEM_QUAD, true);//practice: true, comp: true
-		followerA = new R_Victor(followerAID, R_Victor.follower);
+		master = new Talon(masterID, gearRatio, Talon.position, Encoder.OEM_QUAD, true);//practice: true, comp: true
+		followerA = new Victor(followerAID, Victor.follower);
 		this.shifter = shifter;	
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
@@ -57,25 +57,25 @@ public class E_One extends Elevator {
 	public void init() {
 		master.init();
 		
-		master.setNeutralMode(R_Talon.brake);
+		master.setNeutralMode(Talon.brake);
 		enableSoftLimits();
 		
-		master.config_kP(0, 0.7, R_Talon.kTimeoutMS);
-		master.config_kI(0, 0.0, R_Talon.kTimeoutMS);
-		master.config_kD(0, 0.0, R_Talon.kTimeoutMS);
-		master.config_kP(1, .45, R_Talon.kTimeoutMS);
-		master.config_kI(1, 0.0, R_Talon.kTimeoutMS);
-		master.config_kD(1, 10.0, R_Talon.kTimeoutMS);
+		master.config_kP(0, 0.7, Talon.kTimeoutMS);
+		master.config_kI(0, 0.0, Talon.kTimeoutMS);
+		master.config_kD(0, 0.0, Talon.kTimeoutMS);
+		master.config_kP(1, .45, Talon.kTimeoutMS);
+		master.config_kI(1, 0.0, Talon.kTimeoutMS);
+		master.config_kD(1, 10.0, Talon.kTimeoutMS);
 
 		followerA.init(master);
 	}
 	
 	
 	private void enableSoftLimits() {
-		master.configForwardSoftLimitEnable(true, R_Talon.kTimeoutMS);
-		master.configReverseSoftLimitEnable(true, R_Talon.kTimeoutMS);
-		master.configReverseSoftLimitThreshold(0, R_Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
-		master.configForwardSoftLimitThreshold(maximumEncoderValue, R_Talon.kTimeoutMS);
+		master.configForwardSoftLimitEnable(true, Talon.kTimeoutMS);
+		master.configReverseSoftLimitEnable(true, Talon.kTimeoutMS);
+		master.configReverseSoftLimitThreshold(0, Talon.kTimeoutMS);//assuming negative motor voltage results in downward motion
+		master.configForwardSoftLimitThreshold(maximumEncoderValue, Talon.kTimeoutMS);
 	}
 	
 	
@@ -153,7 +153,7 @@ public class E_One extends Elevator {
 	
 	@Override
 	public void setZero(final double offsetInchesFromCurrent) {
-		master.setSelectedSensorPosition(-(int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, R_Talon.kTimeoutMS);
+		master.setSelectedSensorPosition(-(int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, Talon.kTimeoutMS);
 		enableSoftLimits();
 		knowsZero = true;
 	}

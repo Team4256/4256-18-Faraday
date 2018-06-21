@@ -1,18 +1,18 @@
 package org.usfirst.frc.team4256.robot.Autonomous;//COMPLETE MARCH
 
 import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
-import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
-import org.usfirst.frc.team4256.robot.R_Clamp;
-import org.usfirst.frc.team4256.robot.R_Drivetrain;
 
-public class A_ForwardOpenLoop implements Autonomous {
-	public final FieldPieceConfig switchTarget, scaleTarget;
-	public final StartingPosition startingPosition;
-	
+import com.cyborgcats.reusable.Drivetrain;
+import com.cyborgcats.reusable.Subsystem;
+
+import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
+import org.usfirst.frc.team4256.robot.Clamp;
+import org.usfirst.frc.team4256.robot.D_Swerve;
+
+public class S_DriveForward extends Strategy2018 {
 	private Long start = null;
-	public double initOdometerPosX = 0.0;
 	
-	public A_ForwardOpenLoop(final int startingPosition, final String gameData) {
+	public S_DriveForward(final int startingPosition, final String gameData) {
 		//{organize initialization data}
 		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
 		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
@@ -24,7 +24,8 @@ public class A_ForwardOpenLoop implements Autonomous {
 		}
 	}
 	
-	public void run(final R_Drivetrain swerve, final R_Clamp clamp, final R_Combined elevator) {
+	@Override
+	public void use(final Drivetrain drivetrain, final Subsystem[] subsystems) {
 		ensureTimerHasStarted();
 		if (System.currentTimeMillis() - start < 2000) {
 			swerve.holonomic_encoderIgnorant(0.0, 0.0, 0.0);
@@ -41,8 +42,6 @@ public class A_ForwardOpenLoop implements Autonomous {
 			}
 		}
 	}
-	
-	public double initX() {return initOdometerPosX;}
 	
 	private void ensureTimerHasStarted() {if (start == null) start = System.currentTimeMillis();}
 }

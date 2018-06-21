@@ -3,8 +3,8 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 import java.util.HashMap;
 import java.util.Map;
 
-public final class V_PID {
-	private V_PID() {}
+public final class PID {
+	private PID() {}
 	
 	private static final Map<String, double[]> PIDSystems = new HashMap<String, double[]>();
 	

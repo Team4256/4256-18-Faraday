@@ -1,23 +1,24 @@
 package org.usfirst.frc.team4256.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.cyborgcats.reusable.Phoenix.R_Encoder;
-import com.cyborgcats.reusable.Phoenix.R_Talon;
-import com.cyborgcats.reusable.Phoenix.R_Victor;
+import com.cyborgcats.reusable.Subsystem;
+import com.cyborgcats.reusable.Phoenix.Encoder;
+import com.cyborgcats.reusable.Phoenix.Talon;
+import com.cyborgcats.reusable.Phoenix.Victor;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class R_Clamp {//TODO make a private subclass for the rotator and a private subclass for intaking and combine them; then double check auto-slurp
+public class Clamp implements Subsystem {//TODO make a private subclass for the rotator and a private subclass for intaking and combine them; then double check auto-slurp
 	private enum CubePosition {Absent, WithinReach, Present;}
 	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;
 	private CubePosition cubePosition = CubePosition.Absent;
-	private R_Victor intakeLeft;
-	private R_Victor intakeRight;
+	private Victor intakeLeft;
+	private Victor intakeRight;
 	private DoubleSolenoid clamp;
-	private R_Talon rotator;
+	private Talon rotator;
 	private AnalogInput ultrasonic;
 	private int counter_hasCube = 0;
 	private static double currentSetpoint = 0.0;
@@ -25,11 +26,11 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	
 	public static final double intakeConstant = 0.85;
 	
-	public R_Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int rotatorID, final int ultrasonicPort) {
-		intakeLeft = new R_Victor(intakeLeftID, R_Victor.percent);
-		intakeRight = new R_Victor(intakeRightID, R_Victor.percent);
+	public Clamp(final int intakeLeftID, final int intakeRightID, final DoubleSolenoid clamp, final int rotatorID, final int ultrasonicPort) {
+		intakeLeft = new Victor(intakeLeftID, Victor.percent);
+		intakeRight = new Victor(intakeRightID, Victor.percent);
 		this.clamp = clamp;
-		rotator = new R_Talon(rotatorID, 1.0, ControlMode.Position, R_Encoder.CTRE_MAG_ABSOLUTE, true, 110.0, 230.0);
+		rotator = new Talon(rotatorID, 1.0, ControlMode.Position, Encoder.CTRE_MAG_ABSOLUTE, true, 110.0, 230.0);
 		ultrasonic = new AnalogInput(ultrasonicPort);
 	}
 	
@@ -37,14 +38,14 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		intakeLeft.init();
 		intakeRight.init();
 		rotator.setInverted(false);
-		rotator.setNeutralMode(R_Talon.brake);
+		rotator.setNeutralMode(Talon.brake);
 		
-		rotator.config_kP(0, 0.2, R_Talon.kTimeoutMS);
-		rotator.config_kI(0, 0.0, R_Talon.kTimeoutMS);
-		rotator.config_kD(0, 0.0, R_Talon.kTimeoutMS);
-		rotator.config_kP(1, 2.5, R_Talon.kTimeoutMS);
-		rotator.config_kI(1, 0.0, R_Talon.kTimeoutMS);
-		rotator.config_kD(1, 80.0, R_Talon.kTimeoutMS);
+		rotator.config_kP(0, 0.2, Talon.kTimeoutMS);
+		rotator.config_kI(0, 0.0, Talon.kTimeoutMS);
+		rotator.config_kD(0, 0.0, Talon.kTimeoutMS);
+		rotator.config_kP(1, 2.5, Talon.kTimeoutMS);
+		rotator.config_kI(1, 0.0, Talon.kTimeoutMS);
+		rotator.config_kD(1, 80.0, Talon.kTimeoutMS);
 	}
 	
 	
@@ -139,7 +140,7 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 	 * This function defines zero for the rotator.
 	**/
 	public void setZero() {
-		rotator.setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, R_Talon.kTimeoutMS);
+		rotator.setSelectedSensorPosition((int)rotator.convert.from.DEGREES.afterGears(90.0), 0, Talon.kTimeoutMS);
 		knowsZero = true;
 	}
 	
@@ -168,6 +169,19 @@ public class R_Clamp {//TODO make a private subclass for the rotator and a priva
 		//if the ultrasonic sensor says the cube is in reach at least once, update the enum
 		else if (cubeInReach()) cubePosition = CubePosition.WithinReach;
 		else cubePosition = CubePosition.Absent;
-		SmartDashboard.putNumber("ultrasonic", ultrasonic.getAverageValue());
 	}
+
+	@Override
+	public boolean perform(final String action, final double[] data) {
+		switch(Abilities.valueOf(action)) {
+		case OPEN: open(); return isOpen();
+		case CLOSE: close(); return !isOpen();
+		case SLURP: slurp(); return hasCube();
+		case SPIT: spit(0.5); return true;
+		case EXTEND: rotateTo(0.0); return true;
+		default: throw new IllegalStateException("The clamp cannot " + action);
+		}
+	}
+	
+	public static enum Abilities {OPEN, CLOSE, SLURP, SPIT, EXTEND}
 }
