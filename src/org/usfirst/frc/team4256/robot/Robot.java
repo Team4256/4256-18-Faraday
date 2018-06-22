@@ -18,12 +18,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.usfirst.frc.team4256.robot.Clamp;
+import org.usfirst.frc.team4256.robot.Autonomous.O_Encoder;
+import org.usfirst.frc.team4256.robot.Autonomous.O_ZED;
 import org.usfirst.frc.team4256.robot.Autonomous.S_DriveForward;
 import org.usfirst.frc.team4256.robot.Autonomous.S_PassLine;
 import org.usfirst.frc.team4256.robot.Autonomous.S_DropInNearest;
 import org.usfirst.frc.team4256.robot.Autonomous.Strategy2018;
-import org.usfirst.frc.team4256.robot.Autonomous.O_Encoder;
-import org.usfirst.frc.team4256.robot.Autonomous.O_ZED;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -42,7 +42,7 @@ public class Robot extends IterativeRobot {
 	private static final Xbox driver = new Xbox(0), gunner = new Xbox(1);
 	//{Robot Input}
 	private static final Gyro gyro = new Gyro(Parameters.Gyrometer_updateHz);
-	public static double robotHeading = 0.0;
+	public static double gyroHeading = 0.0;
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.PRESSURE_GAUGE);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.TX2_POWER_SENSOR);
 	
@@ -64,9 +64,9 @@ public class Robot extends IterativeRobot {
 	private static final D_Swerve swerve = new D_Swerve(moduleA, moduleB, moduleC, moduleD);
 	
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ELEVATOR_ONE_SHIFTER_MODULE, Parameters.ELEVATOR_ONE_SHIFTER_FORWARD, Parameters.ELEVATOR_ONE_SHIFTER_REVERSE);
-	private static final E_One elevatorOne = new E_One(Parameters.ELEVATOR_ONE_MASTER, Parameters.ELEVATOR_ONE_FOLLOWER_A, Parameters.ELEVATOR_ONE_FOLLOWER_B, elevatorOneShifter);
-	private static final E_Two elevatorTwo = new E_Two(Parameters.ELEVATOR_TWO_MASTER);
-	private static final R_Combined elevator = new R_Combined(elevatorOne, elevatorTwo);
+	private static final L_One elevatorOne = new L_One(Parameters.ELEVATOR_ONE_MASTER, Parameters.ELEVATOR_ONE_FOLLOWER_A, Parameters.ELEVATOR_ONE_FOLLOWER_B, elevatorOneShifter);
+	private static final L_Two elevatorTwo = new L_Two(Parameters.ELEVATOR_TWO_MASTER);
+	private static final Elevator elevator = new Elevator(elevatorOne, elevatorTwo);
 	
 	private static final DoubleSolenoid clampShifter = new DoubleSolenoid(Parameters.CLAMP_MODUlE, Parameters.CLAMP_FORWARD, Parameters.CLAMP_REVERSE);
 	private static final Clamp clamp = new Clamp(Parameters.INTAKE_LEFT, Parameters.INTAKE_RIGHT, clampShifter, Parameters.CLAMPY_ROTATOR, Parameters.ULTRASONIC);
@@ -170,8 +170,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotPeriodic() {
-		robotHeading = gyro.getCurrentAngle();
-		faraday.getEntry("Gyro").setNumber(robotHeading);
+		gyroHeading = gyro.getCurrentAngle();
+		faraday.getEntry("Gyro").setNumber(gyroHeading);
 		faraday.getEntry("Pressure").setNumber(pressureGauge.getAverageVoltage()*39.875);
 		faraday.getEntry("Clamp Open").setBoolean(clamp.isOpen());
 		faraday.getEntry("Climbing Mode").setBoolean(elevator.inClimbingMode());
@@ -260,7 +260,7 @@ public class Robot extends IterativeRobot {
 		if (gunner.getRawButton(Xbox.BUTTON_START)) swerve.align();//SWERVE ALIGNMENT
 
 		if (Fridge.becomesTrue("gyro reset", driver.getRawButton(Xbox.BUTTON_BACK))) {//GYRO RESET
-			gyro.setTareAngle(robotHeading, true);
+			gyro.setTareAngle(gyroHeading, true);
 			PID.clear("spin");
 		}
 		

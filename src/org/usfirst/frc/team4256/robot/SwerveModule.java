@@ -14,23 +14,24 @@ public class SwerveModule {
 	public static final double tractionWheelCircumference = 2.625*Math.PI;//inches
 	private final Talon rotation;
 	private final Talon traction;
-	private final boolean hasTractionSensor;
+	private final DigitalInput magnet;
+	
 	private double decapitated = 1.0;
 	private double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
-	private DigitalInput magnet;
 	private boolean aligned = true;
 	
 	//This constructor is intended for use with the module which has an encoder on the traction motor.
 	public SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction, final int magnetID) {
-		this.rotation = new Talon(rotatorID, rotatorGearRatio, Talon.position, Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
-		this.traction = new Talon(tractionID, tractionGearRatio, Talon.percent, Encoder.RS7_QUAD, flippedSensorTraction);
-		hasTractionSensor = true;
+		rotation = new Talon(rotatorID, rotatorGearRatio, Talon.position, Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
+		traction = new Talon(tractionID, tractionGearRatio, Talon.percent, Encoder.RS7_QUAD, flippedSensorTraction);
 		magnet = new DigitalInput(magnetID);
 	}
 	//This constructor is intended for all other modules.
 	public SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final int magnetID) {
-		this(rotatorID, flippedSensor, tractionID, false, magnetID);
+		rotation = new Talon(rotatorID, rotatorGearRatio, Talon.position, Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
+		traction = new Talon(tractionID, tractionGearRatio, Talon.percent);
+		magnet = new DigitalInput(magnetID);
 	}
 	
 	
@@ -65,9 +66,7 @@ public class SwerveModule {
 	/**
 	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.
 	**/
-	public void setTareAngle(final double tareAngle) {
-		setTareAngle(tareAngle, false);
-	}
+	public void setTareAngle(final double tareAngle) {setTareAngle(tareAngle, false);}
 	
 	
 	/**
@@ -75,7 +74,7 @@ public class SwerveModule {
 	 * If relativeReference is true, tareAngle will be incremented rather than set.
 	**/
 	public void setTareAngle(double tareAngle, final boolean relativeReference) {
-		if (relativeReference) {tareAngle += rotation.compass.getTareAngle();}
+		if (relativeReference) tareAngle += rotation.compass.getTareAngle();
 		rotation.compass.setTareAngle(tareAngle);
 	}
 	
@@ -100,9 +99,7 @@ public class SwerveModule {
 	 * This function sets the master and slave traction motors to the specified speed, from -1 to 1.
 	 * It also makes sure that they turn in the correct direction, regardless of decapitated state.
 	**/
-	public void set(final double speed) {
-		traction.quickSet(speed*decapitated, false);
-	}
+	public void set(final double speed) {traction.quickSet(speed*decapitated, false);}
 	
 	public boolean magneticAlignment(final double offset) {
 		if (magnet.get()) {
@@ -120,7 +117,7 @@ public class SwerveModule {
 	
 	
 	public void checkTractionEncoder() {
-		if (hasTractionSensor) {
+		if (traction.hasEncoder) {
 			final double currentPathLength = tractionPathLength();
 			tractionDeltaPathLength = currentPathLength - tractionPreviousPathLength;
 			tractionPreviousPathLength = currentPathLength;
@@ -138,11 +135,7 @@ public class SwerveModule {
 	/**
 	 * Threshold should be specified in degrees. If the rotator is within that many degrees of its target, this function returns true.
 	**/
-	public boolean isThere(final double threshold) {
-		return Math.abs(rotation.getCurrentError(true)) <= threshold;
-	}
-	
-	public double decapitated() {return decapitated;}
+	public boolean isThere(final double threshold) {return Math.abs(rotation.getCurrentError(true)) <= threshold;}
 	
 	
 	/**
@@ -156,23 +149,24 @@ public class SwerveModule {
 
 	
 	public double tractionSpeed() {
-		if (hasTractionSensor) return tractionWheelCircumference*traction.getCurrentRPS();
+		if (traction.hasEncoder) return tractionWheelCircumference*traction.getCurrentRPS();
 		else throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 	}
 	
 	
 	public double tractionPathLength() {
-		if (hasTractionSensor) return traction.getCurrentRevs()*tractionWheelCircumference/12.0;
-		else return 0.0;
+		if (traction.hasEncoder) return traction.getCurrentRevs()*tractionWheelCircumference/12.0;
+		else throw new IllegalStateException("Cannot get path length without an encoder!");
 	}
 	
 	
 	public double deltaDistance() {return tractionDeltaPathLength;}
-	public double deltaXDistance() {return tractionDeltaPathLength*Math.sin(convertToField(rotation.getCurrentAngle(true), Robot.robotHeading)*Math.PI/180.0);}
-	public double deltaYDistance() {return tractionDeltaPathLength*Math.cos(convertToField(rotation.getCurrentAngle(true), Robot.robotHeading)*Math.PI/180.0);}
+	public double deltaXDistance() {return tractionDeltaPathLength*Math.sin(convertToField(rotation.getCurrentAngle(true), Robot.gyroHeading)*Math.PI/180.0);}
+	public double deltaYDistance() {return tractionDeltaPathLength*Math.cos(convertToField(rotation.getCurrentAngle(true), Robot.gyroHeading)*Math.PI/180.0);}
 	
 	public Talon rotationMotor() {return rotation;}
 	public Talon tractionMotor() {return traction;}
+	public double decapitated() {return decapitated;}
 	
 
 	public void setParentLogger(final Logger logger) {

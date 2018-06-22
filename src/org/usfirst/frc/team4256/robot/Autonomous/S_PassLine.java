@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4256.robot.Autonomous;//COMPLETE MARCH, untested
+package org.usfirst.frc.team4256.robot.Autonomous;
 
 import com.cyborgcats.reusable.Autonomous.P_Bezier;
 import com.cyborgcats.reusable.Autonomous.Leash;
@@ -26,19 +26,19 @@ public class S_PassLine extends Strategy2018 {
 	}
 	
 	private void useLeash_left() {
-		final P_Bezier a = new P_Bezier(initialX(), initialY(), -110, 93, -93, 93, -switchX, switchY, 0.0);//get to nearest switch
+		final P_Bezier a = new P_Bezier(initialX(), initialY(), -9.17, 7.75, -7.75, 7.75, -switchX, switchY, 0.0);//get to nearest switch
 		P_Bezier[] path = new P_Bezier[] {a};
 		leash = new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 	}
 	
 	private void useLeash_center() {
-		final P_Bezier a = new P_Bezier(initialX(), initialY(), 84, 132, 103, 85, switchX, switchY, 0.0);//get to right switch
+		final P_Bezier a = new P_Bezier(initialX(), initialY(), 7, 11, 8.58, 7.08, switchX, switchY, 0.0);//get to right switch
 		P_Bezier[] path = new P_Bezier[] {a};
 		leash = new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 	}
 	
 	private void useLeash_right() {
-		final P_Bezier a = new P_Bezier(initialX(), initialY(), 116, 89, 99, 89, switchX, switchY, 0.0);//get to nearest switch
+		final P_Bezier a = new P_Bezier(initialX(), initialY(), 9.67, 7.42, 8.25, 7.42, switchX, switchY, 0.0);//get to nearest switch
 		P_Bezier[] path = new P_Bezier[] {a};
 		leash = new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 	}

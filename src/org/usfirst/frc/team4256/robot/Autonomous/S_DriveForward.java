@@ -1,13 +1,15 @@
 package org.usfirst.frc.team4256.robot.Autonomous;//COMPLETE MARCH
 
-import org.usfirst.frc.team4256.robot.Elevators.R_Combined;
+import org.usfirst.frc.team4256.robot.Elevators.Elevator;
 
 import com.cyborgcats.reusable.Drivetrain;
 import com.cyborgcats.reusable.Subsystem;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
+
+import java.util.Map;
+
 import org.usfirst.frc.team4256.robot.Clamp;
-import org.usfirst.frc.team4256.robot.D_Swerve;
 
 public class S_DriveForward extends Strategy2018 {
 	private Long start = null;
@@ -25,20 +27,22 @@ public class S_DriveForward extends Strategy2018 {
 	}
 	
 	@Override
-	public void use(final Drivetrain drivetrain, final Subsystem[] subsystems) {
+	public void use(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems) {
 		ensureTimerHasStarted();
 		if (System.currentTimeMillis() - start < 2000) {
-			swerve.holonomic_encoderIgnorant(0.0, 0.0, 0.0);
-			clamp.close();
-			elevator.setInches(3.0);
+			drivetrain.travelTowards(0.0);
+			drivetrain.setSpeed(0.0);
+			drivetrain.setSpeed(0.0);
+			subsystems.get("Clamp").perform(Clamp.Abilities.CLOSE.name(), null);
+			subsystems.get("Elevator").perform(Elevator.Abilities.SET.name(), new double[] {3.0});
 		}else if (System.currentTimeMillis() - start < 5000) {
-			swerve.holonomic_encoderIgnorant(0.0, 0.5, 0.0);
-			elevator.setInches(ElevatorPresets.SWITCH.height());
+			drivetrain.setSpeed(0.5);
+			subsystems.get("Elevator").perform(Elevator.Abilities.SET.name(), new double [] {ElevatorPresets.SWITCH.height()});
 		}else {
-			swerve.holonomic_encoderIgnorant(0.0, 0.0, 0.0);
+			drivetrain.setSpeed(0.0);
 			if ((startingPosition.equals(StartingPosition.LEFT) && switchTarget.equals(FieldPieceConfig.LEFT)) ||
 				(startingPosition.equals(StartingPosition.RIGHT) && switchTarget.equals(FieldPieceConfig.RIGHT))) {
-				clamp.spit(0.5);
+				subsystems.get("Clamp").perform(Clamp.Abilities.SPIT.name(), null);
 			}
 		}
 	}

@@ -12,21 +12,18 @@ public class D_Swerve implements Drivetrain {
 	private static final double pivotToFront = Math.hypot(pivotToFrontX, pivotToFrontY),
 								pivotToAft = Math.hypot(pivotToAftX, pivotToAftY);
 	
+	private final SwerveModule moduleA, moduleB, moduleC, moduleD;
+	private final SwerveModule[] modules;
+	
 	private double moduleD_maxSpeed = 70.0;//always put max slightly higher than max observed
 	private double moduleD_previousAngle = 0.0;
 	private double previousSpin = 0.0;
-
-	private final SwerveModule moduleA, moduleB, moduleC, moduleD;
-	private final SwerveModule[] modules;
 	
 	private double direction = 0.0, speed = 0.0, spin = 0.0;
 	
 	
 	public D_Swerve(final SwerveModule moduleA, final SwerveModule moduleB, final SwerveModule moduleC, final SwerveModule moduleD) {
-		this.moduleA = moduleA;
-		this.moduleB = moduleB;
-		this.moduleC = moduleC;
-		this.moduleD = moduleD;
+		this.moduleA = moduleA;	this.moduleB = moduleB;	this.moduleC = moduleC;	this.moduleD = moduleD;
 		this.modules = new SwerveModule[] {moduleA, moduleB, moduleC, moduleD};
 	}
 	
@@ -35,17 +32,15 @@ public class D_Swerve implements Drivetrain {
 	**/
 	@Override
 	public void init() {
-		moduleA.init(/*reversed traction*/true);
-		moduleB.init(/*reversed traction*/true);
-		moduleC.init(/*reversed traction*/false);
-		moduleD.init(/*reversed traction*/false);
+		moduleA.init(/*reversed traction*/true);	moduleB.init(/*reversed traction*/true);
+		moduleC.init(/*reversed traction*/false);	moduleD.init(/*reversed traction*/false);
 	}
 	
 	
-	public void holonomic(final double direction, double speed, final double spin) {
+	private void holonomic(final double direction, double speed, final double spin) {
 		//{PREPARE VARIABLES}
 		speed = Math.abs(speed);
-		final double chassis_fieldAngle = Robot.robotHeading;
+		final double chassis_fieldAngle = Robot.gyroHeading;
 		final double forward = speed*Math.cos(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
 					 strafe  = speed*Math.sin(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
 		final double[] comps_desired = computeComponents(strafe, forward, spin);
@@ -91,7 +86,7 @@ public class D_Swerve implements Drivetrain {
 	private void holonomic_encoderIgnorant(final double direction, double speed, final double spin) {
 		//{PREPARE VARIABLES}
 		speed = Math.abs(speed);
-		final double chassis_fieldAngle = Robot.robotHeading;
+		final double chassis_fieldAngle = Robot.gyroHeading;
 		final double forward = speed*Math.cos(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
 					 strafe  = speed*Math.sin(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
 		final double[] comps_desired = computeComponents(strafe, forward, spin);
@@ -138,7 +133,7 @@ public class D_Swerve implements Drivetrain {
 		return moduleA.isThere(threshold) && moduleB.isThere(threshold) && moduleC.isThere(threshold) && moduleD.isThere(threshold);
 	}
 	public void autoMode(final boolean enable) {for (SwerveModule module : modules) module.autoMode(enable);}
-	public void stop() {for (SwerveModule module : modules) module.set(0.0);}
+	private void stop() {for (SwerveModule module : modules) module.set(0.0);}
 	@Override
 	public void completeLoopUpdate() {
 		holonomic_encoderIgnorant(direction, speed, spin);
@@ -181,7 +176,7 @@ public class D_Swerve implements Drivetrain {
 	}
 
 	
-
+	//------------------------------------------------CONFORMING CODE----------------------------------------
 	@Override
 	public void setSpeed(final double speed) {this.speed = speed <= 1.0 ? speed : 1.0;}
 	@Override
@@ -201,7 +196,7 @@ public class D_Swerve implements Drivetrain {
 	
 	@Override
 	public double face(final double heading, double maximumOutput) {
-		final double error = Compass.path(Robot.robotHeading, heading);
+		final double error = Compass.path(Robot.gyroHeading, heading);
 		final double spin = PID.get("spin", error);
 		setSpin(Math.max(-maximumOutput, Math.min(spin, maximumOutput)));
 		return error;

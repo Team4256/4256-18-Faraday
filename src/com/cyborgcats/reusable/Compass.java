@@ -14,17 +14,13 @@ public class Compass {
 	/**
 	 * This function tares the compass at the specified angle, relative to the current 0. It accepts both -'s and +'s.
 	**/
-	public void setTareAngle(final double tareAngle) {
-		this.tareAngle = tareAngle;
-	}
+	public void setTareAngle(final double tareAngle) {this.tareAngle = tareAngle;}
 	
 	
 	/**
 	 * This function returns the current tare angle, relative to the initialized 0.
 	**/
-	public double getTareAngle() {
-		return tareAngle;
-	}
+	public double getTareAngle() {return tareAngle;}
 	
 	
 	/**
@@ -41,17 +37,7 @@ public class Compass {
 	 * This function finds the shortest path from the start angle to the end angle and returns the size of that path in degrees.
 	 * Positive means clockwise and negative means counter-clockwise.
 	**/
-	public static double path(final double start, final double end) {
-//		startAngle = validateAngle(startAngle);
-//		endAngle = validateAngle(endAngle);
-//		double pathVector = endAngle - startAngle;
-//		if (Math.abs(pathVector) > 180) {
-//			pathVector = Math.abs(pathVector) - 360;
-//		}if (endAngle - startAngle < -180) {
-//			pathVector = -pathVector;
-//		}return pathVector;
-		return Math.IEEEremainder(end - start, 360.0);
-	}
+	public static double path(final double start, final double end) {return Math.IEEEremainder(end - start, 360.0);}
 	
 	
 	/**

@@ -20,11 +20,13 @@ public class Talon extends TalonSRX {
 	public static final NeutralMode coast = NeutralMode.Coast;
 	
 	public static final int kTimeoutMS = 10;
+	public final Compass compass;
+	public final boolean hasEncoder;
+	
 	private ControlMode controlMode;
 	private boolean updated = false;
 	private Double lastSetpoint = 0.0;
 	private double lastLegalDirection = 1.0;
-	public Compass compass;
 	public Convert convert;
 	private Logger logger;
 	
@@ -33,14 +35,21 @@ public class Talon extends TalonSRX {
 		super(deviceID);
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
-			case CTRE_MAG_ABSOLUTE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
-			case CTRE_MAG_RELATIVE: throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			case CTRE_MAG_ABSOLUTE:
+				throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+				hasEncoder = false;
+				break;
+			case CTRE_MAG_RELATIVE:
+				throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+				hasEncoder = false;
+				break;
 			default: break;
 			}
 		}else {
 			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 			configSelectedFeedbackSensor(encoder.type(), 1, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
 			configSelectedFeedbackSensor(encoder.type(), 2, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
+			hasEncoder = true;
 		}
 		setSensorPhase(flippedSensor);
 		this.controlMode = controlMode;
@@ -56,6 +65,7 @@ public class Talon extends TalonSRX {
 	public Talon(final int deviceID, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
+		hasEncoder = false;
 		compass = new Compass(0.0, 0.0);
 		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
@@ -75,20 +85,15 @@ public class Talon extends TalonSRX {
 		configPeakOutputForward(Math.abs(maxPercent), kTimeoutMS);
 		configPeakOutputReverse(-Math.abs(maxPercent), kTimeoutMS);
 		
-		if (getControlMode() == follower) {
-			quickSet(masterID, false);
-		}else {
-			quickSet(0.0, false);
-		}
+		if (getControlMode() == follower) quickSet(masterID, false);
+		else quickSet(0.0, false);
 	}
 	
 	
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
 	**/
-	public void init() {
-		init(0, 1.0);
-	}
+	public void init() {init(0, 1.0);}
 	
 	
 	/**
@@ -172,20 +177,16 @@ public class Talon extends TalonSRX {
 
 	
 	private double setMilliAmps(final double milliAmps) throws IllegalAccessException {
-		if (controlMode == current) {
-			super.set(controlMode, milliAmps);
-		}else {
-			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given amps in " + controlMode.name() + " mode.");
-		}return milliAmps;
+		if (controlMode == current) super.set(controlMode, milliAmps);
+		else throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given amps in " + controlMode.name() + " mode.");
+		return milliAmps;
 	}
 	
 	
 	private int setFollower(final int masterID) throws IllegalAccessException {//Only works with other Talons. To follow Victors, use .follow() command.
-		if (controlMode == follower) {
-			super.set(controlMode, masterID);
-		}else {
-			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given master ID in " + controlMode.name() + " mode.");
-		}return masterID;
+		if (controlMode == follower) super.set(controlMode, masterID);
+		else throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given master ID in " + controlMode.name() + " mode.");
+		return masterID;
 	}
 	
 	
@@ -193,21 +194,22 @@ public class Talon extends TalonSRX {
 		if (controlMode == percent) {
 			super.set(controlMode, percentage);
 			logger.log(Level.FINE, Double.toString(percentage));
-		}else {
-			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given percentage in " + controlMode.name() + " mode.");
-		}return percentage;
+		}else throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given percentage in " + controlMode.name() + " mode.");
+		return percentage;
 	}
 	
-	
+	/*
+	 * setDegrees differs from setRevs in more than just units: it wraps values around the motor's axis and finds the shortest path to its target.
+	 * For example, if we set to 0, then 120, 240, 360, and back to 120, the motor will have spun CW 1.333 revs and CCW 0 revs.
+	 * If this were done with setRevs (0 -> .333 -> .666 -> .999 -> .333), the motor will have spun CW 1 rev and CCW .666 revs.
+	 */
 	private double setDegrees(final double degrees) throws IllegalAccessException {
 		if (controlMode == position) {
 			final double encoderCounts = getSelectedSensorPosition(0) + convert.from.DEGREES.afterGears(wornPath(degrees));
 			super.set(controlMode, encoderCounts);
 			logger.log(Level.FINE, Double.toString(degrees));
 			return encoderCounts;
-		}else {
-			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given degrees in " + controlMode.name() + " mode.");
-		}
+		}else throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given degrees in " + controlMode.name() + " mode.");
 	}
 	
 	
@@ -217,9 +219,7 @@ public class Talon extends TalonSRX {
 			super.set(controlMode, encoderCounts);
 			logger.log(Level.FINE, Double.toString(revs));
 			return encoderCounts;
-		}else {
-			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given revs in " + controlMode.name() + " mode.");
-		}
+		}else throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given revs in " + controlMode.name() + " mode.");
 	}
 	
 	
@@ -250,7 +250,7 @@ public class Talon extends TalonSRX {
 			else neutralOutput();
 		}
 		
-		if (getControlMode() != follower) {updated = false;}//loop is over, reset updated for use in next loop (followers excluded)
+		if (getControlMode() != follower) updated = false;//loop is over, reset updated for use in next loop (followers excluded)
 	}
 	
 	

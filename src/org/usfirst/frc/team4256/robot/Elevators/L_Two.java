@@ -2,72 +2,37 @@ package org.usfirst.frc.team4256.robot.Elevators;
 
 import com.cyborgcats.reusable.Phoenix.Encoder;
 import com.cyborgcats.reusable.Phoenix.Talon;
-import com.cyborgcats.reusable.Phoenix.Victor;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-
-public class E_One extends Elevator {
-	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kReverse;//should be kForward, but shifter is broken
-	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kReverse;
+public class L_Two extends Lift {
 	private static final double gearRatio = 1.0;
-	private static final double sprocketCircumference = 2.873*Math.PI;//inches
-	protected static final double maximumHeight = 42.5;//inches
-	protected static final double hookBaseline = 44.0;//inches
+	private static final double sprocketCircumference = 1.29*Math.PI;//inches
+	protected static final double maximumHeight = 42.0;//inches
+	protected static final double climbingHeight = 0.0;//inches
 	private Talon master;
-	private Victor followerA;
-	private DoubleSolenoid shifter;
 	private int maximumEncoderValue;
 	public boolean knowsZero = false;
-
-	public E_One(final int masterID, final int followerAID, final int followerBID, final DoubleSolenoid shifter) {
-		master = new Talon(masterID, gearRatio, Talon.position, Encoder.OEM_QUAD, true);//practice: true, comp: true
-		followerA = new Victor(followerAID, Victor.follower);
-		this.shifter = shifter;	
+	
+	public L_Two(final int masterID) {
+		master = new Talon(masterID, gearRatio, Talon.position, Encoder.CTRE_MAG_ABSOLUTE, true);
 		
 		maximumEncoderValue = (int)master.convert.from.REVS.afterGears(inchesToRevs(maximumHeight));
 	}
 	
 	/**
-	 * 
-	**/
-	public void setTorque(final boolean aWholeLot) {
-		if (aWholeLot) {
-			shifter.set(LowGear);
-			master.selectProfileSlot(0, 0);
-		}
-		else {
-			shifter.set(HighGear);
-			master.selectProfileSlot(1, 0);
-		}
-	}
-	
-	
-	/**
-	 * 
-	**/
-	public boolean hasLotsOfTorque() {
-		return shifter.get().equals(LowGear);
-	}
-	
-	
-	/**
-	 * This function prepares each motor individually by enabling soft limits, setting PID values, and commanding followers.
+	 * This function prepares the motor by enabling soft limits and setting PID values.
 	**/
 	@Override
 	public void init() {
 		master.init();
+		master.configAllowableClosedloopError(0, (int)master.convert.from.REVS.afterGears(inchesToRevs(0.5)), Talon.kTimeoutMS);//TODO
 		
 		master.setNeutralMode(Talon.brake);
+		master.setInverted(true);
 		enableSoftLimits();
-		
-		master.config_kP(0, 0.7, Talon.kTimeoutMS);
-		master.config_kI(0, 0.0, Talon.kTimeoutMS);
-		master.config_kD(0, 0.0, Talon.kTimeoutMS);
-		master.config_kP(1, .45, Talon.kTimeoutMS);
-		master.config_kI(1, 0.0, Talon.kTimeoutMS);
-		master.config_kD(1, 10.0, Talon.kTimeoutMS);
 
-		followerA.init(master);
+		master.config_kP(0, 0.17, Talon.kTimeoutMS);
+		master.config_kI(0, 0.0, Talon.kTimeoutMS);
+		master.config_kD(0, 1.7, Talon.kTimeoutMS);
 	}
 	
 	
@@ -88,11 +53,12 @@ public class E_One extends Elevator {
 	
 	
 	/**
-	 * A shortcut to call getCurrentRevs on the master motor.
+	 * A shortcut to call getCurrentRevs on the motor.
 	**/
 	private double getRevs() {
 		return master.getCurrentRevs();
 	}
+	
 	
 	private double validateInches(final double inches) {
 		if (inches > maximumHeight) {
@@ -153,8 +119,7 @@ public class E_One extends Elevator {
 	
 	@Override
 	public void setZero(final double offsetInchesFromCurrent) {
-		master.setSelectedSensorPosition(-(int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, Talon.kTimeoutMS);
-		enableSoftLimits();
+		master.setSelectedSensorPosition(0 + (int)master.convert.from.REVS.afterGears(inchesToRevs(offsetInchesFromCurrent)), 0, Talon.kTimeoutMS);
 		knowsZero = true;
 	}
 	

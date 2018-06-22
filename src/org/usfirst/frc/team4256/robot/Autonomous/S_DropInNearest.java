@@ -40,18 +40,18 @@ public class S_DropInNearest extends Strategy2018 {
 	//------------------------------------------------------------------------------------------
 	private void useLeash_left() {
 		if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
-			final P_Bezier a = new P_Bezier(initialX(), initialY(), -120, 215, -86, 242, -scaleX, scaleY, 0.0);//get to easy scale
+			final P_Bezier a = new P_Bezier(initialX(), initialY(), -10, 17.92, -7.17, 20.17, -scaleX, scaleY, 0.0);//get to easy scale
 
 			final P_Bezier[] path = new P_Bezier[] {a};
 			leash = new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			if (switchTarget.equals(FieldPieceConfig.LEFT)) {
-				final P_Bezier a = new P_Bezier(initialX(), initialY(), -110, 93, -93, 93, -switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier a = new P_Bezier(initialX(), initialY(), -9.17, 7.75, -7.75, 7.75, -switchX, switchY, 0.0);//get to easy switch
 				
 				final P_Bezier[] path = new P_Bezier[] {a};
 				leash = new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}else {
-				final P_Bezier a = new P_Bezier(initialX(), initialY(), initialX(), 93, initialX(), 93, initialX(), switchY, 0.0);//drive forward
+				final P_Bezier a = new P_Bezier(initialX(), initialY(), initialX(), 7.75, initialX(), 7.75, initialX(), switchY, 0.0);//drive forward
 				leash = new Leash(new P_Bezier[] {a}, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 		}
@@ -88,8 +88,8 @@ public class S_DropInNearest extends Strategy2018 {
 	private Leash useLeash_center() {
 		P_Bezier bezier;
 
-		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(initialX(), initialY(), -30, 82, -52, 60, -switchX, switchY, 0.0);//get to left switch
-		else bezier = new P_Bezier(initialX(), initialY(), 30, 82, 52, 60, switchX, switchY, 0.0);//get to right switch
+		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(initialX(), initialY(), -2.5, 6.83, -4.33, 5, -switchX, switchY, 0.0);//get to left switch
+		else bezier = new P_Bezier(initialX(), initialY(), 2.5, 6.83, 4.33, 5, switchX, switchY, 0.0);//get to right switch
 		
 		leash = new Leash(new P_Bezier[] {bezier}, /*leash length*/1.5, /*growth rate*/0.1);
 		return leash;
@@ -110,18 +110,18 @@ public class S_DropInNearest extends Strategy2018 {
 	//------------------------------------------------------------------------------------------
 	private void useLeash_right() {
 		if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
-			final P_Bezier a = new P_Bezier(initialX(), initialY(), 120, 215, 86, 242, scaleX, scaleY, 0.0);//get to easy scale
+			final P_Bezier a = new P_Bezier(initialX(), initialY(), 10, 17.92, 7.17, 20.17, scaleX, scaleY, 0.0);//get to easy scale
 
 			final P_Bezier[] path = new P_Bezier[] {a};
 			leash = new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
-				final P_Bezier a = new P_Bezier(initialX(), initialY(), 116, 89, 99, 89, switchX, switchY, 0.0);//get to easy switch
+				final P_Bezier a = new P_Bezier(initialX(), initialY(), 9.67, 7.42, 8.25, 7.42, switchX, switchY, 0.0);//get to easy switch
 
 				final P_Bezier[] path = new P_Bezier[] {a};
 				leash = new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}else {
-				final P_Bezier a = new P_Bezier(initialX(), initialY(), initialX(), 89, initialX(), 89, initialX(), switchY, 0.0);//drive forward
+				final P_Bezier a = new P_Bezier(initialX(), initialY(), initialX(), 7.42, initialX(), 7.42, initialX(), switchY, 0.0);//drive forward
 				leash = new Leash(new P_Bezier[] {a}, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 		}
