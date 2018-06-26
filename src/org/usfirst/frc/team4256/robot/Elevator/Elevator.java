@@ -4,7 +4,7 @@ import org.usfirst.frc.team4256.robot.Clamp;
 
 import com.cyborgcats.reusable.Subsystem;
 
-public class Elevator implements Subsystem {
+public final class Elevator implements Subsystem {
 	private static final double initialClimbingHeight = 81.0;//inches
 	private L_One one;
 	private L_Two two;

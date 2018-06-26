@@ -6,7 +6,7 @@ import com.cyborgcats.reusable.Phoenix.Victor;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-public class L_One extends Lift {
+public final class L_One extends Lift {
 	private static final DoubleSolenoid.Value HighGear = DoubleSolenoid.Value.kReverse;//should be kForward, but shifter is broken
 	private static final DoubleSolenoid.Value LowGear = DoubleSolenoid.Value.kReverse;
 	private static final double gearRatio = 1.0;

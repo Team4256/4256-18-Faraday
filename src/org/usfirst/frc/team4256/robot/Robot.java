@@ -21,6 +21,7 @@ import org.usfirst.frc.team4256.robot.Autonomous.O_Encoder;
 import org.usfirst.frc.team4256.robot.Autonomous.O_ZED;
 import org.usfirst.frc.team4256.robot.Autonomous.S_DriveForward;
 import org.usfirst.frc.team4256.robot.Autonomous.S_PassLine;
+import org.usfirst.frc.team4256.robot.Autonomous.Coach;
 import org.usfirst.frc.team4256.robot.Autonomous.S_DropInNearest;
 import org.usfirst.frc.team4256.robot.Autonomous.Strategy2018;
 import org.usfirst.frc.team4256.robot.Elevator.*;
@@ -48,12 +49,8 @@ public class Robot extends IterativeRobot {
 	
 	private static Strategy2018 strategy;
 	private static NetworkTableInstance nt;
-	private static NetworkTable faraday, zed;
+	private static NetworkTable faraday;//, zed;
 	private static Odometer odometer;
-	
-	//{Game Input}
-	private static String gameData_old = "", gameData_new = "";
-	private static boolean haveGameData = false;
 
 	//{Robot Output}
 	private static final SwerveModule
@@ -79,30 +76,23 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
-		//{Robot Input}
+		Coach.init();
+		
 		gyro.reset();
 		nt = NetworkTableInstance.getDefault();
 		faraday = nt.getTable("Faraday");
-		zed = nt.getTable("ZED");
+		//zed = nt.getTable("ZED");
+		
 		odometer = new O_Encoder(moduleD);//new O_ZED(zed);
 		odometer.init();
 		
-		//{Human Input}
-		faraday.getEntry("Starting Position").setNumber(1);
-		faraday.getEntry("Simple Auto").setBoolean(false);
-		
-		//{Game Input}
-		final DriverStation ds = DriverStation.getInstance();
-		gameData_old = ds.getGameSpecificMessage();
-		
 		//{Robot Output}
+		swerve.init();
 		subsystems.put("Clamp", clamp);
 		subsystems.put("Elevator", elevator);
-		swerve.init();
-		elevator.init();
-		clamp.init();
+		for (Subsystem subsystem : subsystems.values()) subsystem.init();
 
-		setupLogging(ds);
+		setupLogging(DriverStation.getInstance());
 		
 		moduleA.setTareAngle(0.0);moduleB.setTareAngle(25.0);moduleC.setTareAngle(-57.0);moduleD.setTareAngle(-45.0);
 		moduleA.setParentLogger(logger);moduleB.setParentLogger(logger);moduleC.setParentLogger(logger);moduleD.setParentLogger(logger);
@@ -111,7 +101,7 @@ public class Robot extends IterativeRobot {
 		elevatorTwo.setZero(1.0);
 		clamp.setZero();
 
-		PID.set("zed", Parameters.ZED_P, Parameters.ZED_I, Parameters.ZED_D);
+		PID.set("leash", Parameters.ZED_P, Parameters.ZED_I, Parameters.ZED_D);
 		PID.set("spin", Parameters.SPIN_P, Parameters.SPIN_I, Parameters.SPIN_D);
 		
 		if (!tx2PowerSensor.get()) {
@@ -124,39 +114,20 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
-		//{Human Input}
-		final int startingPosition = Math.round(faraday.getEntry("Starting Position").getNumber(1).floatValue());
-		final boolean simpleAuto = faraday.getEntry("Simple Auto").getBoolean(false);
+		Coach.waitForGameData(2500);
+		strategy = Coach.selectedStrategy(odometer);
 		
-		//{Game Input}
-		final long start = System.currentTimeMillis();
-		while (!haveGameData && (System.currentTimeMillis() - start <= 2500)) pollGameData();
-		if(!simpleAuto) {
-			if (haveGameData) strategy = new S_DropInNearest(startingPosition, gameData_new, odometer);
-			else strategy = new S_PassLine(startingPosition, odometer);
-		}else {
-			strategy = new S_DriveForward(startingPosition, gameData_new);
-		}
-		
-		//{Robot Input}
-		zed.getEntry("Enable Odometry").setBoolean(false);//TODO if we want to switch back to ZED make sure to remove this line
-		odometer.setOrigin(odometer.getX(false) - strategy.initialX(), odometer.getY(false) - strategy.initialY());
-		
-		//{Robot Output}
 		swerve.autoMode(true);
 		
-		PID.clear("zed");
+		PID.clear("leash");
 		PID.clear("spin");
 	}
 	
 	@Override
 	public void teleopInit() {
-		//{Robot Input}
 		if (odometer.getClass().isInstance(O_ZED.class)) ((O_ZED) odometer).disable();
-		//{Robot Output}
-		swerve.autoMode(false);
 		
-		PID.clear("spin");
+		swerve.autoMode(false);
 		
 		Fridge.initialize("Button LB", true);
 		Fridge.initialize("Button RB", true);
@@ -180,14 +151,15 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Has Cube").setBoolean(clamp.hasCube());
 		faraday.getEntry("Match Timer").setNumber(DriverStation.getInstance().getMatchTime());
 		faraday.getEntry("Battery Voltage").setNumber(PowerJNI.getVinVoltage());
-		faraday.getEntry("Received Field").setBoolean(haveGameData);
-		if (gameData_new != null) faraday.getEntry("Field Data").setString(gameData_new);
+		
+		faraday.getEntry("Received Field").setBoolean(Coach.hasGameData());
+		if (Coach.hasGameData()) faraday.getEntry("Field Data").setString(new String(Coach.gameData()));
+		
 		faraday.getEntry("Angle A").setNumber(moduleA.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle B").setNumber(moduleB.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
 
-		odometer.completeLoopUpdate();
 		faraday.getEntry("X").setNumber(odometer.getX(/*markAsRead*/false));
 		faraday.getEntry("Y").setNumber(odometer.getY(/*markAsRead*/false));
 	}
@@ -219,7 +191,6 @@ public class Robot extends IterativeRobot {
 			swerve.travelTowards(driver.getCurrentAngle(Xbox.STICK_LEFT, true));
 			swerve.setSpeed(speed);
 			swerve.setSpin(spin);
-//			swerve.holonomic_encoderIgnorant(driver.getCurrentAngle(Xbox.STICK_LEFT, true), speed, spin);//SWERVE DRIVE
 		}
 		
 		
@@ -259,10 +230,7 @@ public class Robot extends IterativeRobot {
 		
 		if (gunner.getRawButton(Xbox.BUTTON_START)) swerve.align();//SWERVE ALIGNMENT
 
-		if (Fridge.becomesTrue("gyro reset", driver.getRawButton(Xbox.BUTTON_BACK))) {//GYRO RESET
-			gyro.setTareAngle(gyroHeading, true);
-			PID.clear("spin");
-		}
+		if (Fridge.becomesTrue("gyro reset", driver.getRawButton(Xbox.BUTTON_BACK))) gyro.setTareAngle(gyroHeading, true);//GYRO RESET
 		
 		
 		final double rumbleAmount = clamp.hasCube() ? 0.4 : 0.0;
@@ -288,17 +256,11 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void disabledPeriodic() {
-		pollGameData();
+		Coach.pollGameData();
 		driver.setRumble(RumbleType.kLeftRumble, 0.0); driver.setRumble(RumbleType.kRightRumble, 0.0);
 		gunner.setRumble(RumbleType.kLeftRumble, 0.0); gunner.setRumble(RumbleType.kRightRumble, 0.0);
 	}
 	
-
-	private static void pollGameData() {
-		gameData_new = DriverStation.getInstance().getGameSpecificMessage();
-		if ((gameData_new != null) && (gameData_new.length() == 3) && (gameData_new != gameData_old)) haveGameData = true;
-		else haveGameData = false;
-	}
 	
 	private static void setupLogging(final DriverStation ds) {
 		String logFileName = "/U/", eventName = ds.getEventName(), matchNumber = Integer.toString(ds.getMatchNumber()), replayNumber = Integer.toString(ds.getReplayNumber());

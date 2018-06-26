@@ -12,11 +12,11 @@ import java.util.Map;
 import org.usfirst.frc.team4256.robot.Clamp;
 import org.usfirst.frc.team4256.robot.Elevator.Elevator;
 
-public class S_DriveForward extends Strategy2018 {
+public final class S_DriveForward extends Strategy2018 {
 	private static Long start = null;
 	
-	public S_DriveForward(final int startingPosition, final String gameData, final Odometer odometer) {super(startingPosition, gameData, odometer);}
-	public S_DriveForward(final int startingPosition, final String gameData) {super(startingPosition, gameData, new Strategy.O_Useless());}
+	public S_DriveForward(final StartingPosition posI, final char[] gameData, final Odometer odometer) {super(posI, gameData, odometer);}
+	public S_DriveForward(final StartingPosition posI, final char[] gameData) {super(posI, gameData, new Strategy.O_Useless());}
 	
 	@Override
 	public void use(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems) {
@@ -32,8 +32,8 @@ public class S_DriveForward extends Strategy2018 {
 			subsystems.get("Elevator").perform(Elevator.Abilities.SET.name(), new double [] {ElevatorPresets.SWITCH.height()});
 		}else {
 			drivetrain.setSpeed(0.0);
-			if ((startingPosition.equals(StartingPosition.LEFT) && switchTarget.equals(FieldPieceConfig.LEFT)) ||
-				(startingPosition.equals(StartingPosition.RIGHT) && switchTarget.equals(FieldPieceConfig.RIGHT))) {
+			if ((posI.equals(StartingPosition.LEFT) && switchTarget.equals(FieldPieceConfig.LEFT)) ||
+				(posI.equals(StartingPosition.RIGHT) && switchTarget.equals(FieldPieceConfig.RIGHT))) {
 				subsystems.get("Clamp").perform(Clamp.Abilities.SPIT.name(), null);
 			}
 		}

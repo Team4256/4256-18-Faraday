@@ -5,7 +5,7 @@ import com.cyborgcats.reusable.Autonomous.Odometer;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 
-public class O_ZED extends Odometer{
+public final class O_ZED extends Odometer{
 	private final NetworkTable zed, position;
 	
 	public O_ZED(final NetworkTable zed) {

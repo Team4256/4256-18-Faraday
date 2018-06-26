@@ -4,7 +4,7 @@ import com.cyborgcats.reusable.Compass;
 import com.cyborgcats.reusable.Drivetrain;
 import com.cyborgcats.reusable.PID;
 
-public class D_Swerve implements Drivetrain {
+public final class D_Swerve implements Drivetrain {
 	private static final double pivotToFrontX = 8.45,//inches, pivot point to front wheel tip, x
 								pivotToFrontY = 10.06,//inches, pivot point to front wheel tip, y
 								pivotToAftX = 8.90,//inches, pivot point to aft wheel tip, x
@@ -188,7 +188,7 @@ public class D_Swerve implements Drivetrain {
 	public void correctFor(final double errorDirection, final double errorMagnitude) {
 		travelTowards(errorDirection);
 		
-		double speed = PID.get("zed", errorMagnitude);//DO NOT use I gain with this because errorMagnitude is always positive
+		double speed = PID.get("leash", errorMagnitude);//DO NOT use I gain with this because errorMagnitude is always positive
 		if (speed > 0.6) speed = 0.6;
 		
 		setSpeed(speed);

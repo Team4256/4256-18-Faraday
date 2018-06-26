@@ -10,23 +10,23 @@ import com.cyborgcats.reusable.Autonomous.Leash;
 import com.cyborgcats.reusable.Autonomous.Odometer;
 
 public final class S_DropInNearest extends Strategy2018 {
-	public S_DropInNearest(final int startingPosition, final String gameData, final Odometer odometer) {super(startingPosition, gameData, odometer);}
+	public S_DropInNearest(final StartingPosition posI, final char[] gameData, final Odometer odometer) {super(posI, gameData, odometer);}
 
 	@Override
 	protected Leash leftLeash() {
 		if (scaleTarget.equals(FieldPieceConfig.LEFT)) {
-			final Path a = new P_Bezier(leftXi, Yi, -10, 17.92, -7.17, 20.17, -scaleX, scaleY, 0.0);//get to easy scale
+			final Path a = new P_Bezier(posI.x(), Yi, -10, 17.92, -7.17, 20.17, -scaleX, scaleY, 0.0);//get to easy scale
 
 			final Path[] path = new Path[] {a};
 			return new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			if (switchTarget.equals(FieldPieceConfig.LEFT)) {
-				final Path a = new P_Bezier(leftXi, Yi, -9.17, 7.75, -7.75, 7.75, -switchX, switchY, 0.0);//get to easy switch
+				final Path a = new P_Bezier(posI.x(), Yi, -9.17, 7.75, -7.75, 7.75, -switchX, switchY, 0.0);//get to easy switch
 				
 				final Path[] path = new Path[] {a};
 				return new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}else {
-				final Path a = new P_Bezier(leftXi, Yi, leftXi, 7.75, leftXi, 7.75, leftXi, switchY, 0.0);//drive forward
+				final Path a = new P_Bezier(posI.x(), Yi, posI.x(), 7.75, posI.x(), 7.75, posI.x(), switchY, 0.0);//drive forward
 				return new Leash(new Path[] {a}, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 		}
@@ -64,8 +64,8 @@ public final class S_DropInNearest extends Strategy2018 {
 	protected Leash centerLeash() {
 		Path bezier;
 
-		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(centerXi, Yi, -2.5, 6.83, -4.33, 5, -switchX, switchY, 0.0);//get to left switch
-		else bezier = new P_Bezier(centerXi, Yi, 2.5, 6.83, 4.33, 5, switchX, switchY, 0.0);//get to right switch
+		if (switchTarget.equals(FieldPieceConfig.LEFT)) bezier = new P_Bezier(posI.x(), Yi, -2.5, 6.83, -4.33, 5, -switchX, switchY, 0.0);//get to left switch
+		else bezier = new P_Bezier(posI.x(), Yi, 2.5, 6.83, 4.33, 5, switchX, switchY, 0.0);//get to right switch
 		
 		return new Leash(new Path[] {bezier}, /*leash length*/1.5, /*growth rate*/0.1);
 	}
@@ -85,18 +85,18 @@ public final class S_DropInNearest extends Strategy2018 {
 	@Override
 	protected Leash rightLeash() {
 		if (scaleTarget.equals(FieldPieceConfig.RIGHT)) {
-			final Path a = new P_Bezier(rightXi, Yi, 10, 17.92, 7.17, 20.17, scaleX, scaleY, 0.0);//get to easy scale
+			final Path a = new P_Bezier(posI.x(), Yi, 10, 17.92, 7.17, 20.17, scaleX, scaleY, 0.0);//get to easy scale
 
 			final Path[] path = new Path[] {a};
 			return new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 		}else {
 			if (switchTarget.equals(FieldPieceConfig.RIGHT)) {
-				final Path a = new P_Bezier(rightXi, Yi, 9.67, 7.42, 8.25, 7.42, switchX, switchY, 0.0);//get to easy switch
+				final Path a = new P_Bezier(posI.x(), Yi, 9.67, 7.42, 8.25, 7.42, switchX, switchY, 0.0);//get to easy switch
 
 				final Path[] path = new Path[] {a};
 				return new Leash(path, /*leash length*/1.5, /*growth rate*/0.1);
 			}else {
-				final Path a = new P_Bezier(rightXi, Yi, rightXi, 7.42, rightXi, 7.42, rightXi, switchY, 0.0);//drive forward
+				final Path a = new P_Bezier(posI.x(), Yi, posI.x(), 7.42, posI.x(), 7.42, posI.x(), switchY, 0.0);//drive forward
 				return new Leash(new Path[] {a}, /*leash length*/1.5, /*growth rate*/0.1);
 			}
 		}

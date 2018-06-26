@@ -10,30 +10,27 @@ import org.usfirst.frc.team4256.robot.Elevator.Elevator.Abilities;
 import com.cyborgcats.reusable.Autonomous.Events.Command;
 
 public abstract class Strategy2018 extends Strategy {
-	public static final double leftXi = -11.38, centerXi = 0.184, rightXi = 8.16, Yi = 2.82;//initial values
+	public static final double Yi = 2.82;//initial y value
 	public static final double switchX = 4.25, cubeX = 5.42, scaleX = 6.18;
 	public static final double switchY = 10.0, cubeY = 17.5, scaleY = 23.0;
 	
 	protected final FieldPieceConfig switchTarget, scaleTarget;
-	protected final StartingPosition startingPosition;
+	protected final StartingPosition posI;
 	
-	protected Strategy2018(final int startingPosition, final String gameData, final Odometer odometer) {
+	protected Strategy2018(final StartingPosition posI, final char[] gameData, final Odometer odometer) {
 		super(odometer);
-		if (gameData.length() != 3) throw new IllegalStateException("Strategies only work with valid game data.");
-		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
-		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
-		switch (startingPosition) {
-		case(0):this.startingPosition = StartingPosition.LEFT;  break;
-		case(1):this.startingPosition = StartingPosition.CENTER;break;
-		case(2):this.startingPosition = StartingPosition.RIGHT; break;
-		default:this.startingPosition = StartingPosition.CENTER;break;
-		}
+		this.posI = posI;
+		odometer.setOrigin(odometer.getX(false) - posI.x, odometer.getY(false) - Yi);
+		
+		if (gameData.length != 3) throw new IllegalStateException("Strategies only work with valid game data.");
+		switchTarget = gameData[0] == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
+		scaleTarget = gameData[1] == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
 	}
 	
 	
 	@Override
 	protected Leash getLeash() {
-		switch (startingPosition) {
+		switch (posI) {
 		case LEFT: return leftLeash();
 		case CENTER: return centerLeash();
 		case RIGHT: return rightLeash();
@@ -42,7 +39,7 @@ public abstract class Strategy2018 extends Strategy {
 	}
 	@Override
 	protected Events getEvents() {
-		switch (startingPosition) {
+		switch (posI) {
 		case LEFT: return leftEvents();
 		case CENTER: return centerEvents();
 		case RIGHT: return rightEvents();
@@ -58,8 +55,18 @@ public abstract class Strategy2018 extends Strategy {
 	protected Events rightEvents() {return super.getEvents();}
 	
 	
-	public static enum StartingPosition {LEFT, CENTER, RIGHT};
-	public static enum FieldPieceConfig {LEFT, RIGHT};
+	public static enum StartingPosition {
+		LEFT(-11.38),
+		CENTER(0.184),
+		RIGHT(8.16);
+		
+		private final double x;
+		
+		StartingPosition(final double initialX) {this.x = initialX;}
+		
+		protected double x() {return x;}
+	}
+	public static enum FieldPieceConfig {LEFT, RIGHT}
 
 	
 	

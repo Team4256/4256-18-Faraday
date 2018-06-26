@@ -3,7 +3,7 @@ package org.usfirst.frc.team4256.robot.Elevator;
 import com.cyborgcats.reusable.Phoenix.Encoder;
 import com.cyborgcats.reusable.Phoenix.Talon;
 
-public class L_Two extends Lift {
+public final class L_Two extends Lift {
 	private static final double gearRatio = 1.0;
 	private static final double sprocketCircumference = 1.29*Math.PI;//inches
 	protected static final double maximumHeight = 42.0;//inches

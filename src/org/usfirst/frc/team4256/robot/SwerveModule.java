@@ -8,7 +8,7 @@ import com.cyborgcats.reusable.Phoenix.Talon;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
-public class SwerveModule {
+public final class SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
 	public static final double tractionGearRatio = 40.0/3.0;
 	public static final double tractionWheelCircumference = 2.625*Math.PI;//inches

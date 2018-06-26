@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Clamp implements Subsystem {//TODO make a private subclass for the rotator and a private subclass for intaking and combine them; then double check auto-slurp
+public final class Clamp implements Subsystem {//TODO make a private subclass for the rotator and a private subclass for intaking and combine them; then double check auto-slurp
 	private enum CubePosition {Absent, WithinReach, Present;}
 	private static final DoubleSolenoid.Value CloseState = DoubleSolenoid.Value.kForward;
 	private static final DoubleSolenoid.Value OpenState = DoubleSolenoid.Value.kReverse;

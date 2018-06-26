@@ -1,6 +1,6 @@
 package com.cyborgcats.reusable.Autonomous;
 
-public class P_Curve implements Path {
+public final class P_Curve implements Path {
 	private final Function x, y;
 	private final double end;
 	private double independentVariable;

@@ -1,6 +1,6 @@
 package com.cyborgcats.reusable.Autonomous;
 
-public class P_Bezier implements Path {
+public final class P_Bezier implements Path {
 	private final double p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y, start;
 
 	private double independentVariable = 0.0;

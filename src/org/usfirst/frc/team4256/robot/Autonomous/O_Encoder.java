@@ -4,7 +4,7 @@ import org.usfirst.frc.team4256.robot.SwerveModule;
 
 import com.cyborgcats.reusable.Autonomous.Odometer;
 
-public class O_Encoder extends Odometer {
+public final class O_Encoder extends Odometer {
 	private SwerveModule module;
 	
 	public O_Encoder(final SwerveModule module) {this.module = module;}
