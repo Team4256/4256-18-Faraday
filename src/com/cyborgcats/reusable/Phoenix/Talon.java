@@ -21,13 +21,13 @@ public class Talon extends TalonSRX {
 	
 	public static final int kTimeoutMS = 10;
 	public final Compass compass;
+	public final Convert convert;
 	public final boolean hasEncoder;
 	
 	private ControlMode controlMode;
 	private boolean updated = false;
 	private Double lastSetpoint = 0.0;
 	private double lastLegalDirection = 1.0;
-	public Convert convert;
 	private Logger logger;
 	
 	//This constructor is intended for use with an encoder on a motor with limited rotary motion. To limit linear motion, use built-in Talon commands.
@@ -36,14 +36,12 @@ public class Talon extends TalonSRX {
 		if (getSensorCollection().getPulseWidthRiseToRiseUs() == 0) {
 			switch(encoder) {
 			case CTRE_MAG_ABSOLUTE:
-				throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
 				hasEncoder = false;
-				break;
+				throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
 			case CTRE_MAG_RELATIVE:
-				throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
 				hasEncoder = false;
-				break;
-			default: break;
+				throw new IllegalStateException("Talon " + Integer.toString(deviceID) + " could not find its encoder.");
+			default: hasEncoder = true; break;
 			}
 		}else {
 			configSelectedFeedbackSensor(encoder.type(), 0, kTimeoutMS);//FeedbackDevice, PID slot ID, timeout milliseconds
@@ -67,6 +65,7 @@ public class Talon extends TalonSRX {
 		this.controlMode = controlMode;
 		hasEncoder = false;
 		compass = new Compass(0.0, 0.0);
+		convert = new Convert(0, 0.0);
 		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	

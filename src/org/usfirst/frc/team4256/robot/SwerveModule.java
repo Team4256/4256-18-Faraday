@@ -30,7 +30,7 @@ public class SwerveModule {
 	//This constructor is intended for all other modules.
 	public SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final int magnetID) {
 		rotation = new Talon(rotatorID, rotatorGearRatio, Talon.position, Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
-		traction = new Talon(tractionID, tractionGearRatio, Talon.percent);
+		traction = new Talon(tractionID, Talon.percent);
 		magnet = new DigitalInput(magnetID);
 	}
 	
