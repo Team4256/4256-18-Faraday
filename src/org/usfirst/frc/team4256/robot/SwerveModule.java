@@ -105,14 +105,13 @@ public final class SwerveModule {
 		if (magnet.get()) {
 			aligned = false;
 			rotation.quickSet(rotation.getCurrentRevs() + 0.05, false);
-			return true;
 		}else if (!aligned) {
 			setTareAngle(rotation.getCurrentAngle(true) + offset, true);
 			decapitated = 1;
 			traction.setInverted(true);
 			aligned = true;
 		}
-		return false;
+		return aligned;
 	}
 	
 	

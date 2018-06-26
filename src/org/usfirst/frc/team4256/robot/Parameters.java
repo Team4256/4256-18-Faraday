@@ -25,18 +25,19 @@ public final class Parameters {
 	private Parameters() {}
 	
 	//ELECTRONICS
-	public static final int SWERVE_ROTATOR_A = 11;//CAN, Talon SRX, front left, PDP 4
-	public static final int SWERVE_ROTATOR_B = 12;//CAN, Talon SRX, front right, PDP 5
-	public static final int SWERVE_ROTATOR_C = 13;//CAN, Talon SRX, aft left, PDP 6
-	public static final int SWERVE_ROTATOR_D = 14;//CAN, Talon SRX, aft right, PDP 7
-	public static final int SWERVE_DRIVE_A = 21;//CAN, Talon SRX, front left, PDP 0
-	public static final int SWERVE_DRIVE_B = 22;//CAN, Talon SRX, front right, PDP 1
-	public static final int SWERVE_DRIVE_C = 23;//CAN, Talon SRX, aft left, PDP 2
-	public static final int SWERVE_DRIVE_D = 24;//CAN, Talon SRX, aft right, PDP 3
-	public static final int SWERVE_MAGNET_A = 0;//Digital Input ID for Magnetic Alignment
-	public static final int SWERVE_MAGNET_B = 1;//Digital Input ID for Magnetic Alignment
-	public static final int SWERVE_MAGNET_C = 2;//Digital Input ID for Magnetic Alignment
-	public static final int SWERVE_MAGNET_D = 3;//Digital Input ID for Magnetic Alignment
+	public static final int
+	rotationAID = 11,//CAN, Talon SRX, front left, PDP 4
+	rotationBID = 12,//CAN, Talon SRX, front right, PDP 5
+	rotationCID = 13,//CAN, Talon SRX, aft left, PDP 6
+	rotationDID = 14,//CAN, Talon SRX, aft right, PDP 7
+	tractionAID = 21,//CAN, Talon SRX, front left, PDP 0
+	tractionBID = 22,//CAN, Talon SRX, front right, PDP 1
+	tractionCID = 23,//CAN, Talon SRX, aft left, PDP 2
+	tractionDID = 24,//CAN, Talon SRX, aft right, PDP 3
+	magnetAID = 0,//Digital Input ID for Magnetic Alignment
+	magnetBID = 1,//Digital Input ID for Magnetic Alignment
+	magnetCID = 2,//Digital Input ID for Magnetic Alignment
+	magnetDID = 3;//Digital Input ID for Magnetic Alignment
 	
 	public static final int INTAKE_LEFT = 15;//CAN, Victor SPX, PDP 8
 	public static final int INTAKE_RIGHT = 16;//CAN, Victor SPX, PDP 9
@@ -90,7 +91,7 @@ public final class Parameters {
 	public static final double SPIN_D = 4.25;
 	
 	//.1838 works well for a leash length of 3, doubling that works for length of 1.5
-	public static final double ZED_P = 0.1838*2.0;
-	public static final double ZED_I = 0.0;
-	public static final double ZED_D = 1.2;
+	public static final double LEASH_P = 0.1838*2.0;
+	public static final double LEASH_I = 0.0;
+	public static final double LEASH_D = 1.2;
 }

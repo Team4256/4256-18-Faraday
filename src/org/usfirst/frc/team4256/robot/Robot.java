@@ -54,10 +54,10 @@ public class Robot extends IterativeRobot {
 
 	//{Robot Output}
 	private static final SwerveModule
-	moduleA = new SwerveModule(Parameters.SWERVE_ROTATOR_A,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_A, Parameters.SWERVE_MAGNET_A),
-	moduleB = new SwerveModule(Parameters.SWERVE_ROTATOR_B,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_B, Parameters.SWERVE_MAGNET_B),
-	moduleC = new SwerveModule(Parameters.SWERVE_ROTATOR_C,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_C, Parameters.SWERVE_MAGNET_C),
-	moduleD = new SwerveModule(Parameters.SWERVE_ROTATOR_D,/*flipped sensor*/ false, Parameters.SWERVE_DRIVE_D, true, Parameters.SWERVE_MAGNET_D);
+	moduleA = new SwerveModule(Parameters.rotationAID,/*flipped sensor*/ false, Parameters.tractionAID, Parameters.magnetAID),
+	moduleB = new SwerveModule(Parameters.rotationBID,/*flipped sensor*/ false, Parameters.tractionBID, Parameters.magnetBID),
+	moduleC = new SwerveModule(Parameters.rotationCID,/*flipped sensor*/ false, Parameters.tractionCID, Parameters.magnetCID),
+	moduleD = new SwerveModule(Parameters.rotationDID,/*flipped sensor*/ false, Parameters.tractionDID, true, Parameters.magnetDID);
 	private static final D_Swerve swerve = new D_Swerve(moduleA, moduleB, moduleC, moduleD);
 	
 	private static final DoubleSolenoid elevatorOneShifter = new DoubleSolenoid(Parameters.ELEVATOR_ONE_SHIFTER_MODULE, Parameters.ELEVATOR_ONE_SHIFTER_FORWARD, Parameters.ELEVATOR_ONE_SHIFTER_REVERSE);
@@ -101,7 +101,7 @@ public class Robot extends IterativeRobot {
 		elevatorTwo.setZero(1.0);
 		clamp.setZero();
 
-		PID.set("leash", Parameters.ZED_P, Parameters.ZED_I, Parameters.ZED_D);
+		PID.set("leash", Parameters.LEASH_P, Parameters.LEASH_I, Parameters.LEASH_D);
 		PID.set("spin", Parameters.SPIN_P, Parameters.SPIN_I, Parameters.SPIN_D);
 		
 		if (!tx2PowerSensor.get()) {
@@ -228,8 +228,7 @@ public class Robot extends IterativeRobot {
 		else clamp.increment(-2.0*gunner.getDeadbandedAxis(Xbox.AXIS_LEFT_Y));
 		
 		
-		if (gunner.getRawButton(Xbox.BUTTON_START)) swerve.align();//SWERVE ALIGNMENT
-
+		if (gunner.getRawButton(Xbox.BUTTON_START)) faraday.getEntry("Aligned").setBoolean(swerve.align());//SWERVE ALIGNMENT
 		if (Fridge.becomesTrue("gyro reset", driver.getRawButton(Xbox.BUTTON_BACK))) gyro.setTareAngle(gyroHeading, true);//GYRO RESET
 		
 		
@@ -242,8 +241,7 @@ public class Robot extends IterativeRobot {
 		
 		//{completing motor controller updates}
 		swerve.completeLoopUpdate();
-		elevator.completeLoopUpdate();
-		clamp.completeLoopUpdate();
+		for (Subsystem subsystem : subsystems.values()) subsystem.completeLoopUpdate();
 	}
 	
 	@Override

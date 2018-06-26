@@ -112,7 +112,7 @@ public final class D_Swerve implements Drivetrain {
 					  b = moduleB.magneticAlignment(180.0),
 					  c = moduleC.magneticAlignment(0.0),
 					  d = moduleD.magneticAlignment(90.0);
-		return a || b || c || d;
+		return a && b && c && d;
 	}
 	
 	private double[] speedsFromModuleD() {

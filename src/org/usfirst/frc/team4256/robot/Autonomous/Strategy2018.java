@@ -71,7 +71,7 @@ public abstract class Strategy2018 extends Strategy {
 	
 	
 	/**
-	 * @param instructions a 2D array of Strings with any number of rows and 3 columns<br>
+	 * @param instructions a 2D array of Strings with any number of rows and 5 columns<br>
 	 * first column: clamp action ({@linkplain org.usfirst.frc.team4256.robot.Clamp.Abilities Abilities})<br>
 	 * second column: elevator height (inches)<br>
 	 * third column: robot orientation (degrees)<br>
