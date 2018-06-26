@@ -22,6 +22,7 @@ public class Events {
 		this.commands = commands;
 		this.triggers = triggers;
 		if (commands.length != triggers.length) throw new IllegalStateException("Each command must have a corresponding trigger.");
+		if (commands.length == 0) doneRunning = true;
 	}
 	
 	/**
@@ -30,7 +31,7 @@ public class Events {
 	 */
 	public void reinit() {
 		step = -1;
-		doneRunning = false;
+		doneRunning = commands.length == 0 ? true : false;
 	}
 	
 	/**
@@ -55,5 +56,5 @@ public class Events {
 		if (step > -1) commands[step].execute(drivetrain, subsystems);
 	}
 	
-	public interface Command {void execute(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems);}
+	public static interface Command {void execute(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems);}
 }

@@ -21,5 +21,5 @@ public class P_Curve implements Path {
 	
 	public double getIndependentVariable() {return independentVariable;}
 
-	public interface Function {double at(final double independentVariable);}
+	public static interface Function {double at(final double independentVariable);}
 }

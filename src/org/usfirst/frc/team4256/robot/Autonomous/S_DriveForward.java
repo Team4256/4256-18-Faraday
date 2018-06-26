@@ -2,6 +2,8 @@ package org.usfirst.frc.team4256.robot.Autonomous;//COMPLETE MARCH
 
 import com.cyborgcats.reusable.Drivetrain;
 import com.cyborgcats.reusable.Subsystem;
+import com.cyborgcats.reusable.Autonomous.Odometer;
+import com.cyborgcats.reusable.Autonomous.Strategy;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
 
@@ -11,19 +13,10 @@ import org.usfirst.frc.team4256.robot.Clamp;
 import org.usfirst.frc.team4256.robot.Elevator.Elevator;
 
 public class S_DriveForward extends Strategy2018 {
-	private Long start = null;
+	private static Long start = null;
 	
-	public S_DriveForward(final int startingPosition, final String gameData) {
-		//{organize initialization data}
-		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
-		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
-		switch (startingPosition) {//ROBOT
-		case(0):this.startingPosition = StartingPosition.LEFT;  break;
-		case(1):this.startingPosition = StartingPosition.CENTER;break;
-		case(2):this.startingPosition = StartingPosition.RIGHT; break;
-		default:this.startingPosition = StartingPosition.CENTER;break;
-		}
-	}
+	public S_DriveForward(final int startingPosition, final String gameData, final Odometer odometer) {super(startingPosition, gameData, odometer);}
+	public S_DriveForward(final int startingPosition, final String gameData) {super(startingPosition, gameData, new Strategy.O_Useless());}
 	
 	@Override
 	public void use(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems) {
@@ -47,5 +40,5 @@ public class S_DriveForward extends Strategy2018 {
 		drivetrain.completeLoopUpdate();
 	}
 	
-	private void ensureTimerHasStarted() {if (start == null) start = System.currentTimeMillis();}
+	private static void ensureTimerHasStarted() {if (start == null) start = System.currentTimeMillis();}
 }

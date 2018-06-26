@@ -10,12 +10,21 @@ public abstract class Strategy {
 	protected Events events;
 	protected Odometer odometer;
 	
+	protected Strategy(final Odometer odometer) {
+		leash = getLeash();
+		events = getEvents();
+		this.odometer = odometer;
+	}
+	
 	public void use(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems) {
 		events.check(leash.getIndependentVariable());
 		events.execute(drivetrain, subsystems);
 		
 		stayOnPath(drivetrain);
   	}
+	
+	protected Leash getLeash() {return new Leash(new Path[] {}, 0.0, 0.0);}
+	protected Events getEvents() {return new Events(new Events.Command[] {}, new double[] {});}
 	
 	protected void stayOnPath(final Drivetrain drivetrain) {
 		//run path processing only if odometer values are new
@@ -38,9 +47,16 @@ public abstract class Strategy {
   			final double errorMagnitude = Math.hypot(errorX, errorY);
   			drivetrain.correctFor(errorDirection, errorMagnitude);
   		}
+  		
+  		odometer.completeLoopUpdate();
   		drivetrain.completeLoopUpdate();
 	}
 	
-	public abstract double initialX();
-	public abstract double initialY();
+	protected static class O_Useless extends Odometer {
+		public O_Useless() {}
+		@Override
+		public void init() {}
+		@Override
+		public void completeLoopUpdate() {}
+	}
 }

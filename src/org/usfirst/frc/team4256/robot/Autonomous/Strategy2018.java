@@ -1,41 +1,78 @@
 package org.usfirst.frc.team4256.robot.Autonomous;
 
+import com.cyborgcats.reusable.Autonomous.Events;
+import com.cyborgcats.reusable.Autonomous.Leash;
+import com.cyborgcats.reusable.Autonomous.Odometer;
 import com.cyborgcats.reusable.Autonomous.Strategy;
+
+import org.usfirst.frc.team4256.robot.Elevator.Elevator.Abilities;
+
 import com.cyborgcats.reusable.Autonomous.Events.Command;
 
 public abstract class Strategy2018 extends Strategy {
+	public static final double leftXi = -11.38, centerXi = 0.184, rightXi = 8.16, Yi = 2.82;//initial values
 	public static final double switchX = 4.25, cubeX = 5.42, scaleX = 6.18;
 	public static final double switchY = 10.0, cubeY = 17.5, scaleY = 23.0;
 	
-	protected FieldPieceConfig switchTarget, scaleTarget;
-	protected StartingPosition startingPosition;
+	protected final FieldPieceConfig switchTarget, scaleTarget;
+	protected final StartingPosition startingPosition;
 	
-	@Override
-	public double initialY() {return 2.82;}//feet
-	@Override
-	public double initialX() {
-		switch(startingPosition) {
-		case LEFT: return -11.38;
-		case CENTER: return 0.184;
-		case RIGHT: return 8.16;
-		default: return 0.184;
+	protected Strategy2018(final int startingPosition, final String gameData, final Odometer odometer) {
+		super(odometer);
+		if (gameData.length() != 3) throw new IllegalStateException("Strategies only work with valid game data.");
+		switchTarget = gameData.charAt(0) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
+		scaleTarget = gameData.charAt(1) == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
+		switch (startingPosition) {
+		case(0):this.startingPosition = StartingPosition.LEFT;  break;
+		case(1):this.startingPosition = StartingPosition.CENTER;break;
+		case(2):this.startingPosition = StartingPosition.RIGHT; break;
+		default:this.startingPosition = StartingPosition.CENTER;break;
 		}
 	}
 	
-	public enum StartingPosition {LEFT, CENTER, RIGHT};
-	public enum FieldPieceConfig {LEFT, RIGHT};
+	
+	@Override
+	protected Leash getLeash() {
+		switch (startingPosition) {
+		case LEFT: return leftLeash();
+		case CENTER: return centerLeash();
+		case RIGHT: return rightLeash();
+		default: return centerLeash();
+		}
+	}
+	@Override
+	protected Events getEvents() {
+		switch (startingPosition) {
+		case LEFT: return leftEvents();
+		case CENTER: return centerEvents();
+		case RIGHT: return rightEvents();
+		default: return centerEvents();
+		}
+	}
+	
+	protected Leash leftLeash() {return super.getLeash();}
+	protected Leash centerLeash() {return super.getLeash();}
+	protected Leash rightLeash() {return super.getLeash();}
+	protected Events leftEvents() {return super.getEvents();}
+	protected Events centerEvents() {return super.getEvents();}
+	protected Events rightEvents() {return super.getEvents();}
+	
+	
+	public static enum StartingPosition {LEFT, CENTER, RIGHT};
+	public static enum FieldPieceConfig {LEFT, RIGHT};
 
 	
 	
-	/*
-	 * Instructions is a 2D array of ints. It can have any number of rows, and should have 3 columns.
-	 * The first column determines clamp state (0 is slurp, 1 is spit, 2 is open).
-	 * The second column determines elevator height (in inches).
-	 * The third column represents the desired robot orientation (angle in degrees).
-	 * The fourth column determines the maximum spin speed (as a percent).
-	 * The fifth column determines pause state (1 is wait for orient, 0 is continue regardless).
+	/**
+	 * @param instructions a 2D array of Strings with any number of rows and 3 columns<br>
+	 * first column: clamp action ({@linkplain org.usfirst.frc.team4256.robot.Clamp.Abilities Abilities})<br>
+	 * second column: elevator height (inches)<br>
+	 * third column: robot orientation (degrees)<br>
+	 * fourth column: maximum spin speed (percent)<br>
+	 * fifth column: whether to pause code until actual orientation matches desired orientation (<code>"wait"</code> or <code>"pass"</code>)
 	 * 
-	 * An array of executable commands is returned.
+	 * @return an array of executable commands
+	 * @see Command
 	*/
 	public static Command[] getFromArray(final String[][] instructions) {
 		Command[] commands = new Command[instructions.length];
@@ -47,7 +84,7 @@ public abstract class Strategy2018 extends Strategy {
 				final String clampAction = instruction[0];
 				final double elevatorHeight = Double.parseDouble(instruction[1]),
 							 desiredAngle = Double.parseDouble(instruction[2]),
-							 maxSpin = Double.parseDouble(instruction[3]);
+							 maxSpin = Double.parseDouble(instruction[3])/100.0;
 				final boolean wait = instruction[4] == "wait";
 				
 				if (wait) {
@@ -56,7 +93,7 @@ public abstract class Strategy2018 extends Strategy {
 				}else drive.face((double)desiredAngle, maxSpin);
 				
 				sys.get("Clamp").perform(clampAction, null);
-				sys.get("Elevator").perform("SET", new double[] {elevatorHeight});
+				sys.get("Elevator").perform(Abilities.SET.name(), new double[] {elevatorHeight});
 			};
 		}
 		

@@ -15,7 +15,7 @@ public class Gimbal {
 	public void set(final double degreesX, final double degreesY) {x.setAngle(degreesX);	y.setAngle(degreesY);}
 	public void increment(final double amountX, final double amountY) {x.increment(amountX*K);	y.increment(amountY*K);}
 	
-	private class R_Servo extends Servo {
+	private static class R_Servo extends Servo {
 		private double angle = 0.0;
 		public R_Servo(int port) {super(port);}
 		@Override

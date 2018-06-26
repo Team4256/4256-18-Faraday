@@ -2,7 +2,7 @@ package com.cyborgcats.reusable.Autonomous;
 
 public abstract class Odometer {
 	private double tareX = 0.0, tareY = 0.0;
-	private ConsumableDouble x = new ConsumableDouble(), y = new ConsumableDouble();
+	protected ConsumableDouble x = new ConsumableDouble(), y = new ConsumableDouble();
 	
 	public abstract void init();
 	public abstract void completeLoopUpdate();
@@ -15,7 +15,7 @@ public abstract class Odometer {
 	public boolean newX() {return x.isNew();}
 	public boolean newY() {return y.isNew();}
 	
-	public class ConsumableDouble {
+	public static class ConsumableDouble {
 		private boolean isNew = false;
 		private double value = 0.0;
 		

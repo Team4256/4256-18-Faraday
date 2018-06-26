@@ -15,11 +15,12 @@ public class Leash {
 		this.path = path;
 		this.desiredLength = desiredLength;
 		this.growthRate = growthRate;
+		if (path.length == 0) doneGeneratingTargets = true;
 	}
 	
-	public void init() {
+	public void reinit() {
 		currentSegment = 0;
-		doneGeneratingTargets = false;
+		doneGeneratingTargets = path.length == 0 ? true : false;
 	}
 	
 	private void increment(final double amount) {
