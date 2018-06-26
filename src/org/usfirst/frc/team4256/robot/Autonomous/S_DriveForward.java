@@ -44,6 +44,7 @@ public class S_DriveForward extends Strategy2018 {
 				subsystems.get("Clamp").perform(Clamp.Abilities.SPIT.name(), null);
 			}
 		}
+		drivetrain.completeLoopUpdate();
 	}
 	
 	private void ensureTimerHasStarted() {if (start == null) start = System.currentTimeMillis();}

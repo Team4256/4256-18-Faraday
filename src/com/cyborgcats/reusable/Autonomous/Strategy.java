@@ -38,6 +38,7 @@ public abstract class Strategy {
   			final double errorMagnitude = Math.hypot(errorX, errorY);
   			drivetrain.correctFor(errorDirection, errorMagnitude);
   		}
+  		drivetrain.completeLoopUpdate();
 	}
 	
 	public abstract double initialX();

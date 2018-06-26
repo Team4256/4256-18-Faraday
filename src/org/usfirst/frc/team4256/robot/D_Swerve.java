@@ -32,8 +32,8 @@ public class D_Swerve implements Drivetrain {
 	**/
 	@Override
 	public void init() {
-		moduleA.init(/*reversed traction*/true);	moduleB.init(/*reversed traction*/true);
-		moduleC.init(/*reversed traction*/false);	moduleD.init(/*reversed traction*/false);
+		moduleA.init(/*reversed traction*/true);	moduleB.init(/*reversed traction*/false);
+		moduleC.init(/*reversed traction*/false);	moduleD.init(/*reversed traction*/true);
 	}
 	
 	
