@@ -1,7 +1,6 @@
 package org.usfirst.frc.team4256.robot;
 
 import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
-import org.usfirst.frc.team4256.robot.Elevators.*;
 
 import com.cyborgcats.reusable.Gyro;
 import com.cyborgcats.reusable.Xbox;
@@ -24,6 +23,7 @@ import org.usfirst.frc.team4256.robot.Autonomous.S_DriveForward;
 import org.usfirst.frc.team4256.robot.Autonomous.S_PassLine;
 import org.usfirst.frc.team4256.robot.Autonomous.S_DropInNearest;
 import org.usfirst.frc.team4256.robot.Autonomous.Strategy2018;
+import org.usfirst.frc.team4256.robot.Elevator.*;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;

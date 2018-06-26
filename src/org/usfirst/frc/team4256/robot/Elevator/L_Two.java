@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4256.robot.Elevators;
+package org.usfirst.frc.team4256.robot.Elevator;
 
 import com.cyborgcats.reusable.Phoenix.Encoder;
 import com.cyborgcats.reusable.Phoenix.Talon;

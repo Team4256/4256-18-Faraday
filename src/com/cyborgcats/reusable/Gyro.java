@@ -5,8 +5,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
 
 public class Gyro extends AHRS {
-//	private double lastLegalDirection = 1.0;
-	public Compass compass;
+	public final Compass compass;
 	
 	public Gyro(final byte updateHz) {
 		super(I2C.Port.kOnboard, updateHz);

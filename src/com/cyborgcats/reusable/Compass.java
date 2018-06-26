@@ -18,7 +18,8 @@ public class Compass {
 	
 	
 	/**
-	 * This function returns the current tare angle, relative to the initialized 0.
+	 * This function returns the current tare angle, relative to the original 0.
+	 * It does not indicate the tare angle relative to a previous tare angle.
 	**/
 	public double getTareAngle() {return tareAngle;}
 	
@@ -63,8 +64,8 @@ public class Compass {
 	 * This function returns the path to the border that is nearest to the specified angle.
 	**/
 	private double borderPath(final double start) {
-		final double toStartingEdge = path(start, protectedZoneStart);
-		final double toEndingEdge = path(start, protectedZoneStart + protectedZoneSize);
+		final double toStartingEdge = path(start, protectedZoneStart),
+					 toEndingEdge = path(start, protectedZoneStart + protectedZoneSize);
 		return Math.abs(toStartingEdge) <= Math.abs(toEndingEdge) ? toStartingEdge : toEndingEdge;
 	}
 	
@@ -75,11 +76,11 @@ public class Compass {
 	**/
 	public double legalPath(final double start, final double end) {
 		final double start_legal = legalize(start);
-		final double path_escape = validate(start) == start_legal ? 0.0 : borderPath(start);
+		final double path_escape = validate(start) == start_legal ? 0.0 : borderPath(start);//0 if start was already legal, otherwise borderPath()
 		double path_main = path(start_legal, legalize(end));
 		
 		if (protectedZoneSize != 0) {
-			double borderPath = borderPath(start_legal);
+			double borderPath = borderPath(start_legal);//yes, this is intentionally start_legal not start
 			
 			//OPTION A -- condensed
 			double comparator = borderPath == 0 ? 0 : 1;

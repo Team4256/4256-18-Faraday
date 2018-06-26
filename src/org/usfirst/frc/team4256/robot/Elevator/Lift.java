@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4256.robot.Elevators;
+package org.usfirst.frc.team4256.robot.Elevator;
 
 public abstract class Lift {
 	public abstract void init();

@@ -129,15 +129,9 @@ public class Xbox extends XboxController {
 	 * Otherwise, it returns false.
 	**/
 	public boolean isActive() {
-		for (int i = 1; i < 10; i++) {
-			if(getRawButton(i)) return true;
-		}
-		for (int i = 0; i < deadbands.length; i++) {
-			if(getAxisActivity(i)) return true;
-		}
-		for (int i = 0; i < getPOVCount(); i++) {
-			if(getPOV(i) != -1) return true;
-		}
+		for (int i = 1; i < 10; i++) if(getRawButton(i)) return true;
+		for (int i = 0; i < deadbands.length; i++) if(getAxisActivity(i)) return true;
+		for (int i = 0; i < getPOVCount(); i++) if(getPOV(i) != -1) return true;
 		return false;
 	}
 	
@@ -150,9 +144,8 @@ public class Xbox extends XboxController {
 		final double y = getRawAxis(stick[1]);
 		final boolean badX = Math.abs(x) <= deadbands[stick[0]];
 		final boolean badY = Math.abs(y) <= deadbands[stick[1]];
-		if (deadbanded && badX && badY) {
-			return Compass.convertToAngle(previousAxisValues[stick[0]], previousAxisValues[stick[1]]);
-		}else {
+		if (deadbanded && badX && badY) return Compass.convertToAngle(previousAxisValues[stick[0]], previousAxisValues[stick[1]]);
+		else {
 			previousAxisValues[stick[0]] = x;
 			previousAxisValues[stick[1]] = y;
 			return Compass.convertToAngle(x, y);

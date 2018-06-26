@@ -1,7 +1,5 @@
 package org.usfirst.frc.team4256.robot.Autonomous;//COMPLETE MARCH
 
-import org.usfirst.frc.team4256.robot.Elevators.Elevator;
-
 import com.cyborgcats.reusable.Drivetrain;
 import com.cyborgcats.reusable.Subsystem;
 
@@ -10,6 +8,7 @@ import org.usfirst.frc.team4256.robot.Parameters.ElevatorPresets;
 import java.util.Map;
 
 import org.usfirst.frc.team4256.robot.Clamp;
+import org.usfirst.frc.team4256.robot.Elevator.Elevator;
 
 public class S_DriveForward extends Strategy2018 {
 	private Long start = null;
