@@ -195,8 +195,8 @@ public final class D_Swerve implements Drivetrain {
 	}
 	
 	@Override
-	public double face(final double heading, double maximumOutput) {
-		final double error = Compass.path(Robot.gyroHeading, heading);
+	public double face(final double orientation, double maximumOutput) {
+		final double error = Compass.path(Robot.gyroHeading, orientation);
 		final double spin = PID.get("spin", error);
 		setSpin(Math.max(-maximumOutput, Math.min(spin, maximumOutput)));
 		return error;
