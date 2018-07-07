@@ -11,29 +11,35 @@ public class Gyro extends AHRS {
 		super(I2C.Port.kOnboard, updateHz);
 		compass = new Compass(0.0, 0.0);
 	}
+	
 	/**
-	 * Just calls the function of the same name from V_Compass.
-	**/
+	 * Tares the gyro's compass
+	 * @param tareAngle the new tare angle; can be positive or negative
+	 * @param relativeReference if true, tares relative to the current tare rather than 0
+	 * @see Compass#setTareAngle(double)
+	 */
 	public void setTareAngle(double tareAngle, final boolean relativeReference) {
 		if (relativeReference) {tareAngle += compass.getTareAngle();}
 		compass.setTareAngle(tareAngle);
 	}
+	
 	/**
-	 * This function returns the current angle based on the tare angle.
-	**/
-	public double getCurrentAngle() {
-		return Compass.validate((double)getAngle() - compass.getTareAngle());
-	}
+	 * Cleans up and returns gyro input, accounting for the tare angle
+	 * @return gyro heading in the range [0, 360)
+	 */
+	public double getCurrentAngle() {return Compass.validate((double)getAngle() - compass.getTareAngle());}
+	
 	/**
-	 * This function finds the shortest legal path from the current angle to the end angle and returns the size of that path in degrees.
-	 * Positive means clockwise and negative means counter-clockwise.
-	**/
-	public double pathTo(final double target) {
-		return compass.legalPath(getCurrentAngle(), target);
-	}
+	 * Uses <code>compass.legalPath(start, end)</code> to find the most efficient arc from <code>getCurrentAngle()</code> to target
+	 * @param target angle, designated in degrees
+	 * @return arc measure in degrees (positive if the arc is clockwise of current, negative otherwise)
+	 * @see Compass#legalPath(current, target)
+	 */
+	public double pathTo(final double target) {return compass.legalPath(getCurrentAngle(), target);}
+	
 	/**
-	 * This function computes the magnitude of the sum of the world-based acceleration vectors.
-	**/
+	 * @return magnitude of the acceleration vector
+	 */
 	public double netAcceleration() {
 		double xy = (double)(getWorldLinearAccelX()*getWorldLinearAccelX() + getWorldLinearAccelY()*getWorldLinearAccelY());
 		return Math.sqrt(xy + (double)(getWorldLinearAccelZ()*getWorldLinearAccelZ()));

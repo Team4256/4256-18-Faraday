@@ -142,7 +142,7 @@ public final class SwerveModule {
 	 * It should be used every time a new angle is being set to ensure quick rotation.
 	**/
 	public double decapitateAngle(final double endAngle) {
-		decapitated = Math.abs(rotation.wornPath(endAngle)) > 90 ? -1 : 1;
+		decapitated = Math.abs(rotation.pathTo(endAngle)) > 90 ? -1 : 1;
 		return decapitated == -1 ? Compass.validate(endAngle + 180) : Compass.validate(endAngle);
 	}
 

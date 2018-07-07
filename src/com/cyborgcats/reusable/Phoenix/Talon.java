@@ -69,7 +69,6 @@ public class Talon extends TalonSRX {
 		logger = Logger.getLogger("Talon " + Integer.toString(deviceID));
 	}
 	
-	
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum percentages.
 	 * If a follower, it then gets enslaved to the motor at the specified ID.
@@ -88,43 +87,68 @@ public class Talon extends TalonSRX {
 		else quickSet(0.0, false);
 	}
 	
-	
 	/**
 	 * This function prepares a motor by setting the PID profile, the closed loop error, and the minimum and maximum voltages.
 	**/
 	public void init() {init(0, 1.0);}
-	
 	
 	/**
 	 * This function returns the current position in revolutions.
 	 * talon.setSelectedSensorPosition() commands will be taken into account, and compass.getTareAngle() is ignored.
 	**/
 	public double getCurrentRevs() {
-		return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		if (hasEncoder) return convert.to.REVS.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+		else return 0.0;//TODO could throw an exception
 	}
 	
-	
 	/**
-	 * This function returns the current position in degrees. If wraparound is true, the output will be between 0 and 359.999...
-	 * Both the compass.getTareAngle() and any talon.setSelectedSensorPosition() commands will be taken into account. DON'T USE BOTH!
-	**/
-	public double getCurrentAngle(final boolean wraparound) {//ANGLE
-		final double raw = convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
-		return wraparound ? Compass.validate(raw - compass.getTareAngle()) : raw - compass.getTareAngle();
+	 * Gets raw encoder counts from <code>getSelectedSensorPosition(0)</code><br>
+	 * Accounts for gear ratio and tare angle, then returns the current position in degrees<br><br>
+	 * CAUTION: <code>setSelectedSensorPosition(counts)</code> can easily conflict with the tare angle
+	 * @param wraparound if true, result will be in the range [0, 360)
+	 * @return current angle in degrees
+	 * @see TalonSRX#getSelectedSensorPosition(int)
+	 * @see Convert
+	 */
+	public double getCurrentAngle(final boolean wraparound) {//ANGLE//TODO same as getCurrentRevs todo
+		if (hasEncoder) {
+			final double raw = convert.to.DEGREES.afterGears(getSelectedSensorPosition(0));//arg in getSelectedSensorPosition is PID slot ID
+			return wraparound ? Compass.validate(raw - compass.getTareAngle()) : raw - compass.getTareAngle();
+		}else return 0.0;//TODO could throw an exception
 	}
 	
-	
-	public double getCurrentRPM() {return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));}
-	
-	public double getCurrentRPS() {return convert.to.RPS.afterGears(getSelectedSensorVelocity(0));}
-	
+	/**
+	 * Gets raw encoder units from <code>getSelectedSensorVelocity(0)</code><br>
+	 * Accounts for gear ratio, then returns the current velocity in RPM
+	 * @return velocity in RPM
+	 * @see TalonSRX#getSelectedSensorVelocity(int)
+	 * @see Convert
+	 */
+	public double getCurrentRPM() {
+		if (hasEncoder) return convert.to.RPM.afterGears(getSelectedSensorVelocity(0));
+		else return 0.0;//TODO could throw an exception
+	}
 	
 	/**
-	 * This function finds the shortest legal path from the current angle to the end angle and returns the size of that path in degrees.
-	 * Positive means clockwise and negative means counter-clockwise.
-	 * If the current angle is inside the protected zone, the path goes through the previously breached border.
-	**/
-	public double wornPath(double target) {//ANGLE
+	 * Gets raw encoder units from <code>getSelectedSensorVelocity(0)</code><br>
+	 * Accounts for gear ratio, then returns the current velocity in RPS
+	 * @return velocity in RPS
+	 * @see TalonSRX#getSelectedSensorVelocity(int)
+	 * @see Convert
+	 */
+	public double getCurrentRPS() {
+		if (hasEncoder) return convert.to.RPS.afterGears(getSelectedSensorVelocity(0));
+		else return 0.0;//TODO could throw an excpetion
+	}
+	
+	/**
+	 * Uses <code>compass.legalPath(start, end)</code> to find the most efficient arc from <code>getCurrentAngle()</code> to target<br>
+	 * If the current angle is inside the protected zone, the arc will be forced to intersect the most recently breached border
+	 * @param target angle, designated in degrees
+	 * @return arc measure in degrees (positive if the arc is clockwise of current, negative otherwise)
+	 * @see Compass#legalPath(current, target)
+	 */
+	public double pathTo(double target) {//ANGLE
 		final double current = getCurrentAngle(true);
 		double path = compass.legalPath(current, target);
 		if (current == compass.legalize(current)) lastLegalDirection = Math.signum(path);
@@ -142,6 +166,16 @@ public class Talon extends TalonSRX {
 	 * Position: if treatAsDegrees, then will not spin more than 360 degrees
 	 * Speed: RPM
 	**/
+	/**
+	 * Calls {@link #set} with the <code>updateSetpoint</code> boolean set to true, and handles any exceptions
+	 * @param value units are dependent on <code>controlMode</code>:<br>
+	 * -- Current: Milliamperes<br>
+	 * -- Follower: ID<br>
+	 * -- Percent: -1.0 to 1.0<br>
+	 * -- Position: revs (impacted by <code>setSelectedSensorPosition(counts)</code>) or degrees (impacted by <code>setSelectedSensorPosition(counts)</code> and tare angle)<br>
+	 * -- Speed: RPM<br>
+	 * @param treatAsDegrees if true, input is treated as an angle and Talon will spin no more than 360 degrees
+	 */
 	public void quickSet(final double value, final boolean treatAsDegrees) {
 		try {
 			this.set(value, treatAsDegrees, true);
@@ -150,8 +184,14 @@ public class Talon extends TalonSRX {
 		}
 	}
 
-
-	public void set(final double value, final boolean treatAsDegrees, final boolean updateSetPoint) throws IllegalAccessException {
+	/**
+	 * 
+	 * @param value
+	 * @param treatAsDegrees
+	 * @param updateSetpoint
+	 * @throws IllegalAccessException
+	 */
+	public void set(final double value, final boolean treatAsDegrees, final boolean updateSetpoint) throws IllegalAccessException {
 		double currentSetPoint = lastSetpoint;
 		switch (controlMode) {
 		case Current:
@@ -171,7 +211,7 @@ public class Talon extends TalonSRX {
 		}
 		
 		updated = true;
-		if (updateSetPoint) lastSetpoint = currentSetPoint;
+		if (updateSetpoint) lastSetpoint = currentSetPoint;
 	}
 
 	
@@ -193,18 +233,18 @@ public class Talon extends TalonSRX {
 		if (controlMode == percent) {
 			super.set(controlMode, percentage);
 			logger.log(Level.FINE, Double.toString(percentage));
+			return percentage;
 		}else throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given percentage in " + controlMode.name() + " mode.");
-		return percentage;
 	}
 	
 	/*
 	 * setDegrees differs from setRevs in more than just units: it wraps values around the motor's axis and finds the shortest path to its target.
 	 * For example, if we set to 0, then 120, 240, 360, and back to 120, the motor will have spun CW 1.333 revs and CCW 0 revs.
-	 * If this were done with setRevs (0 -> .333 -> .666 -> .999 -> .333), the motor will have spun CW 1 rev and CCW .666 revs.
+	 * If this were done with setRevs (0 -> .333 -> .666 -> 1 -> .333), the motor will have spun CW 1 rev and CCW .666 revs.
 	 */
 	private double setDegrees(final double degrees) throws IllegalAccessException {
 		if (controlMode == position) {
-			final double encoderCounts = getSelectedSensorPosition(0) + convert.from.DEGREES.afterGears(wornPath(degrees));
+			final double encoderCounts = getSelectedSensorPosition(0) + convert.from.DEGREES.afterGears(pathTo(degrees));
 			super.set(controlMode, encoderCounts);
 			logger.log(Level.FINE, Double.toString(degrees));
 			return encoderCounts;
@@ -227,13 +267,11 @@ public class Talon extends TalonSRX {
 			final double encoderUnits = convert.from.RPM.afterGears(rpm);
 			super.set(controlMode, encoderUnits);
 			return encoderUnits;
-		}else {
-			throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given rpm in " + controlMode.name() + " mode.");
-		}
+		}else throw new IllegalAccessException("Talon " + Integer.toString(getDeviceID()) + " was given rpm in " + controlMode.name() + " mode.");
 	}
 	
 	
-	public void enterNeutral() {
+	public void setNeutral() {
 		neutralOutput();
 		updated = true;
 		lastSetpoint = null;

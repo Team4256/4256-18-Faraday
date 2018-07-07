@@ -87,12 +87,12 @@ public class Compass {
 	 * Positive means clockwise and negative means counter-clockwise.
 	**/
 	/**
-	 * Uses <code>path(start, end)</code> to find the smallest arc between start and <code>legalize(end)</code> that<br>
+	 * Uses <code>path(start, end)</code> to find the smallest arc between start and <code>legalize(end)</code> that
 	 * doesn't intersect the protected zone. If start was in that zone, <code>borderPath(start)</code> is added to the result
 	 * @param start the first point, designated in degrees
 	 * @param end the second point, designated in degrees
 	 * @return arc measure in degrees (positive if the arc is clockwise of start, negative if it's counterclockwise of start)
-	 * @see #path(angle1, angle2)
+	 * @see #path(start, end)
 	 * @see #legalize(angle)
 	 * @see #borderPath(angle)
 	 */

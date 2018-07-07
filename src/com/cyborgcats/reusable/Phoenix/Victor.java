@@ -88,7 +88,7 @@ public class Victor extends VictorSPX {
 	}
 	
 	
-	public void enterNeutral() {
+	public void setNeutral() {
 		neutralOutput();
 		updated = true;
 		lastSetpoint = null;
