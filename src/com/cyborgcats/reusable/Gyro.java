@@ -41,7 +41,7 @@ public class Gyro extends AHRS {
 	 * @return magnitude of the acceleration vector
 	 */
 	public double netAcceleration() {
-		double xy = (double)(getWorldLinearAccelX()*getWorldLinearAccelX() + getWorldLinearAccelY()*getWorldLinearAccelY());
-		return Math.sqrt(xy + (double)(getWorldLinearAccelZ()*getWorldLinearAccelZ()));
+		final double xx_yy = (double)(getWorldLinearAccelX()*getWorldLinearAccelX() + getWorldLinearAccelY()*getWorldLinearAccelY());
+		return Math.sqrt(xx_yy + (double)(getWorldLinearAccelZ()*getWorldLinearAccelZ()));
 	}
 }

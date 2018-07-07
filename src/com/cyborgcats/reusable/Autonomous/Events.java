@@ -5,6 +5,10 @@ import java.util.Map;
 import com.cyborgcats.reusable.Drivetrain;
 import com.cyborgcats.reusable.Subsystem;
 
+/**
+ * Allows discrete actions to be performed at designated points along an autonomous path<br>
+ * Unlike a {@link Leash} object, which updates the drivetrain every loop, an Events object only runs <code>commands</code> when <code>triggers</code> are reached.
+ */
 public class Events {
 	private final Command[] commands;//list of actions
 	private final double[] triggers;//list of values where independentVariable triggers an action
@@ -27,7 +31,7 @@ public class Events {
 	
 	/**
 	 * Resets private instance variables <code>step</code> and <code>doneRunning</code> to their initial values.<br>
-	 * This should be called to start over, for example, at the beginning of autonomous.
+	 * Should be called to start over, for example, at the beginning of autonomous.
 	 */
 	public void reinit() {
 		step = -1;
@@ -36,7 +40,8 @@ public class Events {
 	
 	/**
 	 * If <code>!doneRunning</code>, increments <code>step</code> when <code>independentVariable</code> has reached a trigger<br>
-	 * If <code>step</code> is the last index in <code>commands</code> and <code>triggers</code>, <code>doneRunning</code> will be set to true
+	 * If <code>step</code> is the last index in <code>commands</code> and <code>triggers</code>, <code>doneRunning</code> will be set to true<br><br>
+	 * Should be called every loop
 	 * @param independentVariable should increase as autonomous progresses
 	 */
 	public void check(final double independentVariable) {
@@ -56,5 +61,25 @@ public class Events {
 		if (step > -1) commands[step].execute(drivetrain, subsystems);
 	}
 	
-	public static interface Command {void execute(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems);}
+	/**
+	 * As a single method interface, Command defines a signature against which lambda functions can be matched.<br><br>
+	 * When creating a list of Commands to be used in {@link Events}, many of them start to look very similar.
+	 * To save space, states and parameters can be placed into one big array and passed into a helper function that
+	 * converts them into the corresponding lambda expressions.<br><br>
+	 * 
+	 * Usage:<br>
+	 * <code>Command command = (drive, sys) -> {
+	 * <pre>drive.foo();</pre>
+	 * <pre>sys.get("baz").perform(bar, xyzzy);</pre>
+	 * };</code>
+	 */
+	public static interface Command {
+		/**
+		 * This should update the desired state of one or more subsystems and possibly use <code>drivetrain</code> to set the robot's orientation.<br>
+		 * Unless the drivetrain is swerve AND the current {@link Odometer} can track through a change in orientation, a while loop should be used to pause other code during the change.
+		 * @param drivetrain a {@link Drivetrain} implementation
+		 * @param subsystems a list of {@link Subsystem} implementations
+		 */
+		void execute(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems);
+	}
 }

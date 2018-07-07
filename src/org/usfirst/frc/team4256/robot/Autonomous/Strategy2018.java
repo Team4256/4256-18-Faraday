@@ -71,12 +71,14 @@ public abstract class Strategy2018 extends Strategy {
 	
 	
 	/**
+	 * Converts an array of desired states and parameters into a list of Commands
+	 * 
 	 * @param instructions a 2D array of Strings with any number of rows and 5 columns<br>
 	 * first column: clamp action ({@linkplain org.usfirst.frc.team4256.robot.Clamp.Abilities Abilities})<br>
 	 * second column: elevator height (inches)<br>
 	 * third column: robot orientation (degrees)<br>
 	 * fourth column: maximum spin speed (percent)<br>
-	 * fifth column: whether to pause code until actual orientation matches desired orientation (<code>"wait"</code> or <code>"pass"</code>)
+	 * fifth column: whether to pause code until desired orientation is achieved (<code>"wait"</code> or <code>"pass"</code>)
 	 * 
 	 * @return an array of executable commands
 	 * @see Command
