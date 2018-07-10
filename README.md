@@ -23,13 +23,13 @@ _reusable.Autonomous_
 **P_Curve:** an implementation of Path allowing for the use of mathematical expressions  
 **Strategy:** abstract class for integrating and following a set of Events and a Leash  
   
-_reusable.Phoenix_
+_reusable.Phoenix_  
 **Convert:** a complicated looking class that provides simple syntax for converting raw encoder counts to more useful units  
 **Encoder:** an enum that stores important facts about various encoder models  
 **Talon:** extends CTRE TalonSRX to simplify calls to motors, especially those with encoders  
 **Victor:** essentially the same as Talon  
   
-  
+    
 _this year_  
 **D_Swerve:** an implementation of Drivetrain for 4-module swerve  
 **SwerveModule:** integrates 2 Talons, basically a backend for D_Swerve  
