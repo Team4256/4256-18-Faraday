@@ -13,8 +13,8 @@ public final class S_Slither extends Strategy2018 {
 	
 	@Override
 	protected Leash getLeash() {
-		final Function x = (t) -> 2.0*Math.sin(t);
-		final Function y = (t) -> t;
+		final Function x = (t) -> 2.0*Math.sin(t) + posI.x();
+		final Function y = (t) -> t + Yi;
 		
 		final Path a = new P_Curve(x, y, 0.0, 2.0*Math.PI);
 		final Path[] path = new Path[] {a};

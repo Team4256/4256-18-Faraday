@@ -20,11 +20,14 @@ public abstract class Strategy2018 extends Strategy {
 	protected Strategy2018(final StartingPosition posI, final char[] gameData, final Odometer odometer) {
 		super(odometer);
 		this.posI = posI;
-		odometer.setOrigin(odometer.getX(false) - posI.x, odometer.getY(false) - Yi);
+		odometer.completeLoopUpdate();
+		odometer.setOrigin(odometer.getX(false, true) - posI.x, odometer.getY(false, true) - Yi);
 		
 		if (gameData.length != 3) throw new IllegalStateException("Strategies only work with valid game data.");
 		switchTarget = gameData[0] == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
 		scaleTarget = gameData[1] == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SCALE
+		
+		init();
 	}
 	
 	

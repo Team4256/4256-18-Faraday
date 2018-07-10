@@ -11,9 +11,12 @@ public abstract class Strategy {
 	protected Odometer odometer;
 	
 	protected Strategy(final Odometer odometer) {
+		this.odometer = odometer;
+	}
+	
+	protected void init() {
 		leash = getLeash();
 		events = getEvents();
-		this.odometer = odometer;
 	}
 	
 	public void use(final Drivetrain drivetrain, final Map<String, Subsystem> subsystems) {
@@ -30,8 +33,8 @@ public abstract class Strategy {
 		//run path processing only if odometer values are new
   		if (odometer.newX() || odometer.newY()) {
   			//get most recent odometer values
-  			final double actualX = odometer.getX(true);
-  			final double actualY = odometer.getY(true);
+  			final double actualX = odometer.getX(true, false);
+  			final double actualY = odometer.getY(true, false);
 		
   			//ensure that the desired position stays a leash length away
   			leash.maintainLength(actualX, actualY);
