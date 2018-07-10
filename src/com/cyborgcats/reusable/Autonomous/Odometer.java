@@ -1,22 +1,32 @@
 package com.cyborgcats.reusable.Autonomous;
 
 public abstract class Odometer {
+	private double tareX = 0.0, tareY = 0.0;
+	protected ConsumableDouble x = new ConsumableDouble(), y = new ConsumableDouble();
+	
 	public abstract void init();
-	public abstract void setCurrent(final double x, final double y);
+	public abstract void completeLoopUpdate();
 	
-	public abstract double getX(final boolean markAsRead);
-	public abstract double getY(final boolean markAsRead);
-	public abstract boolean newX();
-	public abstract boolean newY();
-	public abstract void update();
-	public abstract void disable();
+	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
 	
-	protected class ConsumableDouble {
+	public double getX(final boolean markAsRead, final boolean raw) {
+		if (raw) return x.get(markAsRead);
+		else return x.get(markAsRead) - tareX;
+	}
+	public double getY(final boolean markAsRead, final boolean raw) {
+		if (raw) return y.get(markAsRead);
+		else return y.get(markAsRead) - tareY;
+	}
+	
+	public boolean newX() {return x.isNew();}
+	public boolean newY() {return y.isNew();}
+	
+	public static class ConsumableDouble {
 		private boolean isNew = false;
 		private double value = 0.0;
 		
-		public void set(final double val) {this.value = val;	isNew = true;}
-		public void increment(final double val) {this.value += val;		isNew = true;}
+		public void set(final double value) {this.value = value;	isNew = true;}
+		public void increment(final double value) {this.value += value;		isNew = true;}
 		public double get(final boolean markAsRead) {if (markAsRead) isNew = false;		return value;}
 		public boolean isNew() {return isNew;}
 	}

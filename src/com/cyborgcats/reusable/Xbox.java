@@ -2,7 +2,7 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 
 import edu.wpi.first.wpilibj.XboxController;
 
-public class R_Xbox extends XboxController {
+public class Xbox extends XboxController {
 	public static final int AXIS_LEFT_X = 0;
 	public static final int AXIS_LEFT_Y = 1;
 	public static final int AXIS_LT = 2;
@@ -33,7 +33,7 @@ public class R_Xbox extends XboxController {
 	public static final int POV_WEST = 270;
 	public static final int POV_NORTH_WEST = 315;
 	
-	public R_Xbox(final int port) {
+	public Xbox(final int port) {
 		super(port);
 	}
 	private double[] deadbands = new double[6];
@@ -75,18 +75,14 @@ public class R_Xbox extends XboxController {
 	 * This function returns 0 unless |getRawAxis()| is greater than the stored deadband,
 	 * in which case it returns getRawAxis()
 	**/
-	public double getDeadbandedAxis(final int axis) {
-		return getDeadbandedAxis(axis, deadbands[axis]);
-	}
+	public double getDeadbandedAxis(final int axis) {return getDeadbandedAxis(axis, deadbands[axis]);}
 	
 	
 	/**
 	 * This function returns true if the specified axis' value is greater than the specified minimum.
 	 * Otherwise, it returns false.
 	**/
-	public boolean getAxisPress(final int axis, final double minimum) {
-		return Math.abs(getRawAxis(axis)) >= minimum;
-	}
+	public boolean getAxisPress(final int axis, final double minimum) {return Math.abs(getRawAxis(axis)) >= minimum;}
 	
 	
 	/**
@@ -114,9 +110,7 @@ public class R_Xbox extends XboxController {
 	/**
 	 * This function returns the time at which the specified button was last pressed.
 	**/
-	public Long lastPress(final int button) {
-		return buttonTimes[button - 1];
-	}
+	public Long lastPress(final int button) {return buttonTimes[button - 1];}
 	
 	
 	/**
@@ -135,21 +129,9 @@ public class R_Xbox extends XboxController {
 	 * Otherwise, it returns false.
 	**/
 	public boolean isActive() {
-		for (int i = 1; i < 10; i++) {
-			if(getRawButton(i)) {
-				return true;
-			}
-		}
-		for (int i = 0; i < deadbands.length; i++) {
-			if(getAxisActivity(i)) {
-				return true;
-			}
-		}
-		for (int i = 0; i < getPOVCount(); i++) {
-			if(getPOV(i) != -1) {
-				return true;
-			}
-		}
+		for (int i = 1; i < 10; i++) if(getRawButton(i)) return true;
+		for (int i = 0; i < deadbands.length; i++) if(getAxisActivity(i)) return true;
+		for (int i = 0; i < getPOVCount(); i++) if(getPOV(i) != -1) return true;
 		return false;
 	}
 	
@@ -162,12 +144,11 @@ public class R_Xbox extends XboxController {
 		final double y = getRawAxis(stick[1]);
 		final boolean badX = Math.abs(x) <= deadbands[stick[0]];
 		final boolean badY = Math.abs(y) <= deadbands[stick[1]];
-		if (deadbanded && badX && badY) {
-			return V_Compass.convertToAngle(previousAxisValues[stick[0]], previousAxisValues[stick[1]]);
-		}else {
+		if (deadbanded && badX && badY) return Compass.convertToAngle(previousAxisValues[stick[0]], previousAxisValues[stick[1]]);
+		else {
 			previousAxisValues[stick[0]] = x;
 			previousAxisValues[stick[1]] = y;
-			return V_Compass.convertToAngle(x, y);
+			return Compass.convertToAngle(x, y);
 		}
 	}
 	
@@ -180,10 +161,7 @@ public class R_Xbox extends XboxController {
 		final double y = getRawAxis(stick[1]);
 		final boolean badX = Math.abs(x) <= deadbands[stick[0]];
 		final boolean badY = Math.abs(y) <= deadbands[stick[1]];
-		if (deadbanded && badX && badY) {
-			return 0.0;
-		}else {
-			return Math.sqrt(x*x + y*y);
-		}
+		if (deadbanded && badX && badY) return 0.0;
+		else return Math.sqrt(x*x + y*y);
 	}
 }

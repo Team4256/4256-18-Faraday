@@ -2,7 +2,7 @@ package com.cyborgcats.reusable.Phoenix;//COMPLETE 2018
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
-public enum R_Encoder {
+public enum Encoder {
 	CTRE_MAG_ABSOLUTE(FeedbackDevice.CTRE_MagEncoder_Absolute, 4096),
 	CTRE_MAG_RELATIVE(FeedbackDevice.CTRE_MagEncoder_Relative, 4096),
 	RS7_QUAD(FeedbackDevice.QuadEncoder, 12),
@@ -11,7 +11,7 @@ public enum R_Encoder {
 	private final FeedbackDevice feedbackDevice;
 	private final int countsPerRev;
 	
-	R_Encoder(final FeedbackDevice feedbackDevice, final int countsPerRev) {
+	Encoder(final FeedbackDevice feedbackDevice, final int countsPerRev) {
 		this.feedbackDevice = feedbackDevice;
 		this.countsPerRev = countsPerRev;
 	}

@@ -1,11 +1,10 @@
 package org.usfirst.frc.team4256.robot;
 
-import com.cyborgcats.reusable.R_Gyro;
-import com.cyborgcats.reusable.V_Compass;
+import com.cyborgcats.reusable.Compass;
+import com.cyborgcats.reusable.Drivetrain;
+import com.cyborgcats.reusable.PID;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-public class R_Drivetrain {
+public final class D_Swerve implements Drivetrain {
 	private static final double pivotToFrontX = 8.45,//inches, pivot point to front wheel tip, x
 								pivotToFrontY = 10.06,//inches, pivot point to front wheel tip, y
 								pivotToAftX = 8.90,//inches, pivot point to aft wheel tip, x
@@ -13,41 +12,37 @@ public class R_Drivetrain {
 	private static final double pivotToFront = Math.hypot(pivotToFrontX, pivotToFrontY),
 								pivotToAft = Math.hypot(pivotToAftX, pivotToAftY);
 	
+	private final SwerveModule moduleA, moduleB, moduleC, moduleD;
+	private final SwerveModule[] modules;
+	
 	private double moduleD_maxSpeed = 70.0;//always put max slightly higher than max observed
 	private double moduleD_previousAngle = 0.0;
 	private double previousSpin = 0.0;
-
-	public final R_Gyro gyro;
-	private final R_SwerveModule moduleA, moduleB, moduleC, moduleD;
-	private final R_SwerveModule[] modules;
+	
+	private double direction = 0.0, speed = 0.0, spin = 0.0;
 	
 	
-	public R_Drivetrain(final R_Gyro gyro, final R_SwerveModule moduleA, final R_SwerveModule moduleB, final R_SwerveModule moduleC, final R_SwerveModule moduleD) {
-		this.gyro = gyro;
-		this.moduleA = moduleA;
-		this.moduleB = moduleB;
-		this.moduleC = moduleC;
-		this.moduleD = moduleD;
-		this.modules = new R_SwerveModule[] {moduleA, moduleB, moduleC, moduleD};
+	public D_Swerve(final SwerveModule moduleA, final SwerveModule moduleB, final SwerveModule moduleC, final SwerveModule moduleD) {
+		this.moduleA = moduleA;	this.moduleB = moduleB;	this.moduleC = moduleC;	this.moduleD = moduleD;
+		this.modules = new SwerveModule[] {moduleA, moduleB, moduleC, moduleD};
 	}
 	
 	/**
 	 * This function prepares each swerve module individually.
 	**/
+	@Override
 	public void init() {
-		moduleA.init(/*reversed traction*/true);
-		moduleB.init(/*reversed traction*/false);
-		moduleC.init(/*reversed traction*/true);
-		moduleD.init(/*reversed traction*/false);
+		moduleA.init(/*reversed traction*/true);	moduleB.init(/*reversed traction*/false);
+		moduleC.init(/*reversed traction*/false);	moduleD.init(/*reversed traction*/true);
 	}
 	
 	
-	public void holonomic(final double direction, double speed, final double spin) {
+	private void holonomic(final double direction, double speed, final double spin) {
 		//{PREPARE VARIABLES}
 		speed = Math.abs(speed);
-		final double chassis_fieldAngle = gyro.getCurrentAngle();
-		final double forward = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
-					 strafe  = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		final double chassis_fieldAngle = Robot.gyroHeading;
+		final double forward = speed*Math.cos(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
+					 strafe  = speed*Math.sin(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
 		final double[] comps_desired = computeComponents(strafe, forward, spin);
 		final boolean bad = speed == 0.0 && spin == 0.0;
 		
@@ -60,10 +55,10 @@ public class R_Drivetrain {
 		final double[] angles_final;
 		if ((speed < speed_actual) && (speed_actual > .1)) {
 			final double[] angles_desired = computeAngles(comps_desired);
-			final double stdd_desired = V_Compass.stdd(angles_desired);
+			final double stdd_desired = Compass.stdd(angles_desired);
 			
 			final double[] angles_actual = computeAngles(computeComponents(speeds_actual[0], speeds_actual[1], spin));
-			final double stdd_actual = V_Compass.stdd(angles_actual);
+			final double stdd_actual = Compass.stdd(angles_actual);
 			
 			angles_final = stdd_desired > stdd_actual ? angles_actual : angles_desired;
 		}else {
@@ -79,10 +74,7 @@ public class R_Drivetrain {
 		if (!bad && isThere(6.0)) {
 			final double[] speeds_final = computeSpeeds(comps_desired);
 			for (int i = 0; i < 4; i++) modules[i].set(speeds_final[i]);//control traction if good and there
-		}else {
-			stop();//otherwise, stop traction
-			moduleD.tractionDeltaPathLength = 0.0;
-		}
+		}else stop();//otherwise, stop traction
 		
 		if (spin < 0.07) moduleD.checkTractionEncoder();
 		
@@ -91,12 +83,12 @@ public class R_Drivetrain {
 	}
 	
 	
-	public void holonomic_encoderIgnorant(final double direction, double speed, final double spin) {
+	private void holonomic_encoderIgnorant(final double direction, double speed, final double spin) {
 		//{PREPARE VARIABLES}
 		speed = Math.abs(speed);
-		final double chassis_fieldAngle = gyro.getCurrentAngle();
-		final double forward = speed*Math.cos(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
-					 strafe  = speed*Math.sin(Math.toRadians(R_SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
+		final double chassis_fieldAngle = Robot.gyroHeading;
+		final double forward = speed*Math.cos(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle))),
+					 strafe  = speed*Math.sin(Math.toRadians(SwerveModule.convertToRobot(direction, chassis_fieldAngle)));
 		final double[] comps_desired = computeComponents(strafe, forward, spin);
 		final boolean bad = speed == 0.0 && spin == 0.0;
 		
@@ -109,21 +101,18 @@ public class R_Drivetrain {
 		if (!bad && isThere(10.0)) {
 			final double[] speeds_final = computeSpeeds(comps_desired);
 			for (int i = 0; i < 4; i++) modules[i].set(speeds_final[i]);//control traction if good and there
-		}else {
-			stop();//otherwise, stop traction
-			moduleD.tractionDeltaPathLength = 0.0;
-		}
+		}else stop();//otherwise, stop traction
 		
 		if (spin < 0.07) moduleD.checkTractionEncoder();
 	}
 	
 	
-	public void align() {
+	public boolean align() {
 		final boolean a = moduleA.magneticAlignment(-90.0),
 					  b = moduleB.magneticAlignment(180.0),
 					  c = moduleC.magneticAlignment(0.0),
 					  d = moduleD.magneticAlignment(90.0);
-		SmartDashboard.putBoolean("aligning", a || b || c || d);
+		return a && b && c && d;
 	}
 	
 	private double[] speedsFromModuleD() {
@@ -143,9 +132,13 @@ public class R_Drivetrain {
 	public boolean isThere(final double threshold) {
 		return moduleA.isThere(threshold) && moduleB.isThere(threshold) && moduleC.isThere(threshold) && moduleD.isThere(threshold);
 	}
-	public void autoMode(final boolean enable) {for (R_SwerveModule module : modules) module.autoMode(enable);}
-	public void stop() {for (R_SwerveModule module : modules) module.set(0.0);}
-	public void completeLoopUpdate() {for (R_SwerveModule module : modules) module.completeLoopUpdate();}
+	public void autoMode(final boolean enable) {for (SwerveModule module : modules) module.autoMode(enable);}
+	private void stop() {for (SwerveModule module : modules) module.set(0.0);}
+	@Override
+	public void completeLoopUpdate() {
+		holonomic_encoderIgnorant(direction, speed, spin);
+		for (SwerveModule module : modules) module.completeLoopUpdate();
+	}
 	
 	
 	
@@ -180,5 +173,32 @@ public class R_Drivetrain {
 		double max = Math.max(speedA, Math.max(speedB, Math.max(speedC, speedD)));
 		if (max < 1.0) {max = 1.0;}
 		return new double[] {speedA/max, speedB/max, speedC/max, speedD/max};
+	}
+
+	
+	//------------------------------------------------CONFORMING CODE----------------------------------------
+	@Override
+	public void setSpeed(final double speed) {this.speed = speed <= 1.0 ? speed : 1.0;}
+	@Override
+	public void setSpin(final double speed) {this.spin = Math.abs(speed) <= 1.0 ? speed : Math.signum(speed);}
+	@Override
+	public void travelTowards(final double heading) {this.direction = heading;}
+
+	@Override
+	public void correctFor(final double errorDirection, final double errorMagnitude) {
+		travelTowards(errorDirection);
+		
+		double speed = PID.get("leash", errorMagnitude);//DO NOT use I gain with this because errorMagnitude is always positive
+		if (speed > 0.6) speed = 0.6;
+		
+		setSpeed(speed);
+	}
+	
+	@Override
+	public double face(final double orientation, double maximumOutput) {
+		final double error = Compass.path(Robot.gyroHeading, orientation);
+		final double spin = PID.get("spin", error);
+		setSpin(Math.max(-maximumOutput, Math.min(spin, maximumOutput)));
+		return error;
 	}
 }

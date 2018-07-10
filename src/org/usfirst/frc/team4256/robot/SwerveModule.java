@@ -2,35 +2,36 @@ package org.usfirst.frc.team4256.robot;
 
 import java.util.logging.Logger;
 
-import com.cyborgcats.reusable.V_Compass;
-import com.cyborgcats.reusable.Phoenix.R_Encoder;
-import com.cyborgcats.reusable.Phoenix.R_Talon;
+import com.cyborgcats.reusable.Compass;
+import com.cyborgcats.reusable.Phoenix.Encoder;
+import com.cyborgcats.reusable.Phoenix.Talon;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
-public class R_SwerveModule {
+public final class SwerveModule {
 	public static final double rotatorGearRatio = 1.0;
 	public static final double tractionGearRatio = 40.0/3.0;
 	public static final double tractionWheelCircumference = 2.625*Math.PI;//inches
-	private final R_Talon rotation;
-	private final R_Talon traction;
-	private final boolean hasTractionSensor;
+	private final Talon rotation;
+	private final Talon traction;
+	private final DigitalInput magnet;
+	
 	private double decapitated = 1.0;
-	public double tractionDeltaPathLength = 0.0;
+	private double tractionDeltaPathLength = 0.0;
 	private double tractionPreviousPathLength = 0.0;
-	private DigitalInput magnet;
 	private boolean aligned = true;
 	
 	//This constructor is intended for use with the module which has an encoder on the traction motor.
-	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction, final int magnetID) {
-		this.rotation = new R_Talon(rotatorID, rotatorGearRatio, R_Talon.position, R_Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
-		this.traction = new R_Talon(tractionID, tractionGearRatio, R_Talon.percent, R_Encoder.RS7_QUAD, flippedSensorTraction);
-		hasTractionSensor = true;
+	public SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final boolean flippedSensorTraction, final int magnetID) {
+		rotation = new Talon(rotatorID, rotatorGearRatio, Talon.position, Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
+		traction = new Talon(tractionID, tractionGearRatio, Talon.percent, Encoder.RS7_QUAD, flippedSensorTraction);
 		magnet = new DigitalInput(magnetID);
 	}
 	//This constructor is intended for all other modules.
-	public R_SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final int magnetID) {
-		this(rotatorID, flippedSensor, tractionID, false, magnetID);
+	public SwerveModule(final int rotatorID, final boolean flippedSensor, final int tractionID, final int magnetID) {
+		rotation = new Talon(rotatorID, rotatorGearRatio, Talon.position, Encoder.CTRE_MAG_ABSOLUTE, flippedSensor);
+		traction = new Talon(tractionID, Talon.percent);
+		magnet = new DigitalInput(magnetID);
 	}
 	
 	
@@ -40,34 +41,32 @@ public class R_SwerveModule {
 	public void init(final boolean reversedTraction) {
 		rotation.init();
 		
-		rotation.setNeutralMode(R_Talon.coast);
-		rotation.config_kP(0, 12.0, R_Talon.kTimeoutMS);
-		rotation.config_kI(0, 0.0, R_Talon.kTimeoutMS);
-		rotation.config_kD(0, 2.0, R_Talon.kTimeoutMS);
+		rotation.setNeutralMode(Talon.coast);
+		rotation.config_kP(0, 15.0, Talon.kTimeoutMS);
+		rotation.config_kI(0, 0.0, Talon.kTimeoutMS);
+		rotation.config_kD(0, 2.0, Talon.kTimeoutMS);
 		
 		traction.init();
 		
 		traction.setInverted(reversedTraction);
-		traction.setNeutralMode(R_Talon.coast);
+		traction.setNeutralMode(Talon.coast);
 		traction.configPeakOutputForward(.9166, 0);//%, delay to wait for error code
 		traction.configPeakOutputReverse(-.9166, 0);
-		traction.configContinuousCurrentLimit(40, R_Talon.kTimeoutMS);
-		traction.configPeakCurrentLimit(45, R_Talon.kTimeoutMS);
-		traction.configPeakCurrentDuration(250, R_Talon.kTimeoutMS);
+		traction.configContinuousCurrentLimit(40, Talon.kTimeoutMS);
+		traction.configPeakCurrentLimit(45, Talon.kTimeoutMS);
+		traction.configPeakCurrentDuration(250, Talon.kTimeoutMS);
 	}
 	
 	public void autoMode(final boolean enable) {
-		if (enable) traction.configOpenloopRamp(2.0, R_Talon.kTimeoutMS);
-		else traction.configOpenloopRamp(1.0, R_Talon.kTimeoutMS);
+		if (enable) traction.configOpenloopRamp(2.0, Talon.kTimeoutMS);
+		else traction.configOpenloopRamp(1.0, Talon.kTimeoutMS);
 	}
 	
 	
 	/**
 	 * This sets the tare angle. Positive means clockwise and negative means counter-clockwise.
 	**/
-	public void setTareAngle(final double tareAngle) {
-		setTareAngle(tareAngle, false);
-	}
+	public void setTareAngle(final double tareAngle) {setTareAngle(tareAngle, false);}
 	
 	
 	/**
@@ -75,7 +74,7 @@ public class R_SwerveModule {
 	 * If relativeReference is true, tareAngle will be incremented rather than set.
 	**/
 	public void setTareAngle(double tareAngle, final boolean relativeReference) {
-		if (relativeReference) {tareAngle += rotation.compass.getTareAngle();}
+		if (relativeReference) tareAngle += rotation.compass.getTareAngle();
 		rotation.compass.setTareAngle(tareAngle);
 	}
 	
@@ -100,37 +99,27 @@ public class R_SwerveModule {
 	 * This function sets the master and slave traction motors to the specified speed, from -1 to 1.
 	 * It also makes sure that they turn in the correct direction, regardless of decapitated state.
 	**/
-	public void set(final double speed) {
-		traction.quickSet(speed*decapitated, false);
-	}
+	public void set(final double speed) {traction.quickSet(speed*decapitated, false);}
 	
 	public boolean magneticAlignment(final double offset) {
 		if (magnet.get()) {
 			aligned = false;
 			rotation.quickSet(rotation.getCurrentRevs() + 0.05, false);
-			return true;
 		}else if (!aligned) {
 			setTareAngle(rotation.getCurrentAngle(true) + offset, true);
 			decapitated = 1;
 			traction.setInverted(true);
 			aligned = true;
 		}
-		return false;
+		return aligned;
 	}
 	
 	
 	public void checkTractionEncoder() {
-		if (hasTractionSensor) {
+		if (traction.hasEncoder) {
 			final double currentPathLength = tractionPathLength();
 			tractionDeltaPathLength = currentPathLength - tractionPreviousPathLength;
 			tractionPreviousPathLength = currentPathLength;
-		}
-	}
-	public void resetTractionEncoder() {
-		if (hasTractionSensor) {
-			tractionDeltaPathLength = 0.0;
-			tractionPreviousPathLength = 0.0;
-			traction.setSelectedSensorPosition(0, 0, 0);
 		}
 	}
 	/**
@@ -145,11 +134,7 @@ public class R_SwerveModule {
 	/**
 	 * Threshold should be specified in degrees. If the rotator is within that many degrees of its target, this function returns true.
 	**/
-	public boolean isThere(final double threshold) {
-		return Math.abs(rotation.getCurrentError(true)) <= threshold;
-	}
-	
-	public double decapitated() {return decapitated;}
+	public boolean isThere(final double threshold) {return Math.abs(rotation.getCurrentError(true)) <= threshold;}
 	
 	
 	/**
@@ -157,29 +142,30 @@ public class R_SwerveModule {
 	 * It should be used every time a new angle is being set to ensure quick rotation.
 	**/
 	public double decapitateAngle(final double endAngle) {
-		decapitated = Math.abs(rotation.wornPath(endAngle)) > 90 ? -1 : 1;
-		return decapitated == -1 ? V_Compass.validate(endAngle + 180) : V_Compass.validate(endAngle);
+		decapitated = Math.abs(rotation.pathTo(endAngle)) > 90 ? -1 : 1;
+		return decapitated == -1 ? Compass.validate(endAngle + 180) : Compass.validate(endAngle);
 	}
 
 	
 	public double tractionSpeed() {
-		if (hasTractionSensor) return tractionWheelCircumference*traction.getCurrentRPS();
+		if (traction.hasEncoder) return tractionWheelCircumference*traction.getCurrentRPS();
 		else throw new IllegalStateException("Cannot get traction motor speed without an encoder!");
 	}
 	
 	
 	public double tractionPathLength() {
-		if (hasTractionSensor) return traction.getCurrentRevs()*tractionWheelCircumference/12.0;
-		else return 0.0;
+		if (traction.hasEncoder) return traction.getCurrentRevs()*tractionWheelCircumference/12.0;
+		else throw new IllegalStateException("Cannot get path length without an encoder!");
 	}
 	
 	
 	public double deltaDistance() {return tractionDeltaPathLength;}
-	public double deltaXDistance(final double gyroAngle) {return tractionDeltaPathLength*Math.sin(convertToField(rotation.getCurrentAngle(true), gyroAngle)*Math.PI/180.0);}
-	public double deltaYDistance(final double gyroAngle) {return tractionDeltaPathLength*Math.cos(convertToField(rotation.getCurrentAngle(true), gyroAngle)*Math.PI/180.0);}
+	public double deltaXDistance() {return tractionDeltaPathLength*Math.sin(convertToField(rotation.getCurrentAngle(true), Robot.gyroHeading)*Math.PI/180.0);}
+	public double deltaYDistance() {return tractionDeltaPathLength*Math.cos(convertToField(rotation.getCurrentAngle(true), Robot.gyroHeading)*Math.PI/180.0);}
 	
-	public R_Talon rotationMotor() {return rotation;}
-	public R_Talon tractionMotor() {return traction;}
+	public Talon rotationMotor() {return rotation;}
+	public Talon tractionMotor() {return traction;}
+	public double decapitated() {return decapitated;}
 	
 
 	public void setParentLogger(final Logger logger) {
@@ -192,7 +178,7 @@ public class R_SwerveModule {
 	 * It requires an angle and input from the gyro.
 	**/
 	public static double convertToField(final double wheel_robotAngle, final double chassis_fieldAngle) {
-		return V_Compass.validate(wheel_robotAngle + chassis_fieldAngle);
+		return Compass.validate(wheel_robotAngle + chassis_fieldAngle);
 	}
 	
 	
@@ -201,6 +187,6 @@ public class R_SwerveModule {
 	 * It requires an angle and input from the gyro.
 	**/
 	public static double convertToRobot(final double wheel_fieldAngle, final double chassis_fieldAngle) {
-		return V_Compass.validate(wheel_fieldAngle - chassis_fieldAngle);
+		return Compass.validate(wheel_fieldAngle - chassis_fieldAngle);
 	}
 }

@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-public class R_Victor extends VictorSPX {
+public class Victor extends VictorSPX {
 	
 	public static final ControlMode follower = ControlMode.Follower;
 	public static final ControlMode percent = ControlMode.PercentOutput;
@@ -17,7 +17,7 @@ public class R_Victor extends VictorSPX {
 	private Double lastSetpoint = 0.0;
 	private boolean updated = false;
 	
-	public R_Victor(int deviceID, final ControlMode controlMode) {
+	public Victor(int deviceID, final ControlMode controlMode) {
 		super(deviceID);
 		this.controlMode = controlMode;
 	}
@@ -28,7 +28,7 @@ public class R_Victor extends VictorSPX {
 	}
 	
 	
-	public void init(final R_Talon master) {
+	public void init(final Talon master) {
 		init(1.0);
 		follow(master);
 	}
@@ -88,7 +88,7 @@ public class R_Victor extends VictorSPX {
 	}
 	
 	
-	public void enterNeutral() {
+	public void setNeutral() {
 		neutralOutput();
 		updated = true;
 		lastSetpoint = null;

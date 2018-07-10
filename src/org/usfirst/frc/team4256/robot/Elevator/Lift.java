@@ -1,6 +1,6 @@
-package org.usfirst.frc.team4256.robot.Elevators;
+package org.usfirst.frc.team4256.robot.Elevator;
 
-public abstract class Elevator {
+public abstract class Lift {
 	public abstract void init();
 	public abstract void setInches(final double inches);
 	public abstract double getInches();
