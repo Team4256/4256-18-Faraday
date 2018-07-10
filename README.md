@@ -5,20 +5,41 @@ The classes under com.cyborgcats.reusable were designed to work year after year 
   
 primary code outline:  
 _reusable_  
-**R_Talon:** extends CTRE TalonSRX to understand gear ratios and convert encoder counts to angles; expects CTRE Magnetic Encoders  
-**R_Gyro:** extends Kauai Labs AHRS in order to make finding the difference between current and target angles easier  
-**R_Xbox:** extends XboxController and lays out constants to make working with Xbox One controllers more efficient  
-**V_Compass:** main logic for dealing with angles  
-**V_Fridge:** functions that simulate complicated controls like toggles  
-**V_PID:** obviously manages our PID loops  
-_this year_  
-**R_DriveTrain:** integrates 4 swerve modules using math from Chief Delphi  
-**R_SwerveModule:** integrates 2 Talons and contains some field oriented code  
+**Compass:** main logic for dealing with angles  
+**Drivetrain:** interface for creating autonomous-compatible drivetrains  
+**Fridge:** functions that simulate complicated controls like toggles  
+**Gimbal:** class for controlling camera gimbals  
+**Gyro:** extends Kauai Labs AHRS to simplify calls to the gyro  
+**PID:** manages PID loops  
+**Subsystem:** interface for creating autonomous-compatible mechanisms  
+**Xbox:** extends XboxController and lays out constants to make working with Xbox One controllers more efficient  
+_reusable.Autonomous_  
+**Events:** logic for controlling Subsystems autonomously  
+**Leash:** logic for autonomously following Paths with a Drivetrain  
+**Odometer:** abstract class for getting data from a field positioning system  
+**Path:** interface for creating Leash-compatible lines and curves  
+**P_Bezier:** an implementation of Path allowing for the use of cubic splines  
+**P_Curve:** an implementation of Path allowing for the use of mathematical expressions  
+**Strategy:** abstract class for integrating and following a set of Events and a Leash  
+_reusable.Phoenix_
+**Convert:** a complicated looking class that provides simple syntax for converting raw encoder counts to more useful units  
+**Encoder:** an enum that stores important facts about various encoder models  
+**Talon:** extends CTRE TalonSRX to simplify calls to motors, especially those with encoders  
+**Victor:** essentially the same as Talon  
   
-filename prefix conventions:  
-**R:** a class that codes something tangible, like a motor or Xbox controller  
-**V:** a class that embodies real abilities, but doesn't interact with hardware  
-In addition, please note that the "abstract" label on our classes just means that everything is static.  
+_this year_  
+**D_Swerve:** an implementation of Drivetrain for 4-module swerve
+**SwerveModule:** integrates 2 Talons, basically a backend for D_Swerve  
+_this year.Autonomous_  
+**Coach:** a class that helps decide which Strategy to use based on input from the SmartDashboard  
+**O_Encoder:** an implementation of Odometer for an encoder on a swerve wheel  
+**O_ZED:** an implementation of Odometer for visual odometery from the ZED  
+**Strategy2018:** extends Strategy with useful constants and game-specific functions  
+**S_DriveForward:** extends Strategy2018 (drives straight forward, drops cube if appropriate)  
+**S_DropInNearest:** extends Strategy2018 (drops a cube in the nearest appropriate location)  
+**S_PassLine:** extends Strategy2018 (just passes the auto line)  
+**S_Slither:** extends Strategy2018 (follows a sin wave)  
+  
 
 student team:  
 Hayden Shively  
@@ -27,4 +48,4 @@ Michael Pritchett
   
 QUESTIONS AND COMMENTS ARE WELCOME!  
   
-Special thanks to Mr. Ice, Mr. Schultz, Mr. Fultz, and Mr. Albertson!
+Special thanks to Mr. Ice, Mr. Shultz, and Mr. Fultz!
