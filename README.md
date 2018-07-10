@@ -13,6 +13,7 @@ _reusable_
 **PID:** manages PID loops  
 **Subsystem:** interface for creating autonomous-compatible mechanisms  
 **Xbox:** extends XboxController and lays out constants to make working with Xbox One controllers more efficient  
+  
 _reusable.Autonomous_  
 **Events:** logic for controlling Subsystems autonomously  
 **Leash:** logic for autonomously following Paths with a Drivetrain  
@@ -21,15 +22,18 @@ _reusable.Autonomous_
 **P_Bezier:** an implementation of Path allowing for the use of cubic splines  
 **P_Curve:** an implementation of Path allowing for the use of mathematical expressions  
 **Strategy:** abstract class for integrating and following a set of Events and a Leash  
+  
 _reusable.Phoenix_
 **Convert:** a complicated looking class that provides simple syntax for converting raw encoder counts to more useful units  
 **Encoder:** an enum that stores important facts about various encoder models  
 **Talon:** extends CTRE TalonSRX to simplify calls to motors, especially those with encoders  
 **Victor:** essentially the same as Talon  
   
+  
 _this year_  
-**D_Swerve:** an implementation of Drivetrain for 4-module swerve
+**D_Swerve:** an implementation of Drivetrain for 4-module swerve  
 **SwerveModule:** integrates 2 Talons, basically a backend for D_Swerve  
+  
 _this year.Autonomous_  
 **Coach:** a class that helps decide which Strategy to use based on input from the SmartDashboard  
 **O_Encoder:** an implementation of Odometer for an encoder on a swerve wheel  
