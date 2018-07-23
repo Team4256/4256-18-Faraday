@@ -7,16 +7,11 @@ public abstract class Odometer {
 	public abstract void init();
 	public abstract void completeLoopUpdate();
 	
-	public void setOrigin(final double x, final double y) {tareX = x;	tareY = y;}
+	public void setOrigin(final double x, final double y) {tareX += x;	tareY += y;}
 	
-	public double getX(final boolean markAsRead, final boolean raw) {
-		if (raw) return x.get(markAsRead);
-		else return x.get(markAsRead) - tareX;
-	}
-	public double getY(final boolean markAsRead, final boolean raw) {
-		if (raw) return y.get(markAsRead);
-		else return y.get(markAsRead) - tareY;
-	}
+	public double getX(final boolean markAsRead) {return x.get(markAsRead) - tareX;}
+	public double getY(final boolean markAsRead) {return y.get(markAsRead) - tareY;
+}
 	
 	public boolean newX() {return x.isNew();}
 	public boolean newY() {return y.isNew();}

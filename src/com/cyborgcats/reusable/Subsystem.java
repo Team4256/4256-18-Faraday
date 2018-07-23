@@ -1,7 +1,9 @@
 package com.cyborgcats.reusable;
 
-/* This interface is designed such that its implementations can be put into an array and easily passed around during autonomous.
- * Essentially it represents a way for our normally iterative code to become temporarily command based. */
+/**
+ * A set of common methods which can be implemented for many different mechanisms.<br>
+ * Having them all under one interface makes it easier to write reusable autonomous code.
+ */
 public interface Subsystem {
 	public void init();
 	public boolean perform(final String action, final double[] data);

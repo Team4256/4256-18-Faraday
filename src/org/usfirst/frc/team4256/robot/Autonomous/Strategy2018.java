@@ -21,7 +21,7 @@ public abstract class Strategy2018 extends Strategy {
 		super(odometer);
 		this.posI = posI;
 		odometer.completeLoopUpdate();
-		odometer.setOrigin(odometer.getX(false, true) - posI.x, odometer.getY(false, true) - Yi);
+		odometer.setOrigin(odometer.getX(false) - posI.x, odometer.getY(false) - Yi);
 		
 		if (gameData.length != 3) throw new IllegalStateException("Strategies only work with valid game data.");
 		switchTarget = gameData[0] == 'L' ? FieldPieceConfig.LEFT : FieldPieceConfig.RIGHT;//SWITCH
