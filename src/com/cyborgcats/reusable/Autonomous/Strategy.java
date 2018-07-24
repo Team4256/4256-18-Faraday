@@ -33,8 +33,8 @@ public abstract class Strategy {
 		//run path processing only if odometer values are new
   		if (odometer.newX() || odometer.newY()) {
   			//get most recent odometer values
-  			final double actualX = odometer.getX(true, false);
-  			final double actualY = odometer.getY(true, false);
+  			final double actualX = odometer.getX(true);
+  			final double actualY = odometer.getY(true);
 		
   			//ensure that the desired position stays a leash length away
   			leash.maintainLength(actualX, actualY);

@@ -160,8 +160,8 @@ public class Robot extends IterativeRobot {
 		faraday.getEntry("Angle C").setNumber(moduleC.rotationMotor().getCurrentAngle(true));
 		faraday.getEntry("Angle D").setNumber(moduleD.rotationMotor().getCurrentAngle(true));
 
-		faraday.getEntry("X").setNumber(odometer.getX(/*markAsRead*/false, false));
-		faraday.getEntry("Y").setNumber(odometer.getY(/*markAsRead*/false, false));
+		faraday.getEntry("X").setNumber(odometer.getX(/*markAsRead*/false));
+		faraday.getEntry("Y").setNumber(odometer.getY(/*markAsRead*/false));
 	}
 	
 	@Override
