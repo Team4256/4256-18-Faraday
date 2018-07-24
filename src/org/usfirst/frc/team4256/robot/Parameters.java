@@ -91,7 +91,7 @@ public final class Parameters {
 	public static final double SPIN_D = 4.25;
 	
 	//.1838 works well for a leash length of 3, doubling that works for length of 1.5
-	public static final double LEASH_P = 0.1838*2.0;
+	public static final double LEASH_P = 0.1838*2.0*2.0;
 	public static final double LEASH_I = 0.0;
 	public static final double LEASH_D = 1.2;
 }

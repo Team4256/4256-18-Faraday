@@ -44,6 +44,7 @@ public final class Coach {
 		//if no game data, DriveForward and DropInNearest cases fall into PassLine
 		case PassLine: return new S_PassLine(positionChooser.getSelected(), odometer);
 		case Slither: return new S_Slither(odometer);
+		case Mickey: return new S_Mickey(odometer);
 		
 		default: return new S_PassLine(positionChooser.getSelected(), odometer);
 		}
@@ -73,7 +74,8 @@ public final class Coach {
 		DriveForward("Open-Loop Forward"),
 		DropInNearest("Smart Forward"),
 		PassLine("No Elevator"),
-		Slither("Slither Drive");
+		Slither("Slither Drive"),
+		Mickey("Mickey Mouse");
 		
 		private final String readableName;
 		Strategies(final String readableName) {this.readableName = readableName;}
