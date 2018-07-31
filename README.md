@@ -43,6 +43,7 @@ _this year.Autonomous_
 **S_DropInNearest:** extends Strategy2018 (drops a cube in the nearest appropriate location)  
 **S_PassLine:** extends Strategy2018 (just passes the auto line)  
 **S_Slither:** extends Strategy2018 (follows a sin wave)  
+**S_Mickey:** extends Strategy2018 (draws Mickey Mouse)  
   
 
 student team:  
