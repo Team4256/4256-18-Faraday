@@ -103,7 +103,7 @@ public abstract class Strategy2018 extends Strategy {
 				if (wait) {
 					drive.setSpeed(0.0);
 					while (Math.abs(drive.face((double)desiredAngle, maxSpin)) > 10.0) {
-						Robot.gyroHeading = Robot.gyro.getCurrentAngle();
+						Robot.updateGyroHeading();
 						drive.completeLoopUpdate();
 					}
 				}else drive.face((double)desiredAngle, maxSpin);

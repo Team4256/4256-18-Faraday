@@ -42,7 +42,7 @@ public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final Xbox driver = new Xbox(0), gunner = new Xbox(1);
 	//{Robot Input}
-	public static final Gyro gyro = new Gyro(Parameters.Gyrometer_updateHz);
+	private static final Gyro gyro = new Gyro(Parameters.Gyrometer_updateHz);
 	public static double gyroHeading = 0.0;
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.PRESSURE_GAUGE);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.TX2_POWER_SENSOR);
@@ -139,9 +139,10 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit() {}
 	
+	public static void updateGyroHeading() {gyroHeading = gyro.getCurrentAngle();}
 	@Override
 	public void robotPeriodic() {
-		gyroHeading = gyro.getCurrentAngle();
+		updateGyroHeading();
 		faraday.getEntry("Gyro").setNumber(gyroHeading);
 		faraday.getEntry("Pressure").setNumber(pressureGauge.getAverageVoltage()*39.875);
 		faraday.getEntry("Clamp Open").setBoolean(clamp.isOpen());
