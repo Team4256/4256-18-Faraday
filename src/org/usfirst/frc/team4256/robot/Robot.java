@@ -42,7 +42,7 @@ public class Robot extends IterativeRobot {
 	//{Human Input}
 	private static final Xbox driver = new Xbox(0), gunner = new Xbox(1);
 	//{Robot Input}
-	private static final Gyro gyro = new Gyro(Parameters.Gyrometer_updateHz);
+	public static final Gyro gyro = new Gyro(Parameters.Gyrometer_updateHz);
 	public static double gyroHeading = 0.0;
 	private static final AnalogInput pressureGauge = new AnalogInput(Parameters.PRESSURE_GAUGE);
 	private static final DigitalInput tx2PowerSensor = new DigitalInput(Parameters.TX2_POWER_SENSOR);

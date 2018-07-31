@@ -5,6 +5,7 @@ import com.cyborgcats.reusable.Autonomous.Leash;
 import com.cyborgcats.reusable.Autonomous.Odometer;
 import com.cyborgcats.reusable.Autonomous.Strategy;
 
+import org.usfirst.frc.team4256.robot.Robot;
 import org.usfirst.frc.team4256.robot.Elevator.Elevator.Abilities;
 
 import com.cyborgcats.reusable.Autonomous.Events.Command;
@@ -101,7 +102,10 @@ public abstract class Strategy2018 extends Strategy {
 				
 				if (wait) {
 					drive.setSpeed(0.0);
-					while (Math.abs(drive.face((double)desiredAngle, maxSpin)) > 5.0) drive.completeLoopUpdate();
+					while (Math.abs(drive.face((double)desiredAngle, maxSpin)) > 10.0) {
+						Robot.gyroHeading = Robot.gyro.getCurrentAngle();
+						drive.completeLoopUpdate();
+					}
 				}else drive.face((double)desiredAngle, maxSpin);
 				
 				sys.get("Clamp").perform(clampAction, null);
