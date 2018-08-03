@@ -17,10 +17,11 @@ public final class PID {
 			PIDSystems.replace(key, new double[] {P, I, D, previousKerr, previousIerr});
 		}
 	}
+	
 	/**
-	 * This function wipes the i and d errors without messing up p, i, and d values.
-	 * Useful when beginning a new turn to a new angle.
-	**/
+	 * Wipes the i and d errors without messing up p, i, and d values.
+	 * @param key which PID to adjust
+	 */
 	public static void clear(final String key) {
 		if (PIDSystems.get(key) == null) {
 			PIDSystems.put(key, new double[] {0, 0, 0, 0, 0});
@@ -29,9 +30,13 @@ public final class PID {
 			PIDSystems.replace(key, new double[] {p, i, d, 0, 0});
 		}
 	}
+	
 	/**
-	 * This function calculates and returns the result of PID for the specified key with the specified error.
-	**/
+	 * Calculates PID output for the specified key and error
+	 * @param key which PID values to use
+	 * @param error difference between target and actual (position, angle, speed, etc)
+	 * @return PID output
+	 */
 	public static double get(final String key, final double error) {
 		if (PIDSystems.get(key) == null) {
 			return 0;
@@ -46,10 +51,16 @@ public final class PID {
 			return pOut + iOut + dOut;
 		}
 	}
+	
 	/**
-	 * This function calculates and returns the result of PID for the specified key with the specified error.
-	 * Also sets new p, i, and d values on the fly.
-	**/
+	 * Sets P, I, and D values on the fly, then calculates PID output based on the error
+	 * @param key which PID values to update and then use for calculations
+	 * @param error difference between target and actual (position, angle, speed, etc)
+	 * @param P new P value
+	 * @param I new I value
+	 * @param D new D value
+	 * @return PID output
+	 */
 	public static double get(final String key, final double error, final double P, final double I, final double D) {
 		set(key, P, I, D);
 		return get(key, error);

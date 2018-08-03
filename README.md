@@ -1,7 +1,7 @@
 # 4256-18-Faraday
 the Cyborg Cats' Java robot code for FRC Power Up 2018  
   
-The classes under com.cyborgcats.reusable were designed to work year after year with little to no modification, so they would likely work for other FRC teams using similar hardware. Thanks!  
+The classes under com.cyborgcats.reusable were designed to work year after year with little to no modification, so they would likely work for other FRC teams using similar hardware.  
   
 primary code outline:  
 _reusable_  

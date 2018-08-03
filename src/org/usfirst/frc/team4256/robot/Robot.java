@@ -209,7 +209,7 @@ public class Robot extends IterativeRobot {
 				 
 				 if (driver.getAxisPress(Xbox.AXIS_RT, 0.5)) clamp.slurp();//CLAMP SLURP AND SPIT
 			else if (driver.getAxisPress(Xbox.AXIS_LT, 0.2)) clamp.spit(driver.getRawAxis(Xbox.AXIS_LT));
-			else 											   clamp.stop();
+			else 											 clamp.stop();
 			
 				 if (driver.getRawButton(Xbox.BUTTON_LB)) clamp.open();//CLAMP OPEN AND CLOSE OVERRIDE
 			else if (driver.getRawButton(Xbox.BUTTON_RB)) clamp.close();

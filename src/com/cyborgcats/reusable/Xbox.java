@@ -3,36 +3,38 @@ package com.cyborgcats.reusable;//COMPLETE 2017
 import edu.wpi.first.wpilibj.XboxController;
 
 public class Xbox extends XboxController {
-	public static final int AXIS_LEFT_X = 0;
-	public static final int AXIS_LEFT_Y = 1;
-	public static final int AXIS_LT = 2;
-	public static final int AXIS_RT = 3;
-	public static final int AXIS_RIGHT_X = 4;
-	public static final int AXIS_RIGHT_Y = 5;
-
-	public static final int[] STICK_LEFT = new int[] {AXIS_LEFT_X, AXIS_LEFT_Y};
-	public static final int[] STICK_RIGHT = new int[] {AXIS_RIGHT_X, AXIS_RIGHT_Y};
-
-	public static final int BUTTON_A = 1;
-	public static final int BUTTON_B = 2;
-	public static final int BUTTON_X = 3;
-	public static final int BUTTON_Y = 4;
-	public static final int BUTTON_LB = 5;
-	public static final int BUTTON_RB = 6;
-	public static final int BUTTON_BACK = 7;
-	public static final int BUTTON_START = 8;
-	public static final int BUTTON_STICK_LEFT = 9;
-	public static final int BUTTON_STICK_RIGHT = 10;
-
-	public static final int POV_NORTH = 0;
-	public static final int POV_NORTH_EAST = 45;
-	public static final int POV_EAST = 90;
-	public static final int POV_SOUTH_EAST = 135;
-	public static final int POV_SOUTH = 180;
-	public static final int POV_SOUTH_WEST = 225;
-	public static final int POV_WEST = 270;
-	public static final int POV_NORTH_WEST = 315;
+	public static final int
+	AXIS_LEFT_X = 0,
+	AXIS_LEFT_Y = 1,
+	AXIS_LT = 2,
+	AXIS_RT = 3,
+	AXIS_RIGHT_X = 4,
+	AXIS_RIGHT_Y = 5,
 	
+	BUTTON_A = 1,
+	BUTTON_B = 2,
+	BUTTON_X = 3,
+	BUTTON_Y = 4,
+	BUTTON_LB = 5,
+	BUTTON_RB = 6,
+	BUTTON_BACK = 7,
+	BUTTON_START = 8,
+	BUTTON_STICK_LEFT = 9,
+	BUTTON_STICK_RIGHT = 10,
+	
+	POV_NORTH = 0,
+	POV_NORTH_EAST = 45,
+	POV_EAST = 90,
+	POV_SOUTH_EAST = 135,
+	POV_SOUTH = 180,
+	POV_SOUTH_WEST = 225,
+	POV_WEST = 270,
+	POV_NORTH_WEST = 315;
+
+	public static final int[]
+	STICK_LEFT = new int[] {AXIS_LEFT_X, AXIS_LEFT_Y},
+	STICK_RIGHT = new int[] {AXIS_RIGHT_X, AXIS_RIGHT_Y};
+
 	public Xbox(final int port) {
 		super(port);
 	}
@@ -40,15 +42,9 @@ public class Xbox extends XboxController {
 	private double[] previousAxisValues = new double[6];
 	private Long[] buttonTimes = new Long[10];
 	{
-		for (int i = 0; i  < deadbands.length; i++) {
-			deadbands[i] = 0.2;
-		}
-		for (int i = 0; i < previousAxisValues.length; i++) {
-			previousAxisValues[i] = 0.0;
-		}
-		for (int i = 0; i < buttonTimes.length; i++) {
-			buttonTimes[i] = System.currentTimeMillis();
-		}
+		for (int i = 0; i  < deadbands.length; i++) deadbands[i] = 0.2;
+		for (int i = 0; i < previousAxisValues.length; i++) previousAxisValues[i] = 0.0;
+		for (int i = 0; i < buttonTimes.length; i++) buttonTimes[i] = System.currentTimeMillis();
 	}
 	
 	
